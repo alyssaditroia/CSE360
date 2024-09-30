@@ -1,5 +1,4 @@
 package controllers;
-import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -7,26 +6,29 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
+/**
+ * AdminHomePageController
+ * Receives user input
+ * Updates model(s)
+ * Selects and displays the view
+ */
 public class AdminHomePageController extends PageController {
+	public AdminHomePageController() {
+        super(null);
+    }
+	// Constructor
+    public AdminHomePageController(Stage primaryStage) {
+        super(primaryStage);
+    }
+	// Button for logout functionality
 	@FXML
     private Button logoutButton;
-
+	
+	// Method for logout functionality
     @FXML
     public void logout() {
         System.out.println("Admin logged out.");
-        navigateToLoginPage();
-    }
-
-    private void navigateToLoginPage() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/LoginPageView.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        navigateTo("/views/LoginPageView.fxml");
     }
 
 	@Override

@@ -3,10 +3,19 @@ package controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.stage.Stage;
 import models.User;
 
 public class SelectRolePageController extends PageController{
-	    @FXML
+	
+	public SelectRolePageController() {
+		super(null);
+	}
+	    public SelectRolePageController(Stage primaryStage) {
+		super(primaryStage);
+	}
+
+		@FXML
 	    private ComboBox<String> roleComboBox; // ComboBox for selecting a role
 
 	    @FXML
@@ -17,9 +26,6 @@ public class SelectRolePageController extends PageController{
 
 	    private User currentUser; // handling users
 
-	    public SelectRolePageController() {
-	        
-	    }
 
 	    // Method to initialize the view components
 	    @FXML

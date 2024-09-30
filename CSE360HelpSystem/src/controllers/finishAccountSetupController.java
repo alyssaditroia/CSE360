@@ -22,7 +22,16 @@ import models.User;
 import models.TextValidation;
 
 public class finishAccountSetupController extends PageController {
-
+	
+	public finishAccountSetupController() {
+		super(null);
+		// TODO Auto-generated constructor stub
+	}
+	//Constructor
+	public finishAccountSetupController(Stage primaryStage) {
+		super(primaryStage);
+		// TODO Auto-generated constructor stub
+	}
     @FXML
     private TextField emailField; // TextField for email
     @FXML
@@ -38,18 +47,7 @@ public class finishAccountSetupController extends PageController {
 
     @FXML
     public void redirectToSelectRolePageView() {
-        // Ensure that the button is already part of the scene
-        Stage stage = (Stage) finishSetupButton.getScene().getWindow(); // Get the current stage
-        try {
-            // Load the new page and set it on the stage
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SelectRolePageView.fxml"));
-            Parent SelectRolePageView = loader.load();
-            Scene SelectRolePageScene = new Scene(SelectRolePageView);
-            stage.setScene(SelectRolePageScene);
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Failed to load select Role page.");
-        }
+        navigateTo("/views/SelectRolePageView.fxml");
     }
     private User user; // The user object
 

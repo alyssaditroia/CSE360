@@ -10,8 +10,17 @@ import javafx.stage.Stage;
 
 public class InstructorHomePageController extends PageController {
 
+	public InstructorHomePageController() {
+		super(null);
+		// TODO Auto-generated constructor stub
+	}
 
-    @FXML
+    public InstructorHomePageController(Stage primaryStage) {
+		super(primaryStage);
+		// TODO Auto-generated constructor stub
+	}
+
+	@FXML
     private Button logoutButton;
 
     @FXML
@@ -21,15 +30,7 @@ public class InstructorHomePageController extends PageController {
     }
 
     private void navigateToLoginPage() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/LoginPageView.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        navigateTo("/views/LoginPageView.fxml");
     }
 
 	@Override

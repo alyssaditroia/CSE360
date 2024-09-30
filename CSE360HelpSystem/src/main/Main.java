@@ -1,32 +1,27 @@
 package main;
+
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
+import controllers.PageController;
 
-public class Main extends Application{
+public class Main extends Application {
 
-	    @Override
-	    public void start(Stage primaryStage) throws Exception {
-	        primaryStage.setTitle("Your Application Title");
-	        showLoginPage(primaryStage);
-	        primaryStage.show();
-	    }
+    private PageController pageController;
 
-	    public void showLoginPage(Stage stage) throws Exception {
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/LoginPageView.fxml"));
-	        Scene scene = new Scene(loader.load());
-	        stage.setScene(scene);
-	    }
+    @Override
+    public void start(Stage primaryStage) {
+        this.pageController = new PageController(primaryStage); // Initialize with the main stage
+        primaryStage.setTitle("CSE360 Help System");
+        showLoginPage();
+        primaryStage.show();
+    }
 
-	    public void showSetupAccountPage(Stage stage) throws Exception {
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SetupAccountPageView.fxml"));
-	        Scene scene = new Scene(loader.load());
-	        stage.setScene(scene);
-	    }
+    public void showLoginPage() {
+        pageController.navigateTo("/views/LoginPageView.fxml"); // Reusing PageController's method
+    }
 
-	    public static void main(String[] args) {
-	        launch(args);
-	    }
-	}
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
 

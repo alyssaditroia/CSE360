@@ -17,12 +17,18 @@ public class TextValidation {
     }
 
     // Example TextValidation method for validating username and password
-    public static boolean textValidation(String username, String password) {
-        return validateUsername(username) && validatePassword(password);
+    public boolean textValidation(String username, String password) {
+        try {
+			return validateUsername(username) && validatePassword(password);
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		return false;
     }
 
     // Validate username (modify conditions as needed)
-    private static boolean validateUsername(String username) {
+    private boolean validateUsername(String username) {
         // Example conditions: Username must be between 3 and 20 characters and can include letters, numbers, and underscores
         if (username.length() < 3 || username.length() > 20) {
             return false;
@@ -31,7 +37,7 @@ public class TextValidation {
     }
 
     // Validate password
-    public static boolean validatePassword(String password) {
+    public boolean validatePassword(String password) {
         // Example validation logic: Minimum length 8 characters, at least one uppercase letter, one lowercase letter, one digit, and one special character
         if (password.length() < 8) {
             return false;

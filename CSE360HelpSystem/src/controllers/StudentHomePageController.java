@@ -1,13 +1,21 @@
 package controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
 /**
  * Student Home Page Controller Class
  */
 public class StudentHomePageController extends PageController {
+	 public StudentHomePageController() {
+			super(null);
+		}
 
-    @FXML
+    public StudentHomePageController(Stage primaryStage) {
+		super(primaryStage);
+	}
+
+	@FXML
     private Button logoutButton;
 
     @FXML

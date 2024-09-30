@@ -9,12 +9,20 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import models.User;
 import models.TextValidation;
 
 public class SetupAccountPageController extends PageController {
+	public SetupAccountPageController() {
+		super(null);
+	}
 
-    @FXML
+    public SetupAccountPageController(Stage primaryStage) {
+		super(primaryStage);
+	}
+
+	@FXML
     private TextField usernameField;
     @FXML
     private PasswordField passwordField;
@@ -85,17 +93,7 @@ public class SetupAccountPageController extends PageController {
     }
 
     private void redirectToLogin() throws IOException {
-        // Logic to navigate to the login page
-        // Example: Load the login FXML and set it in the scene
-        // FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginPage.fxml"));
-        // Parent root = loader.load();
-        // Scene scene = new Scene(root);
-        // Stage stage = (Stage) setupButton.getScene().getWindow();
-        // stage.setScene(scene);
-        // stage.show();
-        
-        // After logging in, redirect to finishAccountSetup page
-        // This would be handled in the Login controller or after login validation
+       navigateTo("/views/LoginPageView.fxml");
     }
 
     @Override

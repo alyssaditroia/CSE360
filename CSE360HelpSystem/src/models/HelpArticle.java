@@ -3,28 +3,19 @@ package models;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import enums.SkillRating;
-
+ 
+/**
+ * 
+ */
 public class HelpArticle {
     private String articleID;
     private String title;
     private String content;
-    private List<String> tags;
-    private SkillRating targetUserLevel; // Assume UserLevel is another enum or class
     private User createdBy;
     private LocalDateTime createdDate;
     private LocalDateTime lastUpdated;
 
-    public HelpArticle(String articleID, String title, String content, List<String> tags,
-                       SkillRating targetUserLevel, User createdBy) {
-        this.setArticleID(articleID);
-        this.setTitle(title);
-        this.setContent(content);
-        this.setTags(tags);
-        this.setTargetUserLevel(targetUserLevel);
-        this.setCreatedBy(createdBy);
-        this.setCreatedDate(LocalDateTime.now());
-        this.setLastUpdated(LocalDateTime.now());
+    public HelpArticle() {
     }
 
 	/**
@@ -67,34 +58,6 @@ public class HelpArticle {
 	 */
 	public void setContent(String content) {
 		this.content = content;
-	}
-
-	/**
-	 * @return the targetUserLevel
-	 */
-	public SkillRating getTargetUserLevel() {
-		return targetUserLevel;
-	}
-
-	/**
-	 * @param targetUserLevel the targetUserLevel to set
-	 */
-	public void setTargetUserLevel(SkillRating targetUserLevel) {
-		this.targetUserLevel = targetUserLevel;
-	}
-
-	/**
-	 * @return the tags
-	 */
-	public List<String> getTags() {
-		return tags;
-	}
-
-	/**
-	 * @param tags the tags to set
-	 */
-	public void setTags(List<String> tags) {
-		this.tags = tags;
 	}
 
 	/**
