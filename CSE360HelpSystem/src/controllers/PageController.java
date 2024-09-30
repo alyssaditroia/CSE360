@@ -2,6 +2,7 @@ package controllers;
 
 /****
  * Focuses on UI logic, event handling, and communicating between the view and model.
+ * TBH i am not sure if this is doing anything anymore but I am too scared to delete lol
  *
  */
 import javafx.fxml.FXMLLoader;
