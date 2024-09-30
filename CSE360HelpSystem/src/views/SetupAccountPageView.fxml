@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?> <!-- Import other controls as needed -->
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SetupAccountPageController" spacing="10" alignment="CENTER">
+    <TextField fx:id="usernameField" promptText="Username" />
+    <PasswordField fx:id="passwordField" promptText="Password" />
+    <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" />
+    <Button fx:id="setupButton" text="Setup Account" onAction="#handleSetupButtonAction" />
+    <Label fx:id="statusLabel" />
+</VBox>

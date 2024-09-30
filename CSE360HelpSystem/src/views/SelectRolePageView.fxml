@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SelectRolePageController">
+    <Label text="Select Your Role" />
+    
+    <ComboBox fx:id="roleComboBox" promptText="Choose your role" />
+    
+    <Button fx:id="selectRoleButton" text="Select Role" onAction="#selectRole" />
+    
+    <Button fx:id="backButton" text="Back" onAction="#goBack" />
+</VBox>

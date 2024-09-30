@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginPageController">
+    <TextField fx:id="usernameField" promptText="Username"/>
+    <PasswordField fx:id="passwordField" promptText="Password"/>
+    <Button fx:id="loginButton" text="Login" onAction="#handleLogin"/>
+    <TextField fx:id="OTPField" promptText="One Time Password"/>
+    <Button fx:id="setupAccountButton" text="Setup Account" onAction="#handleOtpVerification"/>
+</VBox>
