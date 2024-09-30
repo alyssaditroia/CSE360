@@ -31,11 +31,6 @@ public class AdminHomePageController extends PageController {
         navigateTo("/views/LoginPageView.fxml");
     }
 
-	@Override
-	public void handlePageLogic() {
-		// TODO Auto-generated method stub
-
-	}
 
 
 }

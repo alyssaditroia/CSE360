@@ -1,9 +1,6 @@
 /**
  * 
  */
-/**
- * 
- */
 package controllers;
 
 import java.io.IOException;
@@ -25,12 +22,10 @@ public class finishAccountSetupController extends PageController {
 	
 	public finishAccountSetupController() {
 		super(null);
-		// TODO Auto-generated constructor stub
 	}
 	//Constructor
 	public finishAccountSetupController(Stage primaryStage) {
 		super(primaryStage);
-		// TODO Auto-generated constructor stub
 	}
     @FXML
     private TextField emailField; // TextField for email
@@ -51,10 +46,6 @@ public class finishAccountSetupController extends PageController {
     }
     private User user; // The user object
 
-    @Override
-    public void handlePageLogic() {
-        // Any additional logic that needs to be handled on page load
-    }
 
     // Method to set the user for this setup
     public void setUser(User user) {
@@ -72,7 +63,7 @@ public class finishAccountSetupController extends PageController {
 
         // Validate inputs using the TextValidation Class
         TextValidation validator = new TextValidation();
-        if (!validator.validateEmail(email)) {
+        if (validator.validateEmail(email) != "" ) {
             errorLabel.setText("Invalid email format.");
             return;
         }

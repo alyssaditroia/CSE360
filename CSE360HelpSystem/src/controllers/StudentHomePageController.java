@@ -31,9 +31,4 @@ public class StudentHomePageController extends PageController {
         navigateTo("/views/LoginPageView.fxml");
     }
 
-	@Override
-	public void handlePageLogic() {
-		// TODO Auto-generated method stub
-
-	}
 }
