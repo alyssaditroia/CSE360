@@ -2,94 +2,137 @@ package models;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-/*****
- * Focuses on application/business logic and data handling.
- * Doesn't directly deal with the UI.
- * It processes data and provides results that can be used by the controller to update the UI.
- */
+
 public class TextValidation {
-    // Method to validate email format
-    public boolean validateEmail(String email) {
+    public static String passwordErrorMessage = "";
+    public static String passwordInput = "";
+    public static int passwordIndexofError = -1;
+
+    private static void displayInputState(String inputLine, int currentCharNdx, char currentChar) {
+        System.out.println(inputLine);
+        System.out.println(inputLine.substring(0, currentCharNdx) + "?");
+        System.out.println("The password size: " + inputLine.length() + "  |  The currentCharNdx: " +
+                currentCharNdx + "  |  The currentChar: \"" + currentChar + "\"");
+    }
+
+    public static String evaluatePassword(String input) {
+        passwordErrorMessage = "";
+        passwordIndexofError = 0;
+
+        if (input.length() <= 0) return "*** Error *** The password is empty!";
+
+        String inputLine = input;
+        int currentCharNdx = 0;
+        char currentChar;
+
+        boolean foundUpperCase = false;
+        boolean foundLowerCase = false;
+        boolean foundNumericDigit = false;
+        boolean foundSpecialChar = false;
+        boolean foundLongEnough = false;
+
+        while (currentCharNdx < inputLine.length()) {
+            currentChar = inputLine.charAt(currentCharNdx);
+            displayInputState(inputLine, currentCharNdx, currentChar);
+
+            if (Character.isUpperCase(currentChar)) {
+                foundUpperCase = true;
+            } else if (Character.isLowerCase(currentChar)) {
+                foundLowerCase = true;
+            } else if (Character.isDigit(currentChar)) {
+                foundNumericDigit = true;
+            } else if ("~`!@#$%^&*()_-+={}[]|\\:;\"'<>,.?/".indexOf(currentChar) >= 0) {
+                foundSpecialChar = true;
+            } else {
+                passwordIndexofError = currentCharNdx;
+                return "*** Error *** An invalid character has been found!";
+            }
+
+            if (currentCharNdx >= 7) {
+                foundLongEnough = true;
+            }
+
+            currentCharNdx++;
+        }
+
+        StringBuilder errMessage = new StringBuilder();
+        if (!foundUpperCase) errMessage.append("Upper case; ");
+        if (!foundLowerCase) errMessage.append("Lower case; ");
+        if (!foundNumericDigit) errMessage.append("Numeric digits; ");
+        if (!foundSpecialChar) errMessage.append("Special character; ");
+        if (!foundLongEnough) errMessage.append("Long Enough; ");
+
+        if (errMessage.length() > 0) {
+            passwordIndexofError = currentCharNdx;
+            return errMessage + " conditions were not satisfied.";
+        }
+
+        return ""; // All conditions satisfied
+    }
+
+    public static String validateEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
         Pattern pattern = Pattern.compile(emailRegex);
         Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
+        if (!matcher.matches()) {
+            return "*** Error *** Invalid email format!";
+        }
+        return ""; // Email is valid
     }
 
-    // Example TextValidation method for validating username and password
-    public boolean textValidation(String username, String password) {
-        try {
-			return validateUsername(username) && validatePassword(password);
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-		}
-		return false;
-    }
-
-    // Validate username (modify conditions as needed)
-    private boolean validateUsername(String username) {
-        // Example conditions: Username must be between 3 and 20 characters and can include letters, numbers, and underscores
+    public static String validateUsername(String username) {
         if (username.length() < 3 || username.length() > 20) {
-            return false;
+            return "*** Error *** Username must be between 3 and 20 characters.";
         }
-        return username.matches("^[a-zA-Z0-9_]+$");
+        if (!username.matches("^[a-zA-Z0-9_]+$")) {
+            return "*** Error *** Username can only contain letters, digits, and underscores.";
+        }
+        return ""; // Username is valid
     }
 
-    // Validate password
-    public boolean validatePassword(String password) {
-        // Example validation logic: Minimum length 8 characters, at least one uppercase letter, one lowercase letter, one digit, and one special character
-        if (password.length() < 8) {
-            return false;
+    public static String validatePassword(String password) {
+        String validationResult = evaluatePassword(password);
+        if (!validationResult.isEmpty()) {
+            return validationResult; // Return the validation error message
         }
-        if (!password.matches(".*[A-Z].*")) {
-            return false; // At least one uppercase letter
-        }
-        if (!password.matches(".*[a-z].*")) {
-            return false; // At least one lowercase letter
-        }
-        if (!password.matches(".*\\d.*")) {
-            return false; // At least one digit
-        }
-        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
-            return false; // At least one special character
-        }
-        return true; // If all conditions are met
+        return ""; // Password is valid
     }
-    private boolean isPasswordValid(char[] password) {
-        String passwordStr = new String(password); // Convert char[] to String
 
-        // Password must be at least 8 characters long and include:
-        // - At least one uppercase letter
-        // - At least one lowercase letter
-        // - At least one digit
-        // - At least one special character
-        if (passwordStr.length() < 8 ||
-            !passwordStr.matches(".*[A-Z].*") ||
-            !passwordStr.matches(".*[a-z].*") ||
-            !passwordStr.matches(".*\\d.*") ||
-            !passwordStr.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
-            return false;
+    public static String validateSetupFields(String username, String password, String confirmPassword) {
+        String usernameError = validateUsername(username);
+        if (!usernameError.isEmpty()) {
+            return usernameError; // Username validation failed
         }
 
-        return true; // Password meets all criteria
+        String passwordError = validatePassword(password);
+        if (!passwordError.isEmpty()) {
+            return passwordError; // Password validation failed
+        }
+
+        if (!password.equals(confirmPassword)) {
+            return "*** Error *** Passwords do not match!";
+        }
+
+        return ""; // All validations passed
+    }
+
+    public static String textValidation(String username, char[] password) {
+        String usernameError = validateUsername(username);
+        if (!usernameError.isEmpty()) {
+            return usernameError; // Username is invalid
+        }
+
+        String passwordError = validatePassword(new String(password));
+        if (!passwordError.isEmpty()) {
+            return passwordError; // Password is invalid
+        }
+
+        return ""; // Both username and password are valid
     }
 
     public void displayErrorMessages() {
         // Implement any UI logic for displaying error messages, if needed
     }
-
-	public boolean textValidation(String username, char[] password) {
-		// Validate username
-	    if (!validateUsername(username)) {
-	        return false; // Username is invalid
-	    }
-
-	    // Validate password
-	    if (!isPasswordValid(password)) {
-	        return false; // Password is invalid
-	    }
-
-	    return true; // Both username and password are valid
-	}
 }
+
+

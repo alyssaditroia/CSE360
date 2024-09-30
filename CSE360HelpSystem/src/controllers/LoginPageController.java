@@ -2,6 +2,7 @@ package controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -9,7 +10,7 @@ import models.OTP;
 import models.TextValidation;
 
 public class LoginPageController extends PageController {
-	
+    
     // No-argument constructor required by FXML
     public LoginPageController() {
         super(null); // Pass null or a default stage if needed
@@ -36,6 +37,9 @@ public class LoginPageController extends PageController {
     @FXML
     private Button setupAccountButton; // Button to navigate to account setup
 
+    @FXML
+    private Label errorLabel; // Label to display error messages
+
     // Model classes for validation
     TextValidation validator = new TextValidation();
     OTP otp = new OTP();
@@ -43,12 +47,13 @@ public class LoginPageController extends PageController {
     // Method to handle login action
     @FXML
     public void handleLogin() {
+        errorLabel.setText(""); // Clear previous error messages
         String username = usernameField.getText();
         char[] password = passwordField.getText().toCharArray();
         String oTP = OTPField.getText();
 
         // Validate credentials using the TextValidation model
-        if (validator.textValidation(username, password)) {
+        if (validator.textValidation(username, password) == "") {
             // If login is successful, navigate to Select Role Page
             redirectToSelectRolePageView();
         } else if (otp.validateOTP(oTP)) {
@@ -61,6 +66,7 @@ public class LoginPageController extends PageController {
 
     // Method to handle OTP verification
     public void handleOtpVerification() {
+        errorLabel.setText(""); // Clear previous error messages
         String otpInput = OTPField.getText(); // Get OTP from the field
 
         if (otp.validateOTP(otpInput)) {
@@ -92,7 +98,7 @@ public class LoginPageController extends PageController {
     }
 
     public void showError(String message) {
-        System.out.println("Error: " + message); // You can replace this with an actual UI alert
+        errorLabel.setText(message); // Set the error message in the label
     }
 }
 

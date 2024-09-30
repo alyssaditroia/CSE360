@@ -2,10 +2,12 @@
 
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.*?> <!-- Import other controls as needed -->
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SetupAccountPageController" spacing="10" alignment="CENTER">
-    <TextField fx:id="usernameField" promptText="Username" />
-    <PasswordField fx:id="passwordField" promptText="Password" />
-    <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" />
-    <Button fx:id="setupButton" text="Setup Account" onAction="#handleSetupButtonAction" />
-    <Label fx:id="statusLabel" />
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SetupAccountPageController" spacing="10" alignment="CENTER"
+     minWidth="400" minHeight="300" prefWidth="600" prefHeight="400">
+    <TextField fx:id="usernameField" promptText="Username" prefWidth="300" />
+    <PasswordField fx:id="passwordField" promptText="Password" prefWidth="300" />
+    <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" prefWidth="300" />
+    <Button fx:id="setupButton" text="Setup Account" onAction="#handleSetupButtonAction" prefWidth="150" />
+    <Label fx:id="statusLabel" style="-fx-text-fill: red;" /> <!-- Default style for errors -->
 </VBox>
+

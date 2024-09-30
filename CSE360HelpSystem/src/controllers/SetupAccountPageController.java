@@ -2,8 +2,10 @@ package controllers;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 
-import database.database; // Ensure your Database class is properly named (uppercase D)
+import database.database;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,91 +16,80 @@ import models.User;
 import models.TextValidation;
 
 public class SetupAccountPageController extends PageController {
-	public SetupAccountPageController() {
-		super(null);
-	}
+    private database db;
+    private TextValidation validator;
+    
+ // Constructor with dependency injection for Stage
+    public SetupAccountPageController() {
+        super(null);
+    }
 
+    // Constructor with dependency injection for Stage
     public SetupAccountPageController(Stage primaryStage) {
-		super(primaryStage);
-	}
+        super(primaryStage);
+        db = new database(); // Initialize the database here
+        validator = new TextValidation(); // Initialize the TextValidation object
+    }
 
-	@FXML
+    @FXML
     private TextField usernameField;
+
     @FXML
     private PasswordField passwordField;
+
     @FXML
     private PasswordField confirmPasswordField;
+
     @FXML
     private Button setupButton;
+
     @FXML
     private Label statusLabel;
 
-    private database database = new database(); // Ensure this is properly defined
-    TextValidation validator = new TextValidation();
-
     @FXML
-    private void handleSetupButtonAction() throws SQLException {
-        String username = usernameField.getText();
+    private void handleSetupButtonAction() {
+        // Clear previous status messages
+        statusLabel.setText("");
+
+        // Trim whitespace from username and get password values
+        String username = usernameField.getText().trim();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
         // Validate the username and password using model's TextValidation
-        if (areFieldsValid(username, password, confirmPassword)) {
+        String validationMessage = validator.validateSetupFields(username, password, confirmPassword);
+        if (validationMessage.isEmpty()) {
             // Create a new user object
-            User newUser = new User(username, password.toCharArray()); // Use the relevant constructor
-            // Set up the account using the model
-            if (validator.textValidation(username, password)) {
-                // Add the user with a default role (modify as necessary)
-				newUser.setAdmin(false);
-				newUser.setStudent(true); // Example role setting
-				newUser.setInstructor(false);
+            User newUser = new User(username, password.toCharArray()); // Ensure this constructor is correct
 
-				// Save the user using the database method
-				database.addUser(newUser);
-				statusLabel.setText("Account setup successful! Redirecting to login...");
-				statusLabel.setStyle("-fx-text-fill: green;"); // Example success feedback
+            // Set user roles
+            newUser.setAdmin(false);
+            newUser.setStudent(true);
+            newUser.setInstructor(false);
 
-				// Redirect to login page (make sure to define this logic)
-				try {
-					redirectToLogin();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            } else {
-                statusLabel.setText("Invalid input data.");
-                statusLabel.setStyle("-fx-text-fill: red;");
-            }
+            // Save the user using the database method commenting out for simplicity
+            //db.addUser(newUser);
+            
+            // Show success message
+            statusLabel.setText("Account setup successful! Redirecting to login...");
+            statusLabel.setStyle("-fx-text-fill: green;"); // Example success feedback
+
+            // Create a PauseTransition for 2 seconds
+            PauseTransition pause = new PauseTransition(Duration.seconds(2));
+            pause.setOnFinished(event -> {
+                // Redirect to login page after 2 seconds
+                redirectToLogin();
+            });
+            pause.play(); // Start the pause
+        } else {
+            // Display the validation error message in the GUI
+            statusLabel.setText(validationMessage);
+            statusLabel.setStyle("-fx-text-fill: red;");
         }
     }
 
-    private boolean areFieldsValid(String username, String password, String confirmPassword) {
-        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            statusLabel.setText("Username and password fields are required.");
-            return false;
-        }
-
-        // Validate password using model's TextValidation method
-        if (!validator.validatePassword(password)) {
-            statusLabel.setText("Password does not meet the requirements.");
-            return false;
-        }
-
-        if (!password.equals(confirmPassword)) {
-            statusLabel.setText("Passwords do not match.");
-            return false;
-        }
-
-        return true;
-    }
-
-    private void redirectToLogin() throws IOException {
-       navigateTo("/views/LoginPageView.fxml");
-    }
-
-    @Override
-    public void handlePageLogic() {
-        // Logic for handling page-specific actions, if needed
+    private void redirectToLogin() {
+        navigateTo("/views/LoginPageView.fxml");
     }
 }
 

@@ -3,10 +3,15 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginPageController">
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginPageController" spacing="10" alignment="CENTER"
+      minWidth="400" minHeight="300" prefWidth="600" prefHeight="400">
     <TextField fx:id="usernameField" promptText="Username"/>
     <PasswordField fx:id="passwordField" promptText="Password"/>
-    <Button fx:id="loginButton" text="Login" onAction="#handleLogin"/>
     <TextField fx:id="OTPField" promptText="One Time Password"/>
+    <Button fx:id="loginButton" text="Login" onAction="#handleLogin"/>
     <Button fx:id="setupAccountButton" text="Setup Account" onAction="#handleOtpVerification"/>
+    
+    <!-- Label for displaying error messages -->
+    <Label fx:id="errorLabel" style="-fx-text-fill: red;"/>
 </VBox>
+
