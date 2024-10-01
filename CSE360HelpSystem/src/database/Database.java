@@ -11,8 +11,8 @@ public class Database {
     static final String DB_URL = "jdbc:h2:~/firstDatabase";
 
     // Database credentials
-    static final String USER = "sa";
-    static final String PASS = "";
+    static final String USER = "admin";
+    static final String PASS = "Password1!";
 
     private Connection connection = null;
     private Statement statement = null;
@@ -49,29 +49,32 @@ public class Database {
                 + "otp_expiration TIMESTAMP)";
         statement.execute(userTable);
     }
+	// Check if the database is empty
+	public boolean isDatabaseEmpty() throws SQLException {
+		String query = "SELECT COUNT(*) AS count FROM cse360users";
+		ResultSet resultSet = statement.executeQuery(query);
+		if (resultSet.next()) {
+			return resultSet.getInt("count") == 0;
+		}
+		return true;
+	}
     
-    private void noUsers(String username, String password) throws SQLException {
-        // Check if there are any users in the table
-        String countQuery = "SELECT COUNT(*) FROM cse360users";
-        try (PreparedStatement countStmt = connection.prepareStatement(countQuery);
-             ResultSet rs = countStmt.executeQuery()) {
-            if (rs.next() && rs.getInt(1) == 0) {
-                // No users exist, set the first user as admin
-                String insertAdminUser = "INSERT INTO cse360users (username, password, isAdmin) VALUES (?, ?, ?)";
-                try (PreparedStatement insertStmt = connection.prepareStatement(insertAdminUser)) {
-                    insertStmt.setString(1, username);
-                    insertStmt.setString(2, password); // Make sure to hash this password in production
-                    insertStmt.setBoolean(3, true); // First user is admin
-                    insertStmt.executeUpdate();
-                    System.out.println("First user created and assigned as admin.");
-                }
-            } else {
-                // If users already exist, you might handle it differently
-                System.out.println("Users already exist in the database.");
-            }
+    public void setupAdministrator(String username, String password, boolean isAdmin) throws SQLException {
+    	if (connection == null || connection.isClosed()) {
+            connectToDatabase(); // Ensure connection is established
         }
-    }
+		String insertUser = "INSERT INTO cse360users (username, password, isAdmin) VALUES (?, ?, ?)";
+		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
+			pstmt.setString(1, username);
+			pstmt.setString(2, password);
+			pstmt.setBoolean(3, isAdmin);
+			pstmt.executeUpdate();
+		}
+	}
     public boolean validateCredentials(String username, String password) throws SQLException {
+    	if (connection == null || connection.isClosed()) {
+            connectToDatabase(); // Ensure connection is established
+        }
         String query = "SELECT password, otp, otp_expiration FROM cse360users WHERE username = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, username);
@@ -161,6 +164,9 @@ public class Database {
 
  // Verify the OTP
     public boolean verifyOTP(String username, String otp) throws SQLException {
+    	if (connection == null || connection.isClosed()) {
+            connectToDatabase(); // Ensure connection is established
+        }
         String query = "SELECT otp, otp_expiration FROM cse360users WHERE username = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, username);
@@ -294,7 +300,7 @@ public class Database {
         }
     }
 
-	public boolean getFirstName(String username) {
+	public String getFirstName(String username) {
 	    // SQL query to retrieve the firstName for the given username
 	    String query = "SELECT firstName FROM cse360users WHERE username = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -302,7 +308,7 @@ public class Database {
 	        try (ResultSet rs = pstmt.executeQuery()) {
 	            // Check if a result is returned
 	            if (rs.next()) {
-	                return true; // Return the firstName if it exists
+	                return rs.getNString("firstName"); // Return the firstName if it exists
 	            }
 	        }
 	    } catch (SQLException e) {
@@ -310,7 +316,7 @@ public class Database {
 			e.printStackTrace();
 		}
 	    // If no firstName found, return null or an empty string
-	    return false; // or return ""; based on your preference
+	    return null; // or return ""; based on your preference
 	}
     // Method to update the user's password
     public boolean updatePassword(String username, String newPassword) {
@@ -356,6 +362,20 @@ public class Database {
             return false; // Return false in case of an error
         }
     }
+
+	public void closeConnection() {
+		 if (connection != null) {
+	            try {
+	                if (!connection.isClosed()) {
+	                    connection.close();
+	                    System.out.println("Database connection closed successfully.");
+	                }
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	                System.err.println("Failed to close the database connection.");
+	            }
+	        }
+	    }
 
 }
 

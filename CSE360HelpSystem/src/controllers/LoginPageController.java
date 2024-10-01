@@ -3,21 +3,23 @@ package controllers;
 import java.sql.SQLException;
 
 import database.Database;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import models.OTP;
 import models.TextValidation;
 import models.UserSession;
 
 public class LoginPageController extends PageController {
-    
-    // No-argument constructor required by FXML
+
+    // Constructor for FXML
     public LoginPageController() {
-        super(null); // Pass null or a default stage if needed
+        super(null);
     }
 
     // Constructor with stage
@@ -27,82 +29,114 @@ public class LoginPageController extends PageController {
 
     // FXML elements
     @FXML
-    private TextField usernameField; // Field for entering the username
+    private TextField usernameField;
 
     @FXML
-    private PasswordField passwordField; // Field for entering the password
+    private PasswordField passwordField;
 
     @FXML
-    private Button loginButton; // Button to trigger login
+    private Button loginButton;
 
     @FXML
-    private Label errorLabel; // Label to display error messages
+    private Label errorLabel;
 
-    // Model classes for validation
-    TextValidation validator = new TextValidation();
-    Database db = new Database();
+    @FXML
+    private Label statusLabel;
 
- // Method to handle login action
+    // Model classes
+    private TextValidation validator = new TextValidation();
+    private Database db = new Database();
+
+    // Method to handle login action
     @FXML
     public void handleLogin() {
-        errorLabel.setText(""); // Clear previous error messages
+        // Clear previous error messages
+        errorLabel.setText("");
+
         String username = usernameField.getText();
-        String password = passwordField.getText();
-        String otp = passwordField.getText(); // This seems incorrect, should be an OTP field
+        String password = passwordField.getText(); // Using password field for both password and OTP
 
-        // Validate credentials using the TextValidation model
         try {
+            // Check if the database is empty
+            if (db.isDatabaseEmpty()) {
+                // If the database is empty, we treat this as setting up the administrator
+                setupAdministrator(); // Call the setup method
+                return; // Exit after attempting to set up the administrator
+            }
+
+            // Validate user credentials
             if (db.validateCredentials(username, password)) {
-            	UserSession.getInstance().setUsername(username); // Store username in session
-                // If login is successful, check OTP and redirect accordingly
-                if (db.getOTP(username, otp)) {
-                    redirectToUpdatePassword();
-                    return; // Exit after redirection
+                // Proceed with normal login flow
+                String firstName = db.getFirstName(username);
+                if (firstName == null || firstName.isEmpty()) {
+                    redirectToSetupAccount(); // Redirect to account setup if first name is not set
+                    return;  // Exit after redirection
                 }
 
-                if (db.getFirstName(username) == false) { // Check if firstName is null, assuming that the getFirstName method returns a String
-                    redirectToSetupAccount();
-                    return; // Exit after redirection
-                }
-
+                // Redirect to role selection
                 redirectToSelectRolePageView();
             } else {
-                // Show error message
+                // Show error if credentials are invalid
                 showError("Invalid credentials. Please try again.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            showError("An error occurred while processing your request."); // Show a user-friendly error message
+            showError("An error occurred while processing your request.");
         }
     }
 
 
-    // Method to handle account setup navigation using the PageController's navigateTo method
+    @FXML
+    public void setupAdministrator() {
+        errorLabel.setText(""); // Clear previous error messages
+        statusLabel.setText("");
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+
+        try {
+            db.setupAdministrator(username, password, true);
+            //UserSession.getInstance().setUsername(username);
+
+            redirectToLoginPageView();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showError("An error occurred while trying to create an administrator.");
+        }
+    }
+
+    private void redirectToLoginPageView() {
+        statusLabel.setText("Account setup successful! Redirecting to login...");
+        statusLabel.setStyle("-fx-text-fill: green;");
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(2));
+        pause.setOnFinished(event -> navigateTo("/views/LoginPageView.fxml"));
+        pause.play();
+    }
+
     @FXML
     public void redirectToSetupAccount() {
         navigateTo("/views/SetupAccountPageView.fxml");
     }
+
     @FXML
     public void redirectToUpdatePassword() {
         navigateTo("/views/UpdatePasswordPageView.fxml");
     }
 
-    // Method to handle role selection page navigation using the PageController's navigateTo method
     @FXML
     public void redirectToSelectRolePageView() {
         navigateTo("/views/SelectRolePageView.fxml");
     }
 
-    // Optional: Logout method if needed
     @FXML
     public void logout() {
-        // Handle logout logic, such as clearing session data
-        System.out.println("Logged out successfully."); // Replace with actual logout logic
-        navigateTo("/views/LoginPageView.fxml"); // Navigate back to login page
+        System.out.println("Logged out successfully.");
+        navigateTo("/views/LoginPageView.fxml");
     }
 
     public void showError(String message) {
-        errorLabel.setText(message); // Set the error message in the label
+        errorLabel.setText(message);
     }
 }
+
 
