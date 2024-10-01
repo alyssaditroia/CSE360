@@ -6,7 +6,7 @@ package controllers;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import database.database; // Make sure your Database class is properly named
+import database.Database; // Make sure your Database class is properly named
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,9 +16,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import models.User;
+import models.UserSession;
 import models.TextValidation;
 
 public class finishAccountSetupController extends PageController {
+	String username = UserSession.getInstance().getUsername();
+	Database db = new Database();
 	
 	public finishAccountSetupController() {
 		super(null);
@@ -76,9 +79,9 @@ public class finishAccountSetupController extends PageController {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPreferredName(preferredName);
-
-        database db = new database();
-		db.updateUser(user); // Update User, the user should already exist
+        String usernm = user.getUsername();
+        //database db = new database(); No database at the moment
+		db.setupAccount(usernm, firstName, lastName, email, preferredName); // Update User, the user should already exist
 		redirectToSelectRolePageView(); // Navigate to role selection page after successful setup
     }
    

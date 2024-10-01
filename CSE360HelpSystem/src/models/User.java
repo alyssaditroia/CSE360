@@ -1,7 +1,7 @@
 package models;
 
-
 public class User {
+    private int id;  // Added ID for primary key tracking
     private String email;
     private String username;
     private char[] password;
@@ -9,164 +9,126 @@ public class User {
     private String middleName; // optional
     private String lastName;
     private String preferredName; // optional
-    private boolean isAdmin;
-    private boolean isStudent;
-    private boolean isInstructor;
+    private Boolean isAdmin;  // Changed to Boolean wrapper to handle null cases
+    private Boolean isStudent;
+    private Boolean isInstructor;
 
-    
-    public User(String email, char[] password) {
-        this.setEmail(email);
-        this.setUsername(username);
-        this.setPassword(password);
-        this.setFirstName(firstName);
-        this.setLastName(lastName);
-        this.setPreferredName(preferredName);
-        this.setMiddleName(middleName);
-        this.isAdmin = false;
-        this.isInstructor = false;
-        this.isStudent = false;
+    // Constructor for user registration without additional profile info, only username and password
+    public User(String username, char[] password) {
+        this.username = username;
+        this.password = password;
+    }
+    // Constructor for user registration including email and permissions for invite code
+    public User(int id, String email, boolean isAdmin, boolean isStudent, boolean isInstructor) {
+    	this.id = id;
+        this.email = email;
+        this.isAdmin = isAdmin;
+        this.isStudent = isStudent;
+        this.isInstructor = isInstructor;
     }
 
-	/**
-	 * @return the email
-	 */
-	public String getEmail() {
-		return email;
-	}
+    // Constructor with full profile details
+    public User(int id, String firstName, String lastName, String preferredName, String email, String username, char[] password, boolean isAdmin, boolean isStudent, boolean isInstructor) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.preferredName = preferredName;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.isAdmin = isAdmin;
+        this.isStudent = isStudent;
+        this.isInstructor = isInstructor;
+    }
 
-	/**
-	 * @param email the email to set
-	 */
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    // Getters and setters for all fields
 
-	/**
-	 * @return the username
-	 */
-	public String getUsername() {
-		return username;
-	}
+    public int getId() {
+        return id;
+    }
 
-	/**
-	 * @param username the username to set
-	 */
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	/**
-	 * @return the password
-	 */
-	public char[] getPassword() {
-		return password;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	/**
-	 * @param password the password to set
-	 */
-	public void setPassword(char[] password) {
-		this.password = password;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	/**
-	 * @return the firstName
-	 */
-	public String getFirstName() {
-		return firstName;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	/**
-	 * @param firstName the firstName to set
-	 */
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	/**
-	 * @return the middleName
-	 */
-	public String getMiddleName() {
-		return middleName;
-	}
+    public char[] getPassword() {
+        return password;
+    }
 
-	/**
-	 * @param middleName the middleName to set
-	 */
-	public void setMiddleName(String middleName) {
-		this.middleName = middleName;
-	}
+    public void setPassword(char[] password) {
+        this.password = password;
+    }
 
-	/**
-	 * @return the lastName
-	 */
-	public String getLastName() {
-		return lastName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	/**
-	 * @param lastName the lastName to set
-	 */
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	/**
-	 * @return the preferredName
-	 */
-	public String getPreferredName() {
-		return preferredName;
-	}
+    public String getMiddleName() {
+        return middleName;
+    }
 
-	/**
-	 * @param preferredName the preferredName to set
-	 */
-	public void setPreferredName(String preferredName) {
-		this.preferredName = preferredName;
-	}
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
 
-	/**
-	 * @return the isAdmin
-	 */
-	public boolean isAdmin() {
-		return isAdmin;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	/**
-	 * @param isAdmin the isAdmin to set
-	 */
-	public void setAdmin(boolean isAdmin) {
-		this.isAdmin = isAdmin;
-	}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	/**
-	 * @return the isStudent
-	 */
-	public boolean isStudent() {
-		return isStudent;
-	}
+    public String getPreferredName() {
+        return preferredName;
+    }
 
-	/**
-	 * @param isStudent the isStudent to set
-	 */
-	public void setStudent(boolean isStudent) {
-		this.isStudent = isStudent;
-	}
+    public void setPreferredName(String preferredName) {
+        this.preferredName = preferredName;
+    }
 
-	/**
-	 * @return the isInstructor
-	 */
-	public boolean isInstructor() {
-		return isInstructor;
-	}
+    public Boolean isAdmin() {
+        return isAdmin;
+    }
 
-	/**
-	 * @param isInstructor the isInstructor to set
-	 */
-	public void setInstructor(boolean isInstructor) {
-		this.isInstructor = isInstructor;
-	}
+    public void setAdmin(Boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
 
+    public Boolean isStudent() {
+        return isStudent;
+    }
 
+    public void setStudent(Boolean isStudent) {
+        this.isStudent = isStudent;
+    }
 
+    public Boolean isInstructor() {
+        return isInstructor;
+    }
+
+    public void setInstructor(Boolean isInstructor) {
+        this.isInstructor = isInstructor;
+    }
 }
+

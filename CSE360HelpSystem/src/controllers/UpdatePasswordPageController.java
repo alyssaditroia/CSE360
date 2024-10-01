@@ -1,72 +1,64 @@
+/**
+ * 
+ */
 package controllers;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import javafx.animation.PauseTransition;
-import javafx.util.Duration;
 import database.Database;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import models.User;
+import javafx.util.Duration;
 import models.TextValidation;
+import models.User;
+import models.UserSession;
 
-public class SetupAccountPageController extends PageController {
-    private Database db;
-    private TextValidation validator;
-    
- // Constructor with dependency injection for Stage
-    public SetupAccountPageController() {
-        super(null);
-    }
-
-    // Constructor with dependency injection for Stage
-    public SetupAccountPageController(Stage primaryStage) {
-        super(primaryStage);
-        validator = new TextValidation(); // Initialize the TextValidation object
-        db = new Database();
-    }
-
-    @FXML
-    private TextField usernameField;
-
+/**
+ * 
+ */
+public class UpdatePasswordPageController extends PageController {
+	 private TextValidation validator;
+	 private Database db;
+	public UpdatePasswordPageController() {
+		super(null);
+	}
+	public UpdatePasswordPageController(Stage primaryStage) {
+		super(primaryStage);
+		validator = new TextValidation();
+	}
+	String username = UserSession.getInstance().getUsername();
+	
     @FXML
     private PasswordField passwordField;
 
     @FXML
     private PasswordField confirmPasswordField;
-    
-    @FXML
-    private TextField inviteCodeField;
 
     @FXML
-    private Button setupButton;
+    private Button updateButton;
 
     @FXML
     private Label statusLabel;
-
+    
     @FXML
-    private void handleSetupButtonAction() {
+    private void handleUpdatePasswordAction() {
         // Clear previous status messages
         statusLabel.setText("");
 
-        // Trim whitespace from username and get password values
-        String username = usernameField.getText().trim();
+        // Trim whitespace from password values
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
-        String inviteCode = inviteCodeField.getText();
 
         // Validate the username and password using model's TextValidation
-        String validationMessage = validator.validateSetupFields(username, password, confirmPassword);
+        String validationMessage = validator.validateChangePassword(password, confirmPassword);
         if (validationMessage.isEmpty()) {
-        	db.setupAccount(inviteCode, username, password);
-
+            // Create a new user object
+            db.updatePassword(username, password);
             
             // Show success message
-            statusLabel.setText("Account setup successful! Redirecting to login...");
+            statusLabel.setText("Password Successfully Updated! Redirecting to login...");
             statusLabel.setStyle("-fx-text-fill: green;"); // Example success feedback
 
             // Create a PauseTransition for 2 seconds
@@ -86,5 +78,5 @@ public class SetupAccountPageController extends PageController {
     private void redirectToLogin() {
         navigateTo("/views/LoginPageView.fxml");
     }
-}
 
+}

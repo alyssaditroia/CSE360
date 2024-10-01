@@ -115,6 +115,20 @@ public class TextValidation {
 
         return ""; // All validations passed
     }
+    public static String validateChangePassword(String password, String confirmPassword) {
+
+        String passwordError = validatePassword(password);
+        if (!passwordError.isEmpty()) {
+            return passwordError; // Password validation failed
+        }
+
+        if (!password.equals(confirmPassword)) {
+            return "*** Error *** Passwords do not match!";
+        }
+
+        return ""; // All validations passed
+    }
+
 
     public static String textValidation(String username, char[] password) {
         String usernameError = validateUsername(username);

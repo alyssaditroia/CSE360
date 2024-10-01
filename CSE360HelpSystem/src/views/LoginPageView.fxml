@@ -7,9 +7,7 @@
       minWidth="400" minHeight="300" prefWidth="600" prefHeight="400">
     <TextField fx:id="usernameField" promptText="Username"/>
     <PasswordField fx:id="passwordField" promptText="Password"/>
-    <TextField fx:id="OTPField" promptText="One Time Password"/>
     <Button fx:id="loginButton" text="Login" onAction="#handleLogin"/>
-    <Button fx:id="setupAccountButton" text="Setup Account" onAction="#handleOtpVerification"/>
     
     <!-- Label for displaying error messages -->
     <Label fx:id="errorLabel" style="-fx-text-fill: red;"/>
