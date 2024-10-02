@@ -1,5 +1,6 @@
 package controllers;
 
+import database.Database;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,12 +14,15 @@ import javafx.stage.Stage;
  * Selects and displays the view
  */
 public class AdminHomePageController extends PageController {
+	private Database db;
+	
+	// Default constructor, called by FXMLLoader
 	public AdminHomePageController() {
-        super(null);
+        super();
     }
-	// Constructor
-    public AdminHomePageController(Stage primaryStage) {
-        super(primaryStage);
+    // Constructor with Stage and Database
+    public AdminHomePageController(Stage primaryStage, Database db) {
+        super(primaryStage, db);
     }
 	// Button for logout functionality
 	@FXML

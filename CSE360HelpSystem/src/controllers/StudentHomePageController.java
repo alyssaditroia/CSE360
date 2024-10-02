@@ -1,4 +1,5 @@
 package controllers;
+import database.Database;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
@@ -7,12 +8,16 @@ import javafx.stage.Stage;
  * Student Home Page Controller Class
  */
 public class StudentHomePageController extends PageController {
-	 public StudentHomePageController() {
-			super(null);
+	 Database db;
+	
+	 //Default constructor of FXML
+	public StudentHomePageController() {
+			super();
 		}
 
-    public StudentHomePageController(Stage primaryStage) {
-		super(primaryStage);
+	// Constructor
+    public StudentHomePageController(Stage primaryStage, Database db) {
+		super(primaryStage, db);
 	}
 
 	@FXML
@@ -24,7 +29,7 @@ public class StudentHomePageController extends PageController {
         goBack();
     }
 
- // Method to navigate back to the previous page
+ // Method to navigate back to the Login Page
     @FXML
     public void goBack() {
         // Handle navigation back (adjust the path as needed)

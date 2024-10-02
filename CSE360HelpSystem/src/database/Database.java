@@ -203,6 +203,50 @@ public void setupAdministrator(String username, String password) throws SQLExcep
             throw e; // rethrow the exception after logging it
         }
     }
+    
+    public boolean updatePassword(String username, String password) {
+        Connection connection = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            // Establishing connection to the database
+            connection = DriverManager.getConnection(DB_URL, USER, PASS);
+            
+            // Preparing the SQL query to update the password
+            String updateQuery = "UPDATE cse360users SET password = ? WHERE username = ?";
+
+            // Using PreparedStatement to set parameters and execute the update
+            pstmt = connection.prepareStatement(updateQuery);
+            pstmt.setString(1, password);  // Set the new password
+            pstmt.setString(2, username);  // Set the username
+
+            // Execute the update and check if the password was successfully updated
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;  // Returns true if at least one row was updated
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            // Close the resources in the finally block to avoid resource leaks
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    
 
 
     /**

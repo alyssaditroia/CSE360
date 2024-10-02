@@ -16,18 +16,19 @@ import models.User;
 import models.UserSession;
 
 /**
- * 
+ * When user's password is an OTP, then this is the page the user is directed to 
  */
 public class UpdatePasswordPageController extends PageController {
-	 private TextValidation validator;
 	 private Database db;
+	 
+	// Default constructor for FXML
 	public UpdatePasswordPageController() {
-		super(null);
+		super();
 	}
-	public UpdatePasswordPageController(Stage primaryStage) {
-		super(primaryStage);
-		validator = new TextValidation();
+	public UpdatePasswordPageController(Stage primaryStage, Database db) {
+		super(primaryStage, db);
 	}
+	// Gets the current logged in user by username
 	String username = UserSession.getInstance().getUsername();
 	
     @FXML
@@ -52,6 +53,7 @@ public class UpdatePasswordPageController extends PageController {
         String confirmPassword = confirmPasswordField.getText();
 
         // Validate the username and password using model's TextValidation
+        // Will make sure the username and password meet specific criteria
         String validationMessage = TextValidation.validateChangePassword(password, confirmPassword);
         if (validationMessage.isEmpty()) {
             // Create a new user object
