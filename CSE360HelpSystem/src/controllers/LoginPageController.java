@@ -81,6 +81,12 @@ public class LoginPageController extends PageController {
                 // Fetch user details and check if account is fully set up
                 String firstName = db.getFirstName(username);
                 if (firstName == null || firstName.isEmpty()) {
+                	User loggedInUser = new User();
+                	// After successful login in LoginPageController
+                	UserSession userSession = UserSession.getInstance();
+                	userSession.setCurrentUser(loggedInUser); // Assume loggedInUser is of type User
+                	navigateTo("/views/FinishAccountSetupView.fxml");
+
                     redirectToFinishAccountSetup(); // Redirect to account setup if not completed
                     return;  // Exit after redirection
                 }

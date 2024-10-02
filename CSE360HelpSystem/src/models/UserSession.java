@@ -30,5 +30,10 @@ public class UserSession {
     public void setCurrentUser(User user) {
         this.user = user; // Set the user object
     }
+
+	public static void setInstance(UserSession userSession) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

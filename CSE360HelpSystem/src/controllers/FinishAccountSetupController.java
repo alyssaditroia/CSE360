@@ -94,14 +94,6 @@ public class FinishAccountSetupController extends PageController {
     public void initialize(Stage stage, Database db) {
         super.initialize(stage, db);
 
-        User user = UserSession.getInstance().getCurrentUser();
-        if (user == null) {
-            // Handle the case where no user is logged in
-            errorLabel.setText("No user is currently logged in. Please log in again.");
-        } else {
-            // Proceed with normal operations
-            System.out.println("Current user: " + user.getUsername());
-        }
     }
 }
 

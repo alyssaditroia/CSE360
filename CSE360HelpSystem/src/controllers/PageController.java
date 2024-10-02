@@ -29,6 +29,10 @@ public class PageController {
         String username = UserSession.getInstance().getUsername();
         System.out.println("Current user: " + username);
     }
+    public void setUserSession(UserSession userSession) {
+        // Optionally handle setting the user session or any specific user
+        UserSession.setInstance(userSession);
+    }
 
  // Method to navigate to a different view
     public void navigateTo(String fxmlPath) {
