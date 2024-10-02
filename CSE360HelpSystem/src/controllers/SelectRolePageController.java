@@ -1,5 +1,6 @@
 package controllers;
 
+import database.Database;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -7,12 +8,12 @@ import javafx.stage.Stage;
 import models.User;
 
 public class SelectRolePageController extends PageController{
-	
+	Database db;
 	public SelectRolePageController() {
-		super(null);
+		super();
 	}
-	    public SelectRolePageController(Stage primaryStage) {
-		super(primaryStage);
+	    public SelectRolePageController(Stage primaryStage, Database db) {
+		super(primaryStage, db);
 	}
 
 		@FXML

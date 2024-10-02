@@ -19,14 +19,12 @@ public class SetupAccountPageController extends PageController {
     private Database db;
     // Constructor with dependency injection for Stage
     public SetupAccountPageController() {
-        super(null);
+        super();
     }
 
     // Constructor with dependency injection for Stage
     public SetupAccountPageController(Stage primaryStage, Database db) {
-        super(primaryStage);
-        new TextValidation();
-        this.db = db;
+        super(primaryStage, db);
     }
 
     @FXML

@@ -40,5 +40,11 @@ public class UserSession {
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void setUsername(String username2) {
+		this.user.setUsername(username2);
+		setCurrentUser(user);
+		
+	}
 }
 
