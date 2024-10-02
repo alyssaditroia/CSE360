@@ -18,7 +18,7 @@ import models.UserSession;
 public class LoginPageController extends PageController {
 	private Stage stage;
 	private User user;
-    // FXML elements
+    // FXML elements 
     @FXML
     private TextField usernameField;
 
