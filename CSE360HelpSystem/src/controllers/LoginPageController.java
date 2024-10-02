@@ -14,7 +14,10 @@ import javafx.util.Duration;
 import models.TextValidation;
 import models.User;
 import models.UserSession;
-
+/**
+ *  LoginPageController
+ *  Implements login page
+ */
 public class LoginPageController extends PageController {
 	private Stage stage;
 	private User user;
@@ -48,7 +51,9 @@ public class LoginPageController extends PageController {
     }
 
 
-    // Method to handle login action
+    /**
+     *  Method to handle login action
+     */
     @FXML
     public void handleLogin() {
         db = Database.getInstance();
