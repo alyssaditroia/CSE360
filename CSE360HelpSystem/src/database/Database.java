@@ -10,6 +10,8 @@ import java.util.List;
  * 
  * This class manages all interactions with the database,
  * including saving users, managing OTP, and updating user details.
+ * 
+ * To visualize database run command:  java -jar h2*.jar
  */
 public class Database {
     // JDBC driver name and database URL
@@ -52,7 +54,7 @@ public class Database {
     }
 
     /**
-     * createTables()
+     *  createTables()
      *  Method to create tables
      * @throws SQLException
      */
@@ -81,7 +83,7 @@ public class Database {
      * @return boolean True or False
      * @throws SQLException
      */
-    public boolean isDatabaseEmpty() throws SQLException {
+public boolean isDatabaseEmpty() throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
         String query = "SELECT COUNT(*) AS count FROM cse360users";
@@ -110,7 +112,7 @@ public class Database {
      * @param password
      * @throws SQLException
      */
-    public void setupAdministrator(String username, String password) throws SQLException {
+public void setupAdministrator(String username, String password) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
         // Validate input parameters
@@ -171,7 +173,7 @@ public class Database {
         }
         if (preferredName != null) {
             fields.add("preferredName = ?");
-            values.add(lastName);
+            values.add(preferredName);
         }
         if (email != null) {
             fields.add("email = ?");
@@ -184,7 +186,7 @@ public class Database {
             return;
         }
 
-        String query = "UPDATE users SET " + String.join(", ", fields) + " WHERE username = ?";
+        String query = "UPDATE cse360users SET " + String.join(", ", fields) + " WHERE username = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             for (int i = 0; i < values.size(); i++) {
                 stmt.setString(i + 1, values.get(i));

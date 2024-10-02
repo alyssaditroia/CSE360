@@ -24,6 +24,8 @@ public class LoginPageController extends PageController {
 
     @FXML
     private PasswordField passwordField;
+    @FXML
+    private TextField inviteCodeField;
 
     @FXML
     private Button loginButton;
@@ -82,6 +84,7 @@ public class LoginPageController extends PageController {
                 String firstName = db.getFirstName(username);
                 if (firstName == null || firstName.isEmpty()) {
                 	User loggedInUser = new User();
+                	loggedInUser.setUsername(username);
                 	// After successful login in LoginPageController
                 	UserSession userSession = UserSession.getInstance();
                 	userSession.setCurrentUser(loggedInUser); // Assume loggedInUser is of type User
@@ -107,10 +110,10 @@ public class LoginPageController extends PageController {
         }
     }
 
-    private void redirectToFinishAccountSetup() {
-    	navigateTo("/views/FinishAccountSetupView.fxml");
+ private void redirectToFinishAccountSetup() {
+    navigateTo("/views/FinishAccountSetupView.fxml");
 		
-	}
+}
 
 	@FXML
     public void setupAdministrator() {
