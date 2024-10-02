@@ -10,7 +10,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import models.UserSession;
-
+/***********
+ * 
+ *  FINISHED PAGE DO NOT EDIT
+ *  
+ *  
+ **************/
 public class PageController {
     protected Stage stage; // Protected to allow access in subclasses
     protected Database db; // Make this protected if needed in subclasses

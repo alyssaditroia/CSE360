@@ -1,5 +1,10 @@
 package models;
-
+/***********
+ * 
+ *  FINISHED PAGE DO NOT EDIT
+ *  
+ *  
+ **************/
 public class UserSession {
     private static UserSession instance;
     private User user; // Current logged-in user

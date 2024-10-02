@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * FINISHED PAGE DO NOT EDIT
  * Database
  * 
  * This class manages all interactions with the database,

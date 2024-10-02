@@ -8,6 +8,13 @@ import database.Database;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+/***********
+ * 
+ *  FINISHED PAGE DO NOT EDIT
+ *  @version v.1
+ *  
+ **************/
+
 public class Main extends Application {
 
     private Database db;

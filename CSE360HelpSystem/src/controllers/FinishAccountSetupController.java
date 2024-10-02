@@ -2,7 +2,6 @@ package controllers;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 import database.Database; // Make sure your Database class is properly named
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +12,12 @@ import javafx.stage.Stage;
 import models.User;
 import models.UserSession;
 import models.TextValidation;
-
+/********
+ * 
+ *  FINISHED PAGE DO NOT EDIT
+ *  
+ *  
+ **************/
 public class FinishAccountSetupController extends PageController {
     private Database db;
 
