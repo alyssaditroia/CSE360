@@ -2,12 +2,11 @@
 
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.*?> <!-- Import other controls as needed -->
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.finishAccountSetupController" spacing="10" alignment="CENTER">
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.FinishAccountSetupController" spacing="10" alignment="CENTER">
     <TextField fx:id="emailField" promptText="Email" />
     <TextField fx:id="firstNameField" promptText="First Name" />
     <TextField fx:id="lastNameField" promptText="Last Name" />
-    <TextField fx:id="middleNameField" promptText="Middle Name (optional)" />
     <TextField fx:id="preferredNameField" promptText="Preferred Name (optional)" />
-    <Button fx:id="finishSetupButton" text="Finish" onAction="#handleSetupButtonAction" />
-    <Label fx:id="errorLabel" />
+    <Button fx:id="finishSetupButton" text="Finish" onAction="#finishSetup" />
+    <Label fx:id="errorLabel" text=" " />
 </VBox>

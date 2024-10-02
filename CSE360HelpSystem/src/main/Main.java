@@ -1,55 +1,58 @@
 package main;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
-
 import java.sql.SQLException;
 
 import controllers.LoginPageController;
 import controllers.PageController;
 import database.Database;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    private Database db;
     private PageController pageController;
-    private Database db = new Database();
 
     @Override
     public void start(Stage primaryStage) {
         try {
+            db = new Database();
             db.connectToDatabase();
 
             // Check if the database is empty (no users registered)
             if (db.isDatabaseEmpty()) {
-                System.out.println("In-Memory Database is empty");
-                // Navigate to the LoginPageController to allow admin setup
-                this.pageController = new LoginPageController(primaryStage); // Initialize with the primary stage
-                showLoginPage(); // Show the login page where admin can enter their details
-                primaryStage.setTitle("CSE360 Help System");
-                primaryStage.show();
-                return; // Exit after navigating to login page
+                System.out.println("In-Memory Database is empty. Navigating to login page for admin setup.");
+                // Initialize the LoginPageController and pass the database instance
+                LoginPageController loginPageController = new LoginPageController(primaryStage, db);
+                pageController = loginPageController; // Set the page controller to the login controller
+                pageController.navigateTo("/views/LoginPageView.fxml"); // Show the login page for admin setup
+            } else {
+                System.out.println("Database is not empty. Navigating to login page.");
+                // Initialize the main page controller with the database instance
+                LoginPageController loginPageController = new LoginPageController(primaryStage, db);
+                pageController = loginPageController;
+
+                pageController.navigateTo("/views/LoginPageView.fxml"); 
             }
 
-            // Initialize the page controller after database check
-            this.pageController = new PageController(primaryStage);
+            // Set the title for the primary stage
             primaryStage.setTitle("CSE360 Help System");
-            showLoginPage();
             primaryStage.show();
+
         } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("Database connection failed. Please check your database configuration.");
         }
-    }
-
-    public void showLoginPage() {
-        pageController.navigateTo("/views/LoginPageView.fxml");
     }
 
     @Override
     public void stop() throws Exception {
         super.stop();
+        System.err.println("Closing database connection.");
         // Close database connection when the application stops
         if (db != null) {
             db.closeConnection();
+            System.err.println("Database connection closed.");
         }
     }
 
@@ -57,5 +60,9 @@ public class Main extends Application {
         launch(args);
     }
 }
+
+
+
+
 
 

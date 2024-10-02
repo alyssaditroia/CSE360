@@ -2,23 +2,33 @@ package database;
 
 import java.sql.*;
 import java.util.UUID;
-import java.util.Random; // For OTP generation
-import models.User;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Database
+ * 
+ * This class manages all interactions with the database,
+ * including saving users, managing OTP, and updating user details.
+ */
 public class Database {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "org.h2.Driver";
     static final String DB_URL = "jdbc:h2:~/firstDatabase";
 
     // Database credentials
-    static final String USER = "admin";
-    static final String PASS = "Password1!";
+    static final String USER = "user";
+    static final String PASS = "";
+    
+    private static Database instance;
 
-    private Connection connection = null;
-    private Statement statement = null;
-    private Random random = new Random();
-
-    // Method to connect to the database
+    private Connection connection;
+    private Statement statement;
+    /**
+     * connectToDatabase()
+     * Method to connect to the database
+     * @throws SQLException
+     */
     public void connectToDatabase() throws SQLException {
         try {
             Class.forName(JDBC_DRIVER); // Load the JDBC driver
@@ -30,9 +40,24 @@ public class Database {
             System.err.println("JDBC Driver not found: " + e.getMessage());
         }
     }
+    public Database() {
+        // Private constructor to prevent instantiation
+    }
 
-    // Method to create tables
+    public static synchronized Database getInstance() {
+        if (instance == null) {
+            instance = new Database();
+        }
+        return instance;
+    }
+
+    /**
+     * createTables()
+     *  Method to create tables
+     * @throws SQLException
+     */
     private void createTables() throws SQLException {
+    	System.out.println("Creating Tables");
         String userTable = "CREATE TABLE IF NOT EXISTS cse360users ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, " 
                 + "firstName VARCHAR(255),"
@@ -40,85 +65,161 @@ public class Database {
                 + "preferredName VARCHAR(255),"
                 + "email VARCHAR(255) UNIQUE, "
                 + "username VARCHAR(255),"
-                + "password VARCHAR(255), "
-                + "otp VARCHAR(255), " // Add OTP column
+                + "password VARCHAR(255), " 
                 + "isAdmin BOOLEAN DEFAULT FALSE, "
                 + "isStudent BOOLEAN DEFAULT FALSE, "
                 + "isInstructor BOOLEAN DEFAULT FALSE, "
                 + "inviteToken VARCHAR(255),"
+                + "otp VARCHAR(255), "
                 + "otp_expiration TIMESTAMP)";
         statement.execute(userTable);
     }
-	// Check if the database is empty
-	public boolean isDatabaseEmpty() throws SQLException {
-		String query = "SELECT COUNT(*) AS count FROM cse360users";
-		ResultSet resultSet = statement.executeQuery(query);
-		if (resultSet.next()) {
-			return resultSet.getInt("count") == 0;
-		}
-		return true;
-	}
     
-    public void setupAdministrator(String username, String password, boolean isAdmin) throws SQLException {
-    	if (connection == null || connection.isClosed()) {
-            connectToDatabase(); // Ensure connection is established
+    /**
+     * isDatabaseEmpty()
+     * Method to check if the database is empty
+     * @return boolean True or False
+     * @throws SQLException
+     */
+    public boolean isDatabaseEmpty() throws SQLException {
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+        String query = "SELECT COUNT(*) AS count FROM cse360users";
+        ResultSet resultSet = statement.executeQuery(query);
+        if (resultSet.next()) {
+        	boolean dbStatus = resultSet.getInt("count") == 0;
+        	System.out.println("Database is empty " + dbStatus);
+            return resultSet.getInt("count") == 0; 
         }
-		String insertUser = "INSERT INTO cse360users (username, password, isAdmin) VALUES (?, ?, ?)";
-		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
-			pstmt.setString(1, username);
-			pstmt.setString(2, password);
-			pstmt.setBoolean(3, isAdmin);
-			pstmt.executeUpdate();
-		}
-	}
-    public boolean validateCredentials(String username, String password) throws SQLException {
-    	if (connection == null || connection.isClosed()) {
-            connectToDatabase(); // Ensure connection is established
+        return false;
+    }
+    /**
+     * Connection()
+     * This method returns the active connection object
+     * @return
+     * @throws SQLException
+     */
+    public Connection getConnection() throws SQLException {
+        return connection;
+    }
+
+    /**
+     *  Method to setup the first ever user as an administrator user
+     *  Uses just the username and password input from the login page to setup first user in database
+     * @param username
+     * @param password
+     * @throws SQLException
+     */
+    public void setupAdministrator(String username, String password) throws SQLException {
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+        // Validate input parameters
+        if (username == null || username.isEmpty()) {
+            System.out.println("Failed to add administrator: username cannot be null or empty.");
+            return; // Early exit if username is invalid
         }
-        String query = "SELECT password, otp, otp_expiration FROM cse360users WHERE username = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        
+        if (password == null || password.isEmpty()) {
+            System.out.println("Failed to add administrator: password cannot be null or empty.");
+            return; // Early exit if password is invalid
+        }
+
+        String insertUser = "INSERT INTO cse360users (username, password, isAdmin) VALUES (?, ?, TRUE)";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
+            // Set parameters for the prepared statement
             pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-
-            // Check if the user exists
-            if (rs.next()) {
-                String storedPassword = rs.getString("password");
-                String storedOTP = rs.getString("otp");
-                Timestamp expiration = rs.getTimestamp("otp_expiration");
-
-                // Check if the provided password matches the stored password
-                boolean isPasswordValid = password.equals(storedPassword); // Replace with hash comparison in production
-
-                // Check if the provided OTP is valid and has not expired
-                boolean isOTPValid = false;
-
-                if (storedOTP != null && expiration != null) {
-                    isOTPValid = password.equals(storedOTP) && expiration.after(new Timestamp(System.currentTimeMillis()));
-                } else {
-                    // If there's no OTP, the password is considered valid if it matches the stored password
-                    isOTPValid = isPasswordValid;
-                }
-
-                // If the password matches or the OTP is valid, return true
-                return isPasswordValid || isOTPValid;
+            pstmt.setString(2, password);
+            
+            // Execute the update
+            int rowsAffected = pstmt.executeUpdate();
+            
+            // Check if the insertion was successful
+            if (rowsAffected > 0) {
+                System.out.println("Administrator successfully added to Database");
             } else {
-                // User not found
-                return false;
+                System.out.println("Failed to add administrator: No rows affected.");
             }
+        } catch (SQLException e) {
+            System.out.println("SQL Exception occurred while adding administrator: " + e.getMessage());
+            throw e; // Rethrow the exception after logging it
+        }
+    }
+    /**
+     * Method to update different sections of the user's credentials. 
+     * If the field passed through is null, it will not be updated
+     * @param username
+     * @param firstName
+     * @param lastName
+     * @param email
+     * @throws SQLException
+     */
+    public void updateUser(String username, String firstName, String lastName, String preferredName, String email) throws SQLException {
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+        
+    	List<String> fields = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        
+        if (firstName != null) {
+            fields.add("firstName = ?");
+            values.add(firstName);
+        }
+        if (lastName != null) {
+            fields.add("lastName = ?");
+            values.add(lastName);
+        }
+        if (preferredName != null) {
+            fields.add("preferredName = ?");
+            values.add(lastName);
+        }
+        if (email != null) {
+            fields.add("email = ?");
+            values.add(email);
+        }
+
+        // Check if there's anything to update
+        if (fields.isEmpty()) {
+            System.out.println("No fields to update.");
+            return;
+        }
+
+        String query = "UPDATE users SET " + String.join(", ", fields) + " WHERE username = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            for (int i = 0; i < values.size(); i++) {
+                stmt.setString(i + 1, values.get(i));
+            }
+            stmt.setString(values.size() + 1, username); // Username at the end
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                System.out.println("No user found with username: " + username);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e; // rethrow the exception after logging it
         }
     }
 
 
-
-    // Invite a new user (generate invite link with a token)
+    /**
+     * Method to create a new user in the database when they are invited
+     * Sets the permissions associated with the email that the invite code was sent to
+     * User is able to be found using completeInvite() with the invite code
+     * @param email
+     * @param isAdmin
+     * @param isStudent
+     * @param isInstructor
+     * @return inviteToken
+     * @throws SQLException
+     */
     public String inviteUser(String email, boolean isAdmin, boolean isStudent, boolean isInstructor) throws SQLException {
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
         if (doesUserExist(email)) {
             throw new SQLException("User already exists with the provided email.");
         }
-        
-        // Generate a unique token for the invite link
         String inviteToken = UUID.randomUUID().toString();
-        
         String insertInvite = "INSERT INTO cse360users (email, isAdmin, isStudent, isInstructor, inviteToken) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(insertInvite)) {
             pstmt.setString(1, email);
@@ -128,254 +229,129 @@ public class Database {
             pstmt.setString(5, inviteToken);
             pstmt.executeUpdate();
         }
-        
-        // Return the invite link (assuming http://app.com/invite?token=)
-        return "inviteCode: " + inviteToken;
+        return inviteToken;
     }
 
-    // Generate a one-time password (OTP)
-    public String generateOTP() {
-        int otp = 100000 + random.nextInt(900000); // Generate a 6-digit OTP
-        return String.valueOf(otp);
-    }
-
-    // Send OTP to the user's email (Placeholder for actual sending logic)
-    public void sendOTP(String email, String otp) {
-        // Implement your email sending logic here
-        System.out.println("Sending OTP " + otp + " to " + email);
-    }
-
- // Create and send OTP for the user
-    public void createAndSendOTP(String email) throws SQLException {
-        String otp = generateOTP();
-        Timestamp expiration = new Timestamp(System.currentTimeMillis() + 300000); // 5 minutes from now
-
-        // Update the OTP column instead of the password column
-        String updateOTP = "UPDATE cse360users SET otp = ?, otp_expiration = ? WHERE email = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(updateOTP)) {
-            pstmt.setString(1, otp);
-            pstmt.setTimestamp(2, expiration);
-            pstmt.setString(3, email);
-            pstmt.executeUpdate();
-        }
-        sendOTP(email, otp); // Send OTP to the user
-        System.out.println(otp); // print otp
-    }
-
- // Verify the OTP
-    public boolean verifyOTP(String username, String otp) throws SQLException {
-    	if (connection == null || connection.isClosed()) {
-            connectToDatabase(); // Ensure connection is established
-        }
-        String query = "SELECT otp, otp_expiration FROM cse360users WHERE username = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, username);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    String storedOTP = rs.getString("otp");
-                    Timestamp expiration = rs.getTimestamp("otp_expiration");
-
-                    // Check if the OTP matches and has not expired
-                    if (otp.equals(storedOTP) && expiration != null && expiration.after(new Timestamp(System.currentTimeMillis()))) {
-                        // Clear OTP after successful verification
-                        String clearOTP = "UPDATE cse360users SET otp = NULL, otp_expiration = NULL WHERE email = ?";
-                        try (PreparedStatement clearStmt = connection.prepareStatement(clearOTP)) {
-                            clearStmt.setString(1, username);
-                            clearStmt.executeUpdate();
-                        }
-                        return true; // OTP verified
-                    }
-                }
-            }
-        }
-        return false; // OTP verification failed
-    }
-    public boolean getOTP(String username, String otp) throws SQLException {
-        // Query to retrieve the OTP and its expiration for the given username
-        String query = "SELECT otp, otp_expiration FROM cse360users WHERE username = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, username);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                // Check if the user exists and has an OTP
-                if (rs.next()) {
-                    String storedOTP = rs.getString("otp");
-                    Timestamp expiration = rs.getTimestamp("otp_expiration");
-
-                    // Check if the stored OTP matches the provided OTP
-                    boolean isOTPMatched = otp.equals(storedOTP);
-                    
-                    // Check if the OTP has not expired
-                    boolean isOTPNotExpired = expiration != null && expiration.after(new Timestamp(System.currentTimeMillis()));
-
-                    // Return true if both conditions are met
-                    return isOTPMatched && isOTPNotExpired;
-                }
-            }
-        }
-        // If no valid OTP found, return false
-        return false;
-    }
-
-
- // Accept the invite and complete the user creation
+    /**
+     * Method to complete the invite by setting the users username and password for that specific invite code
+     * Updates the user based on the invite code linked to that user
+     * @param inviteToken
+     * @param username
+     * @param password
+     * @return boolean true or false
+     * @throws SQLException
+     */
     public boolean completeInvite(String inviteToken, String username, String password) throws SQLException {
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+    	// Queries database based on invite code
         String query = "SELECT * FROM cse360users WHERE inviteToken = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, inviteToken);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    // Update the user record with the new details
-                    String updateUser = "UPDATE cse360users SET username = ?, password = ?, inviteToken = NULL, otp = NULL, otp_expiration = NULL WHERE inviteToken = ?";
-                    try (PreparedStatement updateStmt = connection.prepareStatement(updateUser)) {
-                        updateStmt.setString(1, username);
-                        updateStmt.setString(2, password); // Still using the password field here
-                        updateStmt.setString(3, inviteToken);
-                        updateStmt.executeUpdate();
-                        return true;
-                    }
+            ResultSet rs = pstmt.executeQuery();
+            
+            // If the invite code exists then the user is updated accordingly and the invite token is set to NULL
+            if (rs.next()) {
+                String updateUser = "UPDATE cse360users SET username = ?, password = ?, inviteToken = NULL WHERE inviteToken = ?";
+                try (PreparedStatement updateStmt = connection.prepareStatement(updateUser)) {
+                    updateStmt.setString(1, username);
+                    updateStmt.setString(2, password);
+                    updateStmt.setString(3, inviteToken);
+                    updateStmt.executeUpdate();
+                    return true;
                 }
             }
         }
-        return false; // Invalid or used invite token
+        return false;
     }
 
-    // Register a new user (for general use)
-    public void addUser(String username, String password, boolean isAdmin, boolean isStudent, boolean isInstructor) throws SQLException {
-        String insertUser = "INSERT INTO cse360users (username, password, isAdmin, isStudent, isInstructor) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
+    /**
+     * validateCredentials()
+     * Method to validate user credentials to confirm the username and password match a user in the database
+     * @param username
+     * @param password
+     * @return true if the user's username and password match a specific user in the database false if no user is found
+     * @throws SQLException
+     */
+    public boolean validateCredentials(String username, String password) throws SQLException {
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+        String query = "SELECT password FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, username);
-            pstmt.setString(2, password);
-            pstmt.setBoolean(3, isAdmin);
-            pstmt.setBoolean(4, isStudent);
-            pstmt.setBoolean(5, isInstructor);
-            pstmt.executeUpdate();
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String storedPassword = rs.getString("password");
+                return password.equals(storedPassword);
+            }
         }
+        return false;
+    }
+    
+    /**
+     * getFirstName()
+     * Method to get the first name of the user based on the username
+     * @param username
+     * @return
+     */
+    public String getFirstName(String username) {
+    	try {
+			connection = DriverManager.getConnection(DB_URL, USER, PASS);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try {
+			statement = connection.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        String query = "SELECT firstName FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String storedFirstName = rs.getString("firstName");
+                return storedFirstName != null ? storedFirstName : "";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
-    // Admin can create a new user directly
-    public void createUser(String firstName, String lastName, String preferredName, String email, String username, String password, boolean isAdmin, boolean isStudent, boolean isInstructor) throws SQLException {
-        if (doesUserExist(email)) {
-            throw new SQLException("User already exists with the provided email.");
-        }
 
-        String insertUser = "INSERT INTO cse360users (firstName, lastName, preferredName, email, username, password, isAdmin, isStudent, isInstructor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
-            pstmt.setString(1, firstName);
-            pstmt.setString(2, lastName);
-            pstmt.setString(3, preferredName);
-            pstmt.setString(4, email);
-            pstmt.setString(5, username);
-            pstmt.setString(6, password);
-            pstmt.setBoolean(7, isAdmin);
-            pstmt.setBoolean(8, isStudent);
-            pstmt.setBoolean(9, isInstructor);
-            pstmt.executeUpdate();
-        }
-    }
 
-    // Check if a user already exists
-    public boolean doesUserExist(String email) throws SQLException {
+    /**
+     *  Check if a user exists by email
+     * @param email
+     * @return true if they exist false if not
+     * @throws SQLException
+     */
+    private boolean doesUserExist(String email) throws SQLException {
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
         String query = "SELECT COUNT(*) FROM cse360users WHERE email = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0; // User exists if count > 0
-            }
+            return rs.next() && rs.getInt(1) > 0;
         }
-        return false; // User does not exist or error occurred
     }
-
-    // Close the database connection
-    public void close() {
-        try {
-            if (statement != null) {
-                statement.close();
-            }
-            if (connection != null) {
+    public void closeConnection() {
+        if (connection != null) {
+            try {
                 connection.close();
+                System.out.println("Database connection closed.");
+            } catch (SQLException e) {
+                System.err.println("Failed to close the database connection.");
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            System.err.println("Error closing database connection: " + e.getMessage());
+        } else {
+            System.out.println("No connection to close.");
         }
     }
 
-	public String getFirstName(String username) {
-	    // SQL query to retrieve the firstName for the given username
-	    String query = "SELECT firstName FROM cse360users WHERE username = ?";
-	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, username);
-	        try (ResultSet rs = pstmt.executeQuery()) {
-	            // Check if a result is returned
-	            if (rs.next()) {
-	                return rs.getNString("firstName"); // Return the firstName if it exists
-	            }
-	        }
-	    } catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    // If no firstName found, return null or an empty string
-	    return null; // or return ""; based on your preference
-	}
-    // Method to update the user's password
-    public boolean updatePassword(String username, String newPassword) {
-        String updateSQL = "UPDATE users SET password = ? WHERE username = ?";
-        
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
-            preparedStatement.setString(1, newPassword);
-            preparedStatement.setString(2, username);
-            int rowsAffected = preparedStatement.executeUpdate();
-            return rowsAffected > 0; // Returns true if a row was updated
-        } catch (SQLException e) {
-            e.printStackTrace(); // Log the error for debugging
-            return false; // Return false in case of an error
-        }
-    }
-    public boolean setupAccount(String username, String firstName, String lastName, String email, String perferredName) {
-        String updateSQL = "UPDATE users SET firstName = ?, lastName = ?, email = ?, perferredName = ?, WHERE username = ?";
-        
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
-            preparedStatement.setString(1, firstName);
-            preparedStatement.setString(2, lastName);
-            preparedStatement.setString(3, email);
-            preparedStatement.setString(4, perferredName);
-            preparedStatement.setString(5, username);
-            int rowsAffected = preparedStatement.executeUpdate();
-            return rowsAffected > 0; // Returns true if a row was updated
-        } catch (SQLException e) {
-            e.printStackTrace(); // Log the error for debugging
-            return false; // Return false in case of an error
-        }
-    }
-    public boolean setupAccount(String inviteToken, String username, String password) {
-        String updateSQL = "UPDATE users SET username = ?, password = ?, WHERE inviteToken = ?";
-        
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-            preparedStatement.setString(3, inviteToken);
-            int rowsAffected = preparedStatement.executeUpdate();
-            return rowsAffected > 0; // Returns true if a row was updated
-        } catch (SQLException e) {
-            e.printStackTrace(); // Log the error for debugging
-            return false; // Return false in case of an error
-        }
-    }
-
-	public void closeConnection() {
-		 if (connection != null) {
-	            try {
-	                if (!connection.isClosed()) {
-	                    connection.close();
-	                    System.out.println("Database connection closed successfully.");
-	                }
-	            } catch (SQLException e) {
-	                e.printStackTrace();
-	                System.err.println("Failed to close the database connection.");
-	            }
-	        }
-	    }
 
 }
-

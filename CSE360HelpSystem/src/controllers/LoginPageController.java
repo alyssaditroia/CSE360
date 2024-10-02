@@ -11,22 +11,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import models.OTP;
 import models.TextValidation;
+import models.User;
 import models.UserSession;
 
 public class LoginPageController extends PageController {
-
-    // Constructor for FXML
-    public LoginPageController() {
-        super(null);
-    }
-
-    // Constructor with stage
-    public LoginPageController(Stage primaryStage) {
-        super(primaryStage);
-    }
-
+	private Stage stage;
+	private User user;
     // FXML elements
     @FXML
     private TextField usernameField;
@@ -43,37 +34,62 @@ public class LoginPageController extends PageController {
     @FXML
     private Label statusLabel;
 
-    // Model classes
-    private TextValidation validator = new TextValidation();
-    private Database db = new Database();
+    // Default constructor, called by FXMLLoader
+    public LoginPageController() {
+        super(); // Call the default constructor of PageController
+    }
+
+    // Constructor with Stage and Database
+    public LoginPageController(Stage primaryStage, Database db) {
+        super(primaryStage, db);
+        this.stage = primaryStage;
+    }
+
 
     // Method to handle login action
     @FXML
     public void handleLogin() {
+        db = Database.getInstance();
         // Clear previous error messages
         errorLabel.setText("");
 
         String username = usernameField.getText();
-        String password = passwordField.getText(); // Using password field for both password and OTP
+        String password = passwordField.getText();
+
+        // Validate input fields
+        String usernameError = TextValidation.validateUsername(username);
+        String passwordError = TextValidation.validatePassword(password);
+
+        if (!usernameError.isEmpty()) {
+            showError(usernameError);
+            return;
+        }
+        if (!passwordError.isEmpty()) {
+            showError(passwordError);
+            return;
+        }
 
         try {
             // Check if the database is empty
             if (db.isDatabaseEmpty()) {
-                // If the database is empty, we treat this as setting up the administrator
-                setupAdministrator(); // Call the setup method
-                return; // Exit after attempting to set up the administrator
+                setupAdministrator(); // Setup admin if database is empty
+                return; // Exit after setting up the administrator
             }
 
-            // Validate user credentials
+            // Validate user credentials from database
             if (db.validateCredentials(username, password)) {
-                // Proceed with normal login flow
+                // Fetch user details and check if account is fully set up
                 String firstName = db.getFirstName(username);
                 if (firstName == null || firstName.isEmpty()) {
-                    redirectToSetupAccount(); // Redirect to account setup if first name is not set
+                    redirectToFinishAccountSetup(); // Redirect to account setup if not completed
                     return;  // Exit after redirection
                 }
 
-                // Redirect to role selection
+                // Successful login, set user session, and redirect to role selection
+                User loggedInUser = new User();
+                loggedInUser.setUsername(username);
+                UserSession.getInstance().setCurrentUser(loggedInUser);
+                System.out.println("User logged in: " + UserSession.getInstance().getUsername());
                 redirectToSelectRolePageView();
             } else {
                 // Show error if credentials are invalid
@@ -85,18 +101,24 @@ public class LoginPageController extends PageController {
         }
     }
 
+    private void redirectToFinishAccountSetup() {
+    	navigateTo("/views/FinishAccountSetupView.fxml");
+		
+	}
 
-    @FXML
+	@FXML
     public void setupAdministrator() {
+        db = Database.getInstance();
         errorLabel.setText(""); // Clear previous error messages
         statusLabel.setText("");
+
         String username = usernameField.getText();
         String password = passwordField.getText();
 
         try {
-            db.setupAdministrator(username, password, true);
-            //UserSession.getInstance().setUsername(username);
-
+            // Create administrator in the database
+            db.setupAdministrator(username, password);
+            // Redirect to login page after admin setup
             redirectToLoginPageView();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -119,11 +141,6 @@ public class LoginPageController extends PageController {
     }
 
     @FXML
-    public void redirectToUpdatePassword() {
-        navigateTo("/views/UpdatePasswordPageView.fxml");
-    }
-
-    @FXML
     public void redirectToSelectRolePageView() {
         navigateTo("/views/SelectRolePageView.fxml");
     }
@@ -137,6 +154,14 @@ public class LoginPageController extends PageController {
     public void showError(String message) {
         errorLabel.setText(message);
     }
+
+    // Optionally override the initialize method if needed
+    @Override
+    public void initialize(Stage stage, Database db) {
+        super.initialize(stage, db);
+        // Additional initialization if necessary
+    }
 }
+
 
 

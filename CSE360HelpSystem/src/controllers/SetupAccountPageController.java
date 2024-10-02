@@ -12,22 +12,21 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import models.User;
+import models.UserSession;
 import models.TextValidation;
 
 public class SetupAccountPageController extends PageController {
     private Database db;
-    private TextValidation validator;
-    
- // Constructor with dependency injection for Stage
+    // Constructor with dependency injection for Stage
     public SetupAccountPageController() {
         super(null);
     }
 
     // Constructor with dependency injection for Stage
-    public SetupAccountPageController(Stage primaryStage) {
+    public SetupAccountPageController(Stage primaryStage, Database db) {
         super(primaryStage);
-        validator = new TextValidation(); // Initialize the TextValidation object
-        db = new Database();
+        new TextValidation();
+        this.db = db;
     }
 
     @FXML
@@ -60,9 +59,12 @@ public class SetupAccountPageController extends PageController {
         String inviteCode = inviteCodeField.getText();
 
         // Validate the username and password using model's TextValidation
-        String validationMessage = validator.validateSetupFields(username, password, confirmPassword);
+        String validationMessage = TextValidation.validateSetupFields(username, password, confirmPassword);
         if (validationMessage.isEmpty()) {
-        	db.setupAccount(inviteCode, username, password);
+        	try {
+        		User newUser = new User("", "", "", "", username, password.toCharArray(), null, true, null);
+        		UserSession.getInstance().setUsername(username);
+        	    db.completeInvite(inviteCode, username, password);
 
             
             // Show success message
@@ -76,7 +78,13 @@ public class SetupAccountPageController extends PageController {
                 redirectToLogin();
             });
             pause.play(); // Start the pause
-        } else {
+        	} catch (SQLException e){
+            	e.printStackTrace();
+            	statusLabel.setText("error setting up account");
+            	statusLabel.setStyle("-fx-text-fill: red;");
+            	
+            }
+        }else {
             // Display the validation error message in the GUI
             statusLabel.setText(validationMessage);
             statusLabel.setStyle("-fx-text-fill: red;");

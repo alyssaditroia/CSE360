@@ -52,7 +52,7 @@ public class UpdatePasswordPageController extends PageController {
         String confirmPassword = confirmPasswordField.getText();
 
         // Validate the username and password using model's TextValidation
-        String validationMessage = validator.validateChangePassword(password, confirmPassword);
+        String validationMessage = TextValidation.validateChangePassword(password, confirmPassword);
         if (validationMessage.isEmpty()) {
             // Create a new user object
             db.updatePassword(username, password);
