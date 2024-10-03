@@ -88,7 +88,7 @@ public class Database {
      * @return boolean True or False
      * @throws SQLException
      */
-public boolean isDatabaseEmpty() throws SQLException {
+    public boolean isDatabaseEmpty() throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
         String query = "SELECT COUNT(*) AS count FROM cse360users";
@@ -117,7 +117,7 @@ public boolean isDatabaseEmpty() throws SQLException {
      * @param password
      * @throws SQLException
      */
-public void setupAdministrator(String username, String password) throws SQLException {
+    public void setupAdministrator(String username, String password) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
         // Validate input parameters
@@ -402,6 +402,69 @@ public void setupAdministrator(String username, String password) throws SQLExcep
         } else {
             System.out.println("No connection to close.");
         }
+    }
+    
+   
+    /**
+     * Function added by Justin Faris - 10/3/24
+     * 
+     * Checks if the user with the given username inside the database has admin role privileges
+     * 
+     * @param username The username of the user that must be checked
+     * @return Boolean True if the user is an admin, or False if the they are not or the user can not be found
+     * @throws SQLException If there's an error executing the SQL query.
+     */
+    public Boolean isUserAdmin(String username) throws SQLException {
+        return checkUserRole(username, "isAdmin");
+    }
+    
+    /**
+     * Function added by Justin Faris - 10/3/24
+     * 
+     * Checks if the user with the given username inside the database has student role privileges
+     * 
+     * @param username The username of the user that must be checked
+     * @return Boolean True if the user is an admin, or False if the they are not or the user can not be found
+     * @throws SQLException If there's an error executing the SQL query.
+     */
+    public Boolean isUserStudent(String username) throws SQLException {
+        return checkUserRole(username, "isStudent");
+    }
+    
+    /**
+     * Function added by Justin Faris - 10/3/24
+     * 
+     * Checks if the user with the given username inside the database has instructor role privileges
+     * 
+     * @param username The username of the user that must be checked
+     * @return Boolean True if the user is an admin, or False if the they are not or the user can not be found
+     * @throws SQLException If there's an error executing the SQL query.
+     */
+    public Boolean isUserInstructor(String username) throws SQLException {
+        return checkUserRole(username, "isInstructor");
+    }
+    
+    /**
+     * Function added by Justin Faris - 10/3/24
+     * 
+     * Helper function that checks a specific role for a user
+     * 
+     * @param username The username of the user to check
+     * @param roleColumn The name of the column in the database representing the role
+     * @return True if the user has the specified role, False if not, null if user not found or role not set
+     * @throws SQLException If there's an error executing the SQL query.
+     */
+    private Boolean checkUserRole(String username, String roleColumn) throws SQLException {
+        String query = "SELECT " + roleColumn + " FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean(1);
+                }
+            }
+        }
+        return null; // User not found or role not set
     }
 
 
