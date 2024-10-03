@@ -17,7 +17,7 @@ import java.util.List;
 public class Database {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "org.h2.Driver";
-    static final String DB_URL = "jdbc:h2:~/firstDatabase";
+    static final String DB_URL = "jdbc:h2:C:\\\\Users\\\\jjust\\\\h2\\\\firstDatabase";
 
     // Database credentials
     static final String USER = "user";
@@ -37,7 +37,9 @@ public class Database {
             Class.forName(JDBC_DRIVER); // Load the JDBC driver
             System.out.println("Connecting to database...");
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
+            System.out.println("Connection established");
             statement = connection.createStatement();
+            System.out.println("Statement created");
             createTables();  // Create the necessary tables if they don't exist
         } catch (ClassNotFoundException e) {
             System.err.println("JDBC Driver not found: " + e.getMessage());
