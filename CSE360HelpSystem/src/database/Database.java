@@ -311,7 +311,22 @@ public void setupAdministrator(String username, String password) throws SQLExcep
         }
         return false;
     }
-
+    public boolean validateInvite(String inviteToken) throws SQLException {
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+    	// Queries database based on invite code
+        String query = "SELECT * FROM cse360users WHERE inviteToken = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, inviteToken);
+            ResultSet rs = pstmt.executeQuery();
+            
+            // If the invite code exists then the user is updated accordingly and the invite token is set to NULL
+            if (rs.next()) {
+                    return true;
+                }
+            }
+        return false;
+        }
     /**
      * validateCredentials()
      * Method to validate user credentials to confirm the username and password match a user in the database

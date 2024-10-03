@@ -47,6 +47,7 @@ public class SetupAccountPageController extends PageController {
 
     @FXML
     private void handleSetupButtonAction() {
+    	db = Database.getInstance();
         // Clear previous status messages
         statusLabel.setText("");
 
@@ -60,8 +61,7 @@ public class SetupAccountPageController extends PageController {
         String validationMessage = TextValidation.validateSetupFields(username, password, confirmPassword);
         if (validationMessage.isEmpty()) {
         	try {
-        		User newUser = new User("", "", "", "", username, password.toCharArray(), null, true, null);
-        		UserSession.getInstance().setUsername(username);
+        		User newUser = new User("", "", "", "", username, password.toCharArray(), null, null, null);
         	    db.completeInvite(inviteCode, username, password);
 
             

@@ -32,6 +32,9 @@ public class LoginPageController extends PageController {
 
     @FXML
     private Button loginButton;
+    
+    @FXML
+    private Button inviteButton;
 
     @FXML
     private Label errorLabel;
@@ -104,7 +107,8 @@ public class LoginPageController extends PageController {
                 loggedInUser.setUsername(username);
                 UserSession.getInstance().setCurrentUser(loggedInUser);
                 System.out.println("User logged in: " + UserSession.getInstance().getUsername());
-                redirectToSelectRolePageView();
+                redirectToAdminHomepage();
+               // redirectToSelectRolePageView();
             } else {
                 // Show error if credentials are invalid
                 showError("Invalid credentials. Please try again.");
@@ -114,6 +118,38 @@ public class LoginPageController extends PageController {
             showError("An error occurred while processing your request.");
         }
     }
+    /**
+     *  Method to handle Invite Action
+     */
+    @FXML
+    public void handleInviteButton() {
+        db = Database.getInstance();
+        // Clear previous error messages
+        errorLabel.setText("");
+
+        String inviteCode = inviteCodeField.getText();
+
+            // Validate user credentials from database
+            try {
+				if (db.validateInvite(inviteCode)) {
+				    	navigateTo("/views/SetupAccountPageView.fxml");
+				        System.out.println("User invite code validated");
+				        User loggedInUser = new User();
+		                loggedInUser.setInviteToken(inviteCode);
+				        UserSession userSession = UserSession.getInstance();
+	                	userSession.setCurrentUser(loggedInUser); // Assume loggedInUser is of type User
+				        return;  // Exit after redirection
+				    }
+				else {
+				    // Show error if invite code is invalid
+				    showError("Invalid invite code. Please try again.");
+				    return;
+				}
+			} catch (SQLException e) {
+				System.out.println("Error when trying to validate invite code");
+				e.printStackTrace();
+			}
+        }
 
  private void redirectToFinishAccountSetup() {
     navigateTo("/views/FinishAccountSetupView.fxml");
@@ -154,6 +190,11 @@ public class LoginPageController extends PageController {
         navigateTo("/views/SetupAccountPageView.fxml");
     }
 
+    /// DELETE WHEN FINISHED TESTING +++_+++++++++++++++++++++++++++++++
+    @FXML 
+ 	public void redirectToAdminHomepage() {
+	 navigateTo("/views/AdminHomePageView.fxml"); 
+	  }
 
     @FXML 
  	public void redirectToSelectRolePageView() {

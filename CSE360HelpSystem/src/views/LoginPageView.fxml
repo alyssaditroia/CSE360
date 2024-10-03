@@ -5,9 +5,13 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginPageController" spacing="10" alignment="CENTER"
       minWidth="400" minHeight="300" prefWidth="600" prefHeight="400">
+    <Label text="Login" layoutX="20.0" layoutY="150.0" style="-fx-font-size: 14;" />
     <TextField fx:id="usernameField" promptText="Username"/>
     <PasswordField fx:id="passwordField" promptText="Password"/>
     <Button fx:id="loginButton" text="Login" onAction="#handleLogin"/>
+    <Label text="Enter Invite Code" layoutX="20.0" layoutY="150.0" style="-fx-font-size: 14;" />
+    <TextField fx:id="inviteCodeField" promptText="Invite Code"/>
+    <Button fx:id="inviteButton" text="Create Account" onAction="#handleInviteButton"/>
     
     <!-- Label for displaying error messages -->
     <Label fx:id="errorLabel" text=" " style="-fx-text-fill: red;"/>
