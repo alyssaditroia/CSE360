@@ -26,6 +26,8 @@ public class SelectRolePageController extends PageController{
 	    private Button backButton; // Button to navigate back
 
 	    private User currentUser; // handling users
+	    
+	    // Needs current user session from previous page
 
 
 	    // Method to initialize the view components

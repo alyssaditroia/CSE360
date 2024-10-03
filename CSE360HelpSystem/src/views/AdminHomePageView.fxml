@@ -2,7 +2,38 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="views.AdminHomePageView">
-    <Button fx:id="logoutButton" text="Logout" layoutX="10" layoutY="10" />
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.AdminHomePageController">
+    <children>
+        <!-- Title Label -->
+        <Label fx:id="adminHomeTitle" text="Admin Home Page" layoutX="20.0" layoutY="20.0" 
+               style="-fx-font-size: 24; -fx-font-weight: bold;" />
+
+        <!-- Label for Permissions -->
+        <Label text="Select permissions for invitee" layoutX="20.0" layoutY="40.0" 
+               style="-fx-font-size: 14;" />
+
+        <!-- Checkboxes for Permissions -->
+        <CheckBox fx:id="admin" text="Admin" layoutX="20.0" layoutY="60.0" />
+        <CheckBox fx:id="student" text="Student" layoutX="20.0" layoutY="90.0" />
+        <CheckBox fx:id="instructor" text="Instructor" layoutX="20.0" layoutY="120.0" />
+
+        <!-- Label for Email Field -->
+        <Label text="Enter invitee email" layoutX="20.0" layoutY="150.0" 
+               style="-fx-font-size: 14;" />
+
+        <!-- Email for User to Invite -->
+        <TextField fx:id="emailField" promptText="User Email" layoutX="20.0" layoutY="170.0"/>
+
+        <!-- Send Invite Button -->
+        <Button fx:id="sendInviteButton" text="Send Invite" layoutX="20.0" layoutY="210.0" 
+                onAction="#handleInvite" />
+
+        <!-- Logout Button -->
+        <Button fx:id="logoutButton" text="Logout" layoutX="120.0" layoutY="210.0" 
+                onAction="#logout" />
+    </children>
 </AnchorPane>
+
+
