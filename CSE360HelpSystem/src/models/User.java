@@ -7,6 +7,7 @@ package models;
  **************/
 public class User {
 	private int id;
+	private String inviteToken;
     private String username;
     private char[] password;
     private String email;
@@ -32,12 +33,14 @@ public class User {
     }
 
     public User() {
-		// TODO Auto-generated constructor stub
 	}
 
 	// Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+    
+    public String getInviteToken() { return inviteToken; }
+    public void setInviteToken(String inviteToken) { this.inviteToken = inviteToken; }
     
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }

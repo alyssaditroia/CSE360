@@ -157,8 +157,13 @@ public class TextValidation {
     }
 
     // Checks if a given field is empty or invalid
-    public boolean isFieldEmpty(String field) {
-        return field == null || field.trim().length() < 2;
+    public static String isFieldEmpty(String field) {
+        if(field == null || field.trim().length() < 1) {
+        	return "Field can not be null";
+        }
+        else {
+        	return "";
+        }
     }
 
     // Validates both username and password
