@@ -1,7 +1,6 @@
 package database;
 
 import java.sql.*;
-import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,10 @@ import java.util.List;
  * This class manages all interactions with the database,
  * including saving users, managing OTP, and updating user details.
  * 
- * To visualize database run command:  java -jar h2*.jar
+ * To visualize database run commands:
+ * cd h2
+ * cd bin
+ * java -jar h2*.jar
  */
 public class Database {
     // JDBC driver name and database URL
@@ -260,23 +262,21 @@ public void setupAdministrator(String username, String password) throws SQLExcep
      * @return inviteToken
      * @throws SQLException
      */
-    public String inviteUser(String email, boolean isAdmin, boolean isStudent, boolean isInstructor) throws SQLException {
+    public String inviteUser(String inviteCode, boolean isAdmin, boolean isStudent, boolean isInstructor) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
-        if (doesUserExist(email)) {
-            throw new SQLException("User already exists with the provided email.");
+        if (doesUserExist(inviteCode)) {
+            throw new SQLException("User already exists with the provided invite code.");
         }
-        String inviteToken = UUID.randomUUID().toString();
-        String insertInvite = "INSERT INTO cse360users (email, isAdmin, isStudent, isInstructor, inviteToken) VALUES (?, ?, ?, ?, ?)";
+        String insertInvite = "INSERT INTO cse360users (isAdmin, isStudent, isInstructor, inviteToken) VALUES (?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(insertInvite)) {
-            pstmt.setString(1, email);
-            pstmt.setBoolean(2, isAdmin);
-            pstmt.setBoolean(3, isStudent);
-            pstmt.setBoolean(4, isInstructor);
-            pstmt.setString(5, inviteToken);
+            pstmt.setBoolean(1, isAdmin);
+            pstmt.setBoolean(2, isStudent);
+            pstmt.setBoolean(3, isInstructor);
+            pstmt.setString(4, inviteCode);
             pstmt.executeUpdate();
         }
-        return inviteToken;
+        return inviteCode;
     }
 
     /**
@@ -351,7 +351,6 @@ public void setupAdministrator(String username, String password) throws SQLExcep
         try {
 			statement = connection.createStatement();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         String query = "SELECT firstName FROM cse360users WHERE username = ?";
@@ -386,6 +385,9 @@ public void setupAdministrator(String username, String password) throws SQLExcep
             return rs.next() && rs.getInt(1) > 0;
         }
     }
+    /**
+     * Closes connection to the database
+     */
     public void closeConnection() {
         if (connection != null) {
             try {

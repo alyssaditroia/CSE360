@@ -64,8 +64,8 @@ public class LoginPageController extends PageController {
         String password = passwordField.getText();
 
         // Validate input fields
-        String usernameError = TextValidation.validateUsername(username);
-        String passwordError = TextValidation.validatePassword(password);
+        String usernameError = TextValidation.isFieldEmpty(username);
+        String passwordError = TextValidation.isFieldEmpty(password);
 
         if (!usernameError.isEmpty()) {
             showError(usernameError);
@@ -154,10 +154,12 @@ public class LoginPageController extends PageController {
         navigateTo("/views/SetupAccountPageView.fxml");
     }
 
-    @FXML
-    public void redirectToSelectRolePageView() {
-        navigateTo("/views/SelectRolePageView.fxml");
-    }
+
+    @FXML 
+ 	public void redirectToSelectRolePageView() {
+	 navigateTo("/views/SelectRolePageView.fxml"); 
+	  }
+   
 
     @FXML
     public void logout() {
