@@ -9,6 +9,8 @@ public class UserSession {
     private static UserSession instance;
     private User user; // Current logged-in user
     private String username;
+    private String inviteCode;
+    private String email;
 
     // Private constructor to prevent instantiation
     private UserSession() {}
@@ -45,6 +47,31 @@ public class UserSession {
 		this.user.setUsername(username2);
 		setCurrentUser(user);
 		
+	}
+
+	/**
+	 * @return the inviteCode
+	 */
+	public String getInviteCode() {
+		return inviteCode;
+	}
+
+	/**
+	 * 
+	 * @param inviteCode
+	 */
+	public void setInviteCode(String inviteCode) {
+		this.inviteCode = inviteCode;
+	}
+	public String getEmail() {
+		return email;
+	}
+	/**
+	 * 
+	 * @param inviteCode
+	 */
+	public void setEmail(String email) {
+		this.inviteCode = email;
 	}
 }
 

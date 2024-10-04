@@ -75,6 +75,8 @@ public class AdminHomePageController extends PageController {
             showAlert("Invalid Email", validationResult, "");
             return;
         }
+        db = Database.getInstance();
+        if(db.getEmail(email) == "") {
 
         // Check to make sure permissions are set using checkboxes
         if (!admin.isSelected() && !student.isSelected() && !instructor.isSelected()) {
@@ -100,13 +102,16 @@ public class AdminHomePageController extends PageController {
             // Call inviteUser function to add the user into the database
         	// The new user is added with their invite code and permissions
         	db = Database.getInstance();
-            String generatedInviteCode = db.inviteUser(inviteToken, isAdmin, isStudent, isInstructor);
+            String generatedInviteCode = db.inviteUser(inviteToken, email, isAdmin, isStudent, isInstructor);
             showAlert("User Invited!", "User invited with invite code: " + generatedInviteCode, "Invite sent to: " + email);
             System.out.println("User invited with invite code: " + generatedInviteCode);
             
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Database Error", "An error occurred while accessing the database.", "");
+        }
+        }else {
+        	showAlert("User Already Exists!", "User Already Exists With Email", email);
         }
     }
 

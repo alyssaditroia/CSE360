@@ -19,165 +19,193 @@ import models.UserSession;
  *  Implements login page
  */
 public class LoginPageController extends PageController {
-	private Stage stage;
-	private User user;
-    // FXML elements 
-    @FXML
-    private TextField usernameField;
+  // FXML elements 
+  @FXML
+  private TextField usernameField;
 
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private TextField inviteCodeField;
+  @FXML
+  private PasswordField passwordField;
+  @FXML
+  private TextField inviteCodeField;
 
-    @FXML
-    private Button loginButton;
+  @FXML
+  private Button loginButton;
 
-    @FXML
-    private Label errorLabel;
+  @FXML
+  private Button inviteButton;
 
-    @FXML
-    private Label statusLabel;
+  @FXML
+  private Label errorLabel;
 
-    // Default constructor, called by FXMLLoader
-    public LoginPageController() {
-        super(); // Call the default constructor of PageController
+  @FXML
+  private Label statusLabel;
+
+  // Default constructor, called by FXMLLoader
+  public LoginPageController() {
+    super(); 
+  }
+
+  // Constructor with Stage and Database
+  public LoginPageController(Stage primaryStage, Database db) {
+    super(primaryStage, db);
+  }
+
+  /**
+   *  ****** BELOW HANDLES WHEN THE USER LOGS IN FOR ALL CASES *******
+   *  1. USER IS FIRST EVER USER = ADMIN
+   *  2. USER IS LOGGING IN FOR THE FIRST TIME AND HAS NOT FINISHED ACCOUNT SETUP
+   *  3. USER IS FULLY SET UP AND LOGGING IN
+   */
+  @FXML
+  public void handleLogin() {
+    db = Database.getInstance();
+    errorLabel.setText(""); // Clearing any previous error messaages
+
+    String username = usernameField.getText(); // Fetch username from the text field
+    String password = passwordField.getText(); // Fetch password from text field
+
+    // Validate username and password fields to ensure they are not empty
+    String usernameError = TextValidation.isFieldEmpty(username);
+    String passwordError = TextValidation.isFieldEmpty(password);
+
+    // If the error message returned from text validation is not an empty string then display an error
+    if (!usernameError.isEmpty()) {
+      showError(usernameError);
+      return;
+    }
+    // If the error message returned from text validation is not an empty string then display an error
+    if (!passwordError.isEmpty()) {
+      showError(passwordError);
+      return;
     }
 
-    // Constructor with Stage and Database
-    public LoginPageController(Stage primaryStage, Database db) {
-        super(primaryStage, db);
-        this.stage = primaryStage;
+    // Check if the database is empty. If the database is empty then setup the admin account
+    try {
+      if (db.isDatabaseEmpty()) {
+        setupAdministrator();
+        return;
+      }
+
+      // Check the user's credentials with the database and ensure they match
+      if (db.validateCredentials(username, password)) {
+        String firstName = db.getFirstName(username); // Fetch user's first name to check if account is fully set up
+        // ****** BELOW CHECKS IF THE USER IS FULLY SET UP OR NOT *******
+        // If the user in the database associated with the username entered does not have a first name
+        // The user will be navigated to the Finish Account Setup Page
+        if (firstName == null || firstName.isEmpty()) {
+          User loggedInUser = new User(); // Creating a new User 
+          loggedInUser.setUsername(username); // Setting the username of the User
+          UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
+          userSession.setCurrentUser(loggedInUser); // Setting the userSession to the current user 
+          // ****** FINISH SETTING UP ACCOUNT *******
+          redirectToFinishSetupAccount();
+          return;
+        }
+
+        // ****** BELOW IS THE LOGIC FOR WHEN THE USER LOGS IN AND IS FULLY SET UP ******
+        // Otherwise if the user is fully setup, the user will be redirected to the Select Role Page View
+        User loggedInUser = new User();
+        loggedInUser.setUsername(username);
+        loggedInUser.setInviteToken("");
+        UserSession.getInstance().setCurrentUser(loggedInUser);
+        System.out.println("User logged in: " + UserSession.getInstance().getUsername());
+        redirectToSelectRolePageView();
+      } else {
+        // Show error if credentials are invalid
+        showError("Invalid credentials. Please try again.");
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+      showError("An error occurred while processing your request.");
     }
+  }
 
+  /**
+   *  ****** BELOW HANDLES WHEN THE USER ENTERS AN INVITE CODE TO SETUP THEIR ACCOUNT *******
+   */
+  @FXML
+  public void handleInviteButton() {
+    db = Database.getInstance();
+    // Clear previous error messages
+    errorLabel.setText("");
 
-    /**
-     *  Method to handle login action
-     */
-    @FXML
-    public void handleLogin() {
-        db = Database.getInstance();
-        // Clear previous error messages
-        errorLabel.setText("");
+    String inviteCode = inviteCodeField.getText();
 
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-
-        // Validate input fields
-        String usernameError = TextValidation.isFieldEmpty(username);
-        String passwordError = TextValidation.isFieldEmpty(password);
-
-        if (!usernameError.isEmpty()) {
-            showError(usernameError);
-            return;
-        }
-        if (!passwordError.isEmpty()) {
-            showError(passwordError);
-            return;
-        }
-
-        try {
-            // Check if the database is empty
-            if (db.isDatabaseEmpty()) {
-                setupAdministrator(); // Setup admin if database is empty
-                return; // Exit after setting up the administrator
-            }
-
-            // Validate user credentials from database
-            if (db.validateCredentials(username, password)) {
-                // Fetch user details and check if account is fully set up
-                String firstName = db.getFirstName(username);
-                if (firstName == null || firstName.isEmpty()) {
-                	User loggedInUser = new User();
-                	loggedInUser.setUsername(username);
-                	// After successful login in LoginPageController
-                	UserSession userSession = UserSession.getInstance();
-                	userSession.setCurrentUser(loggedInUser); // Assume loggedInUser is of type User
-                	navigateTo("/views/FinishAccountSetupView.fxml");
-
-                    redirectToFinishAccountSetup(); // Redirect to account setup if not completed
-                    return;  // Exit after redirection
-                }
-
-                // Successful login, set user session, and redirect to role selection
-                User loggedInUser = new User();
-                loggedInUser.setUsername(username);
-                UserSession.getInstance().setCurrentUser(loggedInUser);
-                System.out.println("User logged in: " + UserSession.getInstance().getUsername());
-                redirectToSelectRolePageView();
-            } else {
-                // Show error if credentials are invalid
-                showError("Invalid credentials. Please try again.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showError("An error occurred while processing your request.");
-        }
+    // Validate user credentials from database
+    try {
+      if (db.validateInvite(inviteCode)) {
+        System.out.println("User invite code validated");
+        User userWithInvite = new User();
+        userWithInvite.setInviteToken(inviteCode);
+        UserSession userSession = UserSession.getInstance();
+        userSession.setCurrentUser(userWithInvite); // Assume loggedInUser is of type User
+        userSession.setInviteCode(inviteCode);
+        System.out.println("User Logged in with invite code " + inviteCode);
+        redirectToSetupAccount();
+        return; // Exit after redirection
+      } else {
+        // Show error if invite code is invalid
+        showError("Invalid invite code. Please try again.");
+        return;
+      }
+    } catch (SQLException e) {
+      System.out.println("Error when trying to validate invite code");
+      e.printStackTrace();
     }
+  }
+  /**
+   *  ****** BELOW HANDLES WHEN THE USER IS THE FIRST EVER USER *******
+   */
+  @FXML
+  public void setupAdministrator() {
+    db = Database.getInstance();
+    errorLabel.setText(""); // Clear previous error messages
+    statusLabel.setText("");
 
- private void redirectToFinishAccountSetup() {
+    String username = usernameField.getText();
+    String password = passwordField.getText();
+
+    try {
+      // Create administrator in the database
+      db.setupAdministrator(username, password);
+      // Redirect to login page after admin setup
+      redirectToLoginPageView();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      showError("An error occurred while trying to create an administrator.");
+    }
+  }
+
+  private void redirectToLoginPageView() {
+    statusLabel.setText("Account setup successful! Redirecting to login...");
+    statusLabel.setStyle("-fx-text-fill: green;");
+
+    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+    pause.setOnFinished(event -> navigateTo("/views/LoginPageView.fxml"));
+    pause.play();
+  }
+
+  @FXML
+  public void redirectToSetupAccount() {
+    navigateTo("/views/SetupAccountPageView.fxml");
+  }
+  @FXML
+  public void redirectToFinishSetupAccount() {
     navigateTo("/views/FinishAccountSetupView.fxml");
-		
+  }
+
+  @FXML
+  public void redirectToSelectRolePageView() {
+    navigateTo("/views/SelectRolePageView.fxml");
+  }
+
+  public void showError(String message) {
+    errorLabel.setText(message);
+  }
+
+  // OVERRIDE the initialize method if needed
+  @Override
+  public void initialize(Stage stage, Database db) {
+    super.initialize(stage, db);
+  }
 }
-
-	@FXML
-    public void setupAdministrator() {
-        db = Database.getInstance();
-        errorLabel.setText(""); // Clear previous error messages
-        statusLabel.setText("");
-
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-
-        try {
-            // Create administrator in the database
-            db.setupAdministrator(username, password);
-            // Redirect to login page after admin setup
-            redirectToLoginPageView();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showError("An error occurred while trying to create an administrator.");
-        }
-    }
-
-    private void redirectToLoginPageView() {
-        statusLabel.setText("Account setup successful! Redirecting to login...");
-        statusLabel.setStyle("-fx-text-fill: green;");
-
-        PauseTransition pause = new PauseTransition(Duration.seconds(2));
-        pause.setOnFinished(event -> navigateTo("/views/LoginPageView.fxml"));
-        pause.play();
-    }
-
-    @FXML
-    public void redirectToSetupAccount() {
-        navigateTo("/views/SetupAccountPageView.fxml");
-    }
-
-
-    @FXML 
- 	public void redirectToSelectRolePageView() {
-	 navigateTo("/views/SelectRolePageView.fxml"); 
-	  }
-   
-
-    @FXML
-    public void logout() {
-        System.out.println("Logged out successfully.");
-        navigateTo("/views/LoginPageView.fxml");
-    }
-
-    public void showError(String message) {
-        errorLabel.setText(message);
-    }
-
-    // Optionally override the initialize method if needed
-    @Override
-    public void initialize(Stage stage, Database db) {
-        super.initialize(stage, db);
-        // Additional initialization if necessary
-    }
-}
-
-
-
