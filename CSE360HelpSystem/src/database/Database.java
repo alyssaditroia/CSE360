@@ -262,18 +262,19 @@ public void setupAdministrator(String username, String password) throws SQLExcep
      * @return inviteToken
      * @throws SQLException
      */
-    public String inviteUser(String inviteCode, boolean isAdmin, boolean isStudent, boolean isInstructor) throws SQLException {
+    public String inviteUser(String inviteCode, String email, boolean isAdmin, boolean isStudent, boolean isInstructor) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
         if (doesUserExist(inviteCode)) {
             throw new SQLException("User already exists with the provided invite code.");
         }
-        String insertInvite = "INSERT INTO cse360users (isAdmin, isStudent, isInstructor, inviteToken) VALUES (?, ?, ?, ?)";
+        String insertInvite = "INSERT INTO cse360users (isAdmin, isStudent, isInstructor, email, inviteToken) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(insertInvite)) {
             pstmt.setBoolean(1, isAdmin);
             pstmt.setBoolean(2, isStudent);
             pstmt.setBoolean(3, isInstructor);
-            pstmt.setString(4, inviteCode);
+            pstmt.setString(4,  email);
+            pstmt.setString(5, inviteCode);
             pstmt.executeUpdate();
         }
         return inviteCode;
@@ -375,6 +376,37 @@ public void setupAdministrator(String username, String password) throws SQLExcep
             if (rs.next()) {
                 String storedFirstName = rs.getString("firstName");
                 return storedFirstName != null ? storedFirstName : "";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    /**
+     * getFirstName()
+     * Method to get the first name of the user based on the username
+     * @param username
+     * @return
+     */
+    public String getEmail(String email) {
+    	try {
+			connection = DriverManager.getConnection(DB_URL, USER, PASS);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try {
+			statement = connection.createStatement();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        String query = "SELECT firstName FROM cse360users WHERE email = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String storedEmail = rs.getString("email");
+                return storedEmail != null ? storedEmail : "";
             }
         } catch (SQLException e) {
             e.printStackTrace();

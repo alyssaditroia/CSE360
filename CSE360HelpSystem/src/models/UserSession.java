@@ -10,6 +10,7 @@ public class UserSession {
     private User user; // Current logged-in user
     private String username;
     private String inviteCode;
+    private String email;
 
     // Private constructor to prevent instantiation
     private UserSession() {}
@@ -56,10 +57,21 @@ public class UserSession {
 	}
 
 	/**
-	 * @param inviteCode the inviteCode to set
+	 * 
+	 * @param inviteCode
 	 */
 	public void setInviteCode(String inviteCode) {
 		this.inviteCode = inviteCode;
+	}
+	public String getEmail() {
+		return email;
+	}
+	/**
+	 * 
+	 * @param inviteCode
+	 */
+	public void setEmail(String email) {
+		this.inviteCode = email;
 	}
 }
 

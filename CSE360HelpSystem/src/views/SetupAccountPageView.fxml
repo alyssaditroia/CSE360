@@ -7,7 +7,6 @@
     <TextField fx:id="usernameField" promptText="Username" prefWidth="300" />
     <PasswordField fx:id="passwordField" promptText="Password" prefWidth="300" />
     <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" prefWidth="300" />
-    <TextField fx:id="inviteCodeField" promptText="Invite Code" prefWidth="300" />
     <Button fx:id="setupButton" text="Setup Account" onAction="#handleSetupButtonAction" prefWidth="150" />
     <Label fx:id="statusLabel" style="-fx-text-fill: red;" /> <!-- Default style for errors -->
 </VBox>
