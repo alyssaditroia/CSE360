@@ -31,7 +31,7 @@
                 <Button fx:id="sendInviteButton" text="Send Invite" onAction="#handleInvite" GridPane.rowIndex="5" GridPane.columnIndex="1" />
             </GridPane>
 
-            <!-- Buttons for Actions -->
+            <!-- Buttons for Actions  -->
             <HBox alignment="CENTER_RIGHT" spacing="20">
                 <Button fx:id="logoutButton" text="Logout" onAction="#logout" />
             </HBox>

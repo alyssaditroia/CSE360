@@ -17,4 +17,4 @@ pom.xml
 # Ignore Gradle files
 .gradle/
 build/
-*.gradle
+*.gradle 
