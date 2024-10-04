@@ -104,7 +104,15 @@ public class LoginPageController extends PageController {
                 loggedInUser.setUsername(username);
                 UserSession.getInstance().setCurrentUser(loggedInUser);
                 System.out.println("User logged in: " + UserSession.getInstance().getUsername());
-                redirectToSelectRolePageView();
+                
+                // CHANGED: Justin Faris 10-3-24 
+                // Check number of roles and redirect accordingly
+                int numRoles = checkNumRoles(username);
+                if (numRoles == 1) {
+                    redirectBasedOnSingleRole(username);
+                } else {
+                    redirectToSelectRolePageView();
+                }
             } else {
                 // Show error if credentials are invalid
                 showError("Invalid credentials. Please try again.");
@@ -115,10 +123,10 @@ public class LoginPageController extends PageController {
         }
     }
 
- private void redirectToFinishAccountSetup() {
-    navigateTo("/views/FinishAccountSetupView.fxml");
-		
-}
+	private void redirectToFinishAccountSetup() {
+	    navigateTo("/views/FinishAccountSetupView.fxml");
+			
+	}
 
 	@FXML
     public void setupAdministrator() {
@@ -137,6 +145,24 @@ public class LoginPageController extends PageController {
         } catch (SQLException e) {
             e.printStackTrace();
             showError("An error occurred while trying to create an administrator.");
+        }
+    }
+	
+	private int checkNumRoles(String username) throws SQLException {
+        int numRoles = 0;
+        if (db.isUserAdmin(username)) numRoles++;
+        if (db.isUserInstructor(username)) numRoles++;
+        if (db.isUserStudent(username)) numRoles++;
+        return numRoles;
+    }
+
+    private void redirectBasedOnSingleRole(String username) throws SQLException {
+        if (db.isUserAdmin(username)) {
+            navigateTo("/views/AdminHomePageView.fxml");
+        } else if (db.isUserInstructor(username)) {
+            navigateTo("/views/InstructorHomePageView.fxml");
+        } else if (db.isUserStudent(username)) {
+            navigateTo("/views/StudentHomePageView.fxml");
         }
     }
 
