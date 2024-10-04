@@ -1,2 +1,20 @@
+# Ignore build directories
 /bin/
 /lib/
+
+# Ignore class files
+*.class
+
+# Ignore IDE-specific files (e.g., Eclipse)
+.classpath
+.project
+.settings/
+
+# Ignore Maven files
+target/
+pom.xml
+
+# Ignore Gradle files
+.gradle/
+build/
+*.gradle
