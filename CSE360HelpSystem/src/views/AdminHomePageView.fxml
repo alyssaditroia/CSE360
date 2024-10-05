@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.AdminHomePageController"
       prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
@@ -31,6 +30,18 @@
                 <Button fx:id="sendInviteButton" text="Send Invite" onAction="#handleInvite" GridPane.rowIndex="5" GridPane.columnIndex="1" />
             </GridPane>
 
+            <!-- TableView for displaying invited users -->
+            <TableView fx:id="userTable" prefHeight="300">
+                <columns>
+                    <TableColumn fx:id="emailColumn" text="Email" />
+                    <TableColumn fx:id="adminColumn" text="Admin" />
+                    <TableColumn fx:id="studentColumn" text="Student" />
+                    <TableColumn fx:id="instructorColumn" text="Instructor" />
+                    <TableColumn fx:id="updatePermissionsColumn" text="Update User Permissions" />
+                    <TableColumn fx:id="resetPasswordColumn" text="Reset User Password" />
+                </columns>
+            </TableView>
+
             <!-- Buttons for Actions  -->
             <HBox alignment="CENTER_RIGHT" spacing="20">
                 <Button fx:id="logoutButton" text="Logout" onAction="#logout" />
@@ -38,11 +49,6 @@
         </VBox>
     </children>
 </AnchorPane>
-
-
-
-
-
 
 
 

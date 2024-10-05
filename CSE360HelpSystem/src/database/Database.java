@@ -2,7 +2,11 @@ package database;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import models.User;
 
 /**
  * FINISHED PAGE DO NOT EDIT
@@ -78,7 +82,8 @@ public class Database {
                 + "isInstructor BOOLEAN DEFAULT FALSE, "
                 + "inviteToken VARCHAR(255),"
                 + "otp VARCHAR(255), "
-                + "otp_expiration TIMESTAMP)";
+                + "otpFlag BOOLEAN DEFAULT FALSE, "
+                + "otpExpiration TIMESTAMP)";
         statement.execute(userTable);
     }
     
@@ -208,46 +213,27 @@ public class Database {
         }
     }
     
-    public boolean updatePassword(String username, String password) {
-        Connection connection = null;
-        PreparedStatement pstmt = null;
-
-        try {
-            // Establishing connection to the database
-            connection = DriverManager.getConnection(DB_URL, USER, PASS);
+    public boolean updatePassword(String username, String password) throws SQLException {
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+    	// Queries database based on invite code
+        String query = "SELECT * FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
             
-            // Preparing the SQL query to update the password
-            String updateQuery = "UPDATE cse360users SET password = ? WHERE username = ?";
-
-            // Using PreparedStatement to set parameters and execute the update
-            pstmt = connection.prepareStatement(updateQuery);
-            pstmt.setString(1, password);  // Set the new password
-            pstmt.setString(2, username);  // Set the username
-
-            // Execute the update and check if the password was successfully updated
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0;  // Returns true if at least one row was updated
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            // Close the resources in the finally block to avoid resource leaks
-            if (pstmt != null) {
-                try {
-                    pstmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            // If the user exists then the user is updated accordingly and the invite token is set to NULL
+            if (rs.next()) {
+                String updateUser = "UPDATE cse360users SET password = ? WHERE username = ?";
+                try (PreparedStatement updateStmt = connection.prepareStatement(updateUser)) {
+                    updateStmt.setString(1, password);
+                    updateStmt.setString(2, username);
+                    updateStmt.executeUpdate();
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     
@@ -513,6 +499,76 @@ public class Database {
         }
         return null; // User not found or role not set
     }
+    public void updateUserPermissions(String email, Boolean isAdmin, Boolean isStudent, Boolean isInstructor) throws SQLException {
+        String query = "UPDATE cse360users SET isAdmin = ?, isStudent = ?, isInstructor = ? WHERE email = ?";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setBoolean(1, isAdmin);
+            stmt.setBoolean(2, isStudent);
+            stmt.setBoolean(3, isInstructor);
+            stmt.setString(4, email);
+            
+            stmt.executeUpdate();
+        }
+    }
 
 
+    /**
+     * Retrieve all users from the cse360users table.
+     * @return List<User> A list of all users
+     * @throws SQLException
+     */
+    public List<Map<String, Object>> getAllUsers() throws SQLException {
+        List<Map<String, Object>> usersList = new ArrayList<>();
+        String query = "SELECT * FROM cse360users";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Map<String, Object> userMap = new HashMap<>();
+                userMap.put("id", resultSet.getInt("id"));
+                userMap.put("firstName", resultSet.getString("firstName"));
+                userMap.put("lastName", resultSet.getString("lastName"));
+                userMap.put("preferredName", resultSet.getString("preferredName"));
+                userMap.put("email", resultSet.getString("email"));
+                userMap.put("username", resultSet.getString("username"));
+                userMap.put("password", resultSet.getString("password")); // Consider security implications
+                userMap.put("isAdmin", resultSet.getBoolean("isAdmin"));
+                userMap.put("isStudent", resultSet.getBoolean("isStudent"));
+                userMap.put("isInstructor", resultSet.getBoolean("isInstructor"));
+                userMap.put("inviteToken", resultSet.getString("inviteToken"));
+                userMap.put("otp", resultSet.getString("otp"));
+                userMap.put("otpExpiration", resultSet.getTimestamp("otpExpiration"));
+                userMap.put("otpFlag", resultSet.getBoolean("otpFlag"));
+
+                usersList.add(userMap);
+            }
+        }
+
+        return usersList;
+    }
+    public Boolean getOTPFlag(String username) throws SQLException {
+        // Initialize the connection
+        connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        
+        // Define the SQL query to select the otpFlag
+        String query = "SELECT otpFlag FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            
+            // Check if a result exists
+            if (rs.next()) {
+                // Return true if otpFlag is true, false if otpFlag is false
+                return rs.getBoolean("otpFlag");
+            } else {
+                // Return null if no user found
+                return null;
+            }
+        }
+    }
 }
+
+
+

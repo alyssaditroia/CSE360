@@ -11,6 +11,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import models.OTP;
 import models.TextValidation;
 import models.User;
 import models.UserSession;
@@ -89,6 +90,25 @@ public class LoginPageController extends PageController {
       // Check the user's credentials with the database and ensure they match
       if (db.validateCredentials(username, password)) {
         String firstName = db.getFirstName(username); // Fetch user's first name to check if account is fully set up
+        
+        // ****** BELOW CHECKS IF THE USER'S PASSWORD IS A ONE TIME PASSWORD *******
+        Boolean otpFlag = db.getOTPFlag(username);
+        if(otpFlag == true) {
+        OTP otp = new OTP();
+        String validOTP = otp.validateOTP(username, password);
+        if(validOTP == "") {
+        	User loggedInUser = new User();
+        	loggedInUser.setUsername(username);
+        	otp.invalidateOTP(username);
+        	UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
+            userSession.setCurrentUser(loggedInUser); 
+        	redirectToUpdatePassword();
+        	return;
+        }else {
+        	System.out.println("OTP VALIDATION MESSAGE: " + validOTP);
+        	// NEED TO IMPLEMENT THE CASE WHERE THE VALIDATION MESSAGE IS FALSE
+        }
+        }
         // ****** BELOW CHECKS IF THE USER IS FULLY SET UP OR NOT *******
         // If the user in the database associated with the username entered does not have a first name
         // The user will be navigated to the Finish Account Setup Page
@@ -109,7 +129,15 @@ public class LoginPageController extends PageController {
         loggedInUser.setInviteToken("");
         UserSession.getInstance().setCurrentUser(loggedInUser);
         System.out.println("User logged in: " + UserSession.getInstance().getUsername());
-        redirectToSelectRolePageView();
+
+        // CHANGED: Justin Faris 10-3-24 
+        // Check number of roles and redirect accordingly
+        int numRoles = checkNumRoles(username);
+        if (numRoles == 1) {
+            redirectBasedOnSingleRole(username);
+        } else {
+            redirectToSelectRolePageView();
+        }
       } else {
         // Show error if credentials are invalid
         showError("Invalid credentials. Please try again.");
@@ -169,15 +197,33 @@ public class LoginPageController extends PageController {
       // Create administrator in the database
       db.setupAdministrator(username, password);
       // Redirect to login page after admin setup
-      redirectToLoginPageView();
+      redirectToLoginPageViewAdmin();
     } catch (SQLException e) {
       e.printStackTrace();
       showError("An error occurred while trying to create an administrator.");
     }
   }
 
-  private void redirectToLoginPageView() {
-    statusLabel.setText("Account setup successful! Redirecting to login...");
+private int checkNumRoles(String username) throws SQLException {
+    int numRoles = 0;
+    if (db.isUserAdmin(username)) numRoles++;
+    if (db.isUserInstructor(username)) numRoles++;
+    if (db.isUserStudent(username)) numRoles++;
+    return numRoles;
+}
+
+private void redirectBasedOnSingleRole(String username) throws SQLException {
+    if (db.isUserAdmin(username)) {
+        navigateTo("/views/AdminHomePageView.fxml");
+    } else if (db.isUserInstructor(username)) {
+        navigateTo("/views/InstructorHomePageView.fxml");
+    } else if (db.isUserStudent(username)) {
+        navigateTo("/views/StudentHomePageView.fxml");
+    }
+ }
+
+  private void redirectToLoginPageViewAdmin() {
+    statusLabel.setText("Admin account setup successful! Redirecting to login...");
     statusLabel.setStyle("-fx-text-fill: green;");
 
     PauseTransition pause = new PauseTransition(Duration.seconds(2));
@@ -187,16 +233,40 @@ public class LoginPageController extends PageController {
 
   @FXML
   public void redirectToSetupAccount() {
-    navigateTo("/views/SetupAccountPageView.fxml");
+	    statusLabel.setText("Invite code validated! Redirecting to account setup...");
+	    statusLabel.setStyle("-fx-text-fill: green;");
+
+	    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+	    pause.setOnFinished(event -> navigateTo("/views/SetupAccountPageView.fxml"));
+	    pause.play();
+  }
+  @FXML
+  public void redirectToUpdatePassword() {
+	    statusLabel.setText("One-time password validated! Redirecting to update password...");
+	    statusLabel.setStyle("-fx-text-fill: green;");
+
+	    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+	    pause.setOnFinished(event -> navigateTo("/views/UpdatePasswordPageView.fxml"));
+	    pause.play();
   }
   @FXML
   public void redirectToFinishSetupAccount() {
-    navigateTo("/views/FinishAccountSetupView.fxml");
+	    statusLabel.setText("Login successful, finish setup required! Redirecting to finish account setup...");
+	    statusLabel.setStyle("-fx-text-fill: green;");
+
+	    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+	    pause.setOnFinished(event -> navigateTo("/views/FinishAccountSetupView.fxml"));
+	    pause.play();
   }
 
   @FXML
   public void redirectToSelectRolePageView() {
-    navigateTo("/views/SelectRolePageView.fxml");
+	    statusLabel.setText("Login successful! Redirecting to select role page...");
+	    statusLabel.setStyle("-fx-text-fill: green;");
+
+	    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+	    pause.setOnFinished(event -> navigateTo("/views/SelectRolePageView.fxml"));
+	    pause.play();
   }
 
   public void showError(String message) {

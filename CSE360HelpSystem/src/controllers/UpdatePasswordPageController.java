@@ -3,34 +3,40 @@
  */
 package controllers;
 
-import database.Database;
+import java.sql.SQLException;
 import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import database.Database;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import models.TextValidation;
 import models.User;
 import models.UserSession;
+import models.TextValidation;
 
 /**
- * When user's password is an OTP, then this is the page the user is directed to 
+ * <p> Title: UpdatePasswordPageController </p>
+ * <p> Description: Controls the view for the page where the user's password is being changed </p>
  */
 public class UpdatePasswordPageController extends PageController {
-	 private Database db;
-	 
-	// Default constructor for FXML
-	public UpdatePasswordPageController() {
-		super();
-	}
-	public UpdatePasswordPageController(Stage primaryStage, Database db) {
-		super(primaryStage, db);
-	}
-	// Gets the current logged in user by username
-	String username = UserSession.getInstance().getUsername();
-	
+    private Database db;
+
+    // Constructor for FXMLLoader
+    public UpdatePasswordPageController() {
+        super();
+    }
+
+    // Constructor with dependency injection for Stage and Database
+    public UpdatePasswordPageController(Stage primaryStage, Database db) {
+        super(primaryStage, db);
+    }
+
+    @FXML
+    private TextField usernameField;
+
     @FXML
     private PasswordField passwordField;
 
@@ -38,40 +44,56 @@ public class UpdatePasswordPageController extends PageController {
     private PasswordField confirmPasswordField;
 
     @FXML
-    private Button updateButton;
+    private Button setupButton;
 
     @FXML
     private Label statusLabel;
-    
-    @FXML
-    private void handleUpdatePasswordAction() {
-        // Clear previous status messages
-        statusLabel.setText("");
 
-        // Trim whitespace from password values
+    /**
+     * handleSetupButtonAction()
+     * Below is the implementation for handling the user's account setup and updating their information in the database.
+     * The details are validated and the user's information associated with that invite code is updated in the database.
+     * The invite code is set to null after use.
+     */
+    @FXML
+    private void handleSetupButtonAction() {
+        db = Database.getInstance(); // Get the current instance of the Database
+        statusLabel.setText(""); // Clear previous status messages
+        UserSession currentUser = UserSession.getInstance(); // Get the current user instance
+        String inviteCode = currentUser.getInviteCode(); // Get the current user instance invite code
+        String currentUsername = currentUser.getUsername();
+        System.out.println("Current user username: " + currentUsername);
+
+        // Trim whitespace from username field
+        String username = usernameField.getText().trim();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        // Validate the username and password using model's TextValidation
-        // Will make sure the username and password meet specific criteria
-        String validationMessage = TextValidation.validateChangePassword(password, confirmPassword);
-        if (validationMessage.isEmpty()) {
-            // Create a new user object
-            db.updatePassword(username, password);
-            
-            // Show success message
-            statusLabel.setText("Password Successfully Updated! Redirecting to login...");
-            statusLabel.setStyle("-fx-text-fill: green;"); // Example success feedback
+        // Validate the username and password using TextValidation model
+        String validationMessage = TextValidation.validateSetupFields(username, password, confirmPassword);
 
-            // Create a PauseTransition for 2 seconds
-            PauseTransition pause = new PauseTransition(Duration.seconds(2));
-            pause.setOnFinished(event -> {
+        // If the fields are valid
+        if (validationMessage.isEmpty()) {
+            try {
+                // No invite code, update the password for the user
+                User newUser = new User("", "", "", "", username, password.toCharArray(), null, null, null);
+                db.updatePassword(username, password);
+
+                // Show success message for password update
+                statusLabel.setText("Password updated successfully! Redirecting to login...");
+                statusLabel.setStyle("-fx-text-fill: green;");
+
                 // Redirect to login page after 2 seconds
-                redirectToLogin();
-            });
-            pause.play(); // Start the pause
+                PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                pause.setOnFinished(event -> redirectToLogin());
+                pause.play();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                statusLabel.setText("Error processing request. Please try again.");
+                statusLabel.setStyle("-fx-text-fill: red;");
+            }
         } else {
-            // Display the validation error message in the GUI
+            // If the fields don't meet validation criteria, show error message
             statusLabel.setText(validationMessage);
             statusLabel.setStyle("-fx-text-fill: red;");
         }
@@ -80,5 +102,4 @@ public class UpdatePasswordPageController extends PageController {
     private void redirectToLogin() {
         navigateTo("/views/LoginPageView.fxml");
     }
-
 }
