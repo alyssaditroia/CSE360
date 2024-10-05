@@ -12,7 +12,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/jjust/h2/bin/h2-2.3.232.jar"/>
+	<classpathentry kind="lib" path="%USERPROFILE%/h2/bin/h2-2.3.232.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
