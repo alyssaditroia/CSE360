@@ -53,49 +53,52 @@ public class SetupAccountPageController extends PageController {
    */
   @FXML
   private void handleSetupButtonAction() {
-    db = Database.getInstance(); // Get the current instance of the Database
-    statusLabel.setText(""); // Clear previous status messages
-    UserSession currentUser = UserSession.getInstance(); // Get the current user instance
-    String inviteCode = currentUser.getInviteCode(); // Set the current user instance invite code
-    System.out.println("Current user invite code: " + inviteCode);
+      db = Database.getInstance(); // Get the current instance of the Database
+      statusLabel.setText(""); // Clear previous status messages
+      UserSession currentUser = UserSession.getInstance(); // Get the current user instance
+      String inviteCode = currentUser.getInviteCode(); // Get the current user instance invite code
+      String currentUsername = currentUser.getUsername();
+      System.out.println("Current user invite code: " + inviteCode);
+      System.out.println("Current user username: " + currentUsername);
 
-    // Trim whitespace from username field
-    String username = usernameField.getText().trim();
-    String password = passwordField.getText();
-    String confirmPassword = confirmPasswordField.getText();
+      // Trim whitespace from username field
+      String username = usernameField.getText().trim();
+      String password = passwordField.getText();
+      String confirmPassword = confirmPasswordField.getText();
 
-    // Validate the username and password using TextValidation model
-    String validationMessage = TextValidation.validateSetupFields(username, password, confirmPassword);
-    // If the username and password properly meet the requirements then the user will be updated in the database
-    if (validationMessage.isEmpty()) {
-      try {
-        User newUser = new User("", "", "", "", username, password.toCharArray(), null, null, null);
-        db.completeInvite(inviteCode, username, password);
+      // Validate the username and password using TextValidation model
+      String validationMessage = TextValidation.validateSetupFields(username, password, confirmPassword);
+      
+      // If the fields are valid
+      if (validationMessage.isEmpty()) {
+          try {
+              if (inviteCode != null) {
+                  // User has an invite code, complete the invite process
+                  User newUser = new User("", "", "", "", username, password.toCharArray(), null, null, null);
+                  db.completeInvite(inviteCode, username, password);
 
-        // Success message will show when user was properly updated in the database
-        statusLabel.setText("Account setup successful! Redirecting to login...");
-        statusLabel.setStyle("-fx-text-fill: green;");
+                  // Show success message for account setup
+                  statusLabel.setText("Account setup successful! Redirecting to login...");
+                  statusLabel.setStyle("-fx-text-fill: green;");
 
-        // Create a PauseTransition for 2 seconds
-        PauseTransition pause = new PauseTransition(Duration.seconds(2));
-        pause.setOnFinished(event -> {
-          // Redirect to login page after 2 seconds
-          redirectToLogin();
-        });
-        pause.play(); // Start the pause
-      } catch (SQLException e) {
-        e.printStackTrace();
-        statusLabel.setText("error setting up account"); // If user is not properly setup then an error will show
-        statusLabel.setStyle("-fx-text-fill: red;");
+                  // Redirect to login page after 2 seconds
+                  PauseTransition pause = new PauseTransition(Duration.seconds(2));
+                  pause.setOnFinished(event -> redirectToLogin());
+                  pause.play();
+              }
 
+          } catch (SQLException e) {
+              e.printStackTrace();
+              statusLabel.setText("Error processing request. Please try again."); 
+              statusLabel.setStyle("-fx-text-fill: red;");
+          }
+      } else {
+          // If the fields don't meet validation criteria, show error message
+          statusLabel.setText(validationMessage);
+          statusLabel.setStyle("-fx-text-fill: red;");
       }
-    } else {
-      // If the user's password or username does not meet the criteria
-      // Display the validation error message in the GUI
-      statusLabel.setText(validationMessage);
-      statusLabel.setStyle("-fx-text-fill: red;");
-    }
   }
+
 
   private void redirectToLogin() {
     navigateTo("/views/LoginPageView.fxml");

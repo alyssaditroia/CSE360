@@ -23,16 +23,10 @@ public class StudentHomePageController extends PageController {
 	@FXML
     private Button logoutButton;
 
+    // Logout functionality
     @FXML
     public void logout() {
         System.out.println("Student logged out.");
-        goBack();
-    }
-
- // Method to navigate back to the Login Page
-    @FXML
-    public void goBack() {
-        // Handle navigation back (adjust the path as needed)
         navigateTo("/views/LoginPageView.fxml");
     }
 

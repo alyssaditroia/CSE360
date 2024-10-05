@@ -2,13 +2,17 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SelectRolePageController">
-    <Label text="Select Your Role" />
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SelectRolePageController" spacing="20" alignment="CENTER"
+      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
+    <Label text="CSE 360 Help System" style="-fx-font-size: 19; -fx-font-weight: bold;" />
+    <Label text="Select Your Role" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
     
-    <ComboBox fx:id="roleComboBox" promptText="Choose your role" />
+    <Button fx:id="adminButton" text="Admin" onAction="#redirectToAdminHomepage" visible="false"/>
+    <Button fx:id="instructorButton" text="Instructor" onAction="#redirectToInstructorHomepage" visible="false"/>
+    <Button fx:id="studentButton" text="Student" onAction="#redirectToStudentHomepage" visible="false"/>
     
-    <Button fx:id="selectRoleButton" text="Select Role" onAction="#selectRole" />
     
     <Button fx:id="backButton" text="Back" onAction="#goBack" />
 </VBox>
