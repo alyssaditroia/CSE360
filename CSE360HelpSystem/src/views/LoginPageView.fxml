@@ -1,16 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginPageController" spacing="10" alignment="CENTER"
-      minWidth="400" minHeight="300" prefWidth="600" prefHeight="400">
-    <TextField fx:id="usernameField" promptText="Username"/>
-    <PasswordField fx:id="passwordField" promptText="Password"/>
-    <Button fx:id="loginButton" text="Login" onAction="#handleLogin"/>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginPageController" spacing="20" alignment="CENTER"
+      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
+    <Label text="CSE 360 Help System" style="-fx-font-size: 19; -fx-font-weight: bold;" />
+    <!-- Login Section -->
+    <Label text="Login" style="-fx-font-size: 18; -fx-font-weight: bold;" />
     
-    <!-- Label for displaying error messages -->
-    <Label fx:id="errorLabel" text=" " style="-fx-text-fill: red;"/>
-     <Label fx:id="statusLabel" text=" " style="-fx-text-fill: green;"/>
+    <GridPane hgap="10" vgap="10" alignment="CENTER">
+        <TextField fx:id="usernameField" promptText="Username" style="-fx-pref-width: 250px;" GridPane.rowIndex="0"/>
+        <PasswordField fx:id="passwordField" promptText="Password" style="-fx-pref-width: 250px;" GridPane.rowIndex="1"/>
+    </GridPane>
+    
+    <Button fx:id="loginButton" text="Login" onAction="#handleLogin" style="-fx-padding: 8 20;" />
+    
+    <!-- Invite Code Section  -->
+    <Label text="Enter Invite Code" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+    
+    <GridPane hgap="10" vgap="10" alignment="CENTER">
+        <TextField fx:id="inviteCodeField" promptText="Invite Code" style="-fx-pref-width: 250px;" GridPane.rowIndex="0"/>
+    </GridPane>
+    
+    <Button fx:id="inviteButton" text="Create Account" onAction="#handleInviteButton" style="-fx-padding: 8 20;" />
+    
+    <!-- Status Labels -->
+    <Label fx:id="errorLabel" text=" " style="-fx-text-fill: red; -fx-font-size: 12;" />
+    <Label fx:id="statusLabel" text=" " style="-fx-text-fill: green; -fx-font-size: 12;" />
 </VBox>
+
 
