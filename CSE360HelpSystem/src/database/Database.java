@@ -26,7 +26,8 @@ public class Database {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "org.h2.Driver";
 
-    static final String DB_URL = "jdbc:h2:~/firstDatabase"; // If using Windows: jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\firstDatabase
+    static final String DB_URL = "jdbc:h2:~/firstDatabase";// If using Windows: jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\firstDatabase
+    static final String DB_URL_TEST = "jdbc:h2:~/testDatabase";// If using Windows: jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\testDatabase
 
 
     // Database credentials
@@ -46,6 +47,9 @@ public class Database {
         try {
             Class.forName(JDBC_DRIVER); // Load the JDBC driver
             System.out.println("Connecting to database...");
+            /**
+             * ***** IF TESTING CHANGE THE DB_URL TO DB_URL_TEST *****
+             */
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
             System.out.println("Connection established");
             statement = connection.createStatement();
