@@ -2,9 +2,11 @@ package database;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import models.User;
 
@@ -124,7 +126,7 @@ public class Database {
      * @param password
      * @throws SQLException
      */
-    public void setupAdministrator(String username, String password) throws SQLException {
+    public void setupAdministrator(String username, char [] password) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
         // Validate input parameters
@@ -133,7 +135,7 @@ public class Database {
             return; // Early exit if username is invalid
         }
         
-        if (password == null || password.isEmpty()) {
+        if (password == null || password.length == 0) {
             System.out.println("Failed to add administrator: password cannot be null or empty.");
             return; // Early exit if password is invalid
         }
@@ -143,7 +145,7 @@ public class Database {
         try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
             // Set parameters for the prepared statement
             pstmt.setString(1, username);
-            pstmt.setString(2, password);
+            pstmt.setString(2, String.valueOf(password));
             
             // Execute the update
             int rowsAffected = pstmt.executeUpdate();
@@ -215,7 +217,7 @@ public class Database {
         }
     }
     
-    public boolean updatePassword(String username, String password) throws SQLException {
+    public boolean updatePassword(String username, char [] password) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
     	// Queries database based on invite code
@@ -228,9 +230,10 @@ public class Database {
             if (rs.next()) {
                 String updateUser = "UPDATE cse360users SET password = ? WHERE username = ?";
                 try (PreparedStatement updateStmt = connection.prepareStatement(updateUser)) {
-                    updateStmt.setString(1, password);
+                	updateStmt.setString(1, String.valueOf(password));
                     updateStmt.setString(2, username);
                     updateStmt.executeUpdate();
+                    Arrays.fill(password, '\0');
                     return true;
                 }
             }
@@ -279,7 +282,7 @@ public class Database {
      * @return boolean true or false
      * @throws SQLException
      */
-    public boolean completeInvite(String inviteToken, String username, String password) throws SQLException {
+    public boolean completeInvite(String inviteToken, String username, char [] password) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
     	// Queries database based on invite code
@@ -293,7 +296,7 @@ public class Database {
                 String updateUser = "UPDATE cse360users SET username = ?, password = ?, inviteToken = NULL WHERE inviteToken = ?";
                 try (PreparedStatement updateStmt = connection.prepareStatement(updateUser)) {
                     updateStmt.setString(1, username);
-                    updateStmt.setString(2, password);
+                    updateStmt.setString(2, String.valueOf(password));
                     updateStmt.setString(3, inviteToken);
                     updateStmt.executeUpdate();
                     return true;
@@ -326,19 +329,43 @@ public class Database {
      * @return true if the user's username and password match a specific user in the database false if no user is found
      * @throws SQLException
      */
-    public boolean validateCredentials(String username, String password) throws SQLException {
-    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
-        statement = connection.createStatement();
+    public boolean validateCredentials(String username, char[] password) throws SQLException {
+        connection = DriverManager.getConnection(DB_URL, USER, PASS);
         String query = "SELECT password FROM cse360users WHERE username = ?";
+        
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                String storedPassword = rs.getString("password");
-                return password.equals(storedPassword);
+            
+            if (rs.next()) { // Only need to check once
+                // Retrieve the stored password as a String
+                String storedPasswordString = rs.getString("password");
+                
+                // If the stored password is null, return false
+                if (storedPasswordString == null) {
+                    return false;
+                }
+                
+                // Convert stored password to char array
+                char[] storedPassword = storedPasswordString.toCharArray();
+
+                // Check if the lengths match
+                if (storedPassword.length != password.length) {
+                    return false;
+                }
+
+                // Compare each character
+                for (int i = 0; i < storedPassword.length; i++) {
+                    if (storedPassword[i] != password[i]) {
+                        return false; // Passwords do not match
+                    }
+                }
+
+                return true; // Passwords match
             }
         }
-        return false;
+        
+        return false; // User not found
     }
     
     /**
@@ -450,7 +477,20 @@ public class Database {
      * @throws SQLException If there's an error executing the SQL query.
      */
     public Boolean isUserAdmin(String username) throws SQLException {
-        return checkUserRole(username, "isAdmin");
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+        String query = "SELECT isAdmin FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    if (rs.getObject("isAdmin") != null) {
+                        return rs.getBoolean("isAdmin");
+                    }
+                }
+            }
+        }
+        return false; // User not found or role not set
     }
     
     /**
@@ -463,7 +503,20 @@ public class Database {
      * @throws SQLException If there's an error executing the SQL query.
      */
     public Boolean isUserStudent(String username) throws SQLException {
-        return checkUserRole(username, "isStudent");
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+        String query = "SELECT isStudent FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    if (rs.getObject("isStudent") != null) {
+                        return rs.getBoolean("isStudent");
+                    }
+                }
+            }
+        }
+        return false; // User not found or role not set
     }
     
     /**
@@ -476,8 +529,22 @@ public class Database {
      * @throws SQLException If there's an error executing the SQL query.
      */
     public Boolean isUserInstructor(String username) throws SQLException {
-        return checkUserRole(username, "isInstructor");
+    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        statement = connection.createStatement();
+        String query = "SELECT isInstructor FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    if (rs.getObject("isInstructor") != null) {
+                        return rs.getBoolean("isInstructor");
+                    }
+                }
+            }
+        }
+        return false; // User not found or role not set
     }
+  
     
     /**
      * Function added by Justin Faris - 10/3/24
@@ -535,7 +602,6 @@ public class Database {
                 userMap.put("preferredName", resultSet.getString("preferredName"));
                 userMap.put("email", resultSet.getString("email"));
                 userMap.put("username", resultSet.getString("username"));
-                userMap.put("password", resultSet.getString("password")); // Consider security implications
                 userMap.put("isAdmin", resultSet.getBoolean("isAdmin"));
                 userMap.put("isStudent", resultSet.getBoolean("isStudent"));
                 userMap.put("isInstructor", resultSet.getBoolean("isInstructor"));

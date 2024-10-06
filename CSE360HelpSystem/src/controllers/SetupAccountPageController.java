@@ -63,8 +63,8 @@ public class SetupAccountPageController extends PageController {
 
       // Trim whitespace from username field
       String username = usernameField.getText().trim();
-      String password = passwordField.getText();
-      String confirmPassword = confirmPasswordField.getText();
+      char [] password = passwordField.getText().toCharArray();
+      char [] confirmPassword = confirmPasswordField.getText().toCharArray();
 
       // Validate the username and password using TextValidation model
       String validationMessage = TextValidation.validateSetupFields(username, password, confirmPassword);
@@ -74,7 +74,7 @@ public class SetupAccountPageController extends PageController {
           try {
               if (inviteCode != null) {
                   // User has an invite code, complete the invite process
-                  User newUser = new User("", "", "", "", username, password.toCharArray(), null, null, null);
+                  User newUser = new User("", "", "", "", username, password, null, null, null);
                   db.completeInvite(inviteCode, username, password);
 
                   // Show success message for account setup
