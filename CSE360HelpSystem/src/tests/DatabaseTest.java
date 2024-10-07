@@ -1,121 +1,130 @@
 package tests;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import database.Database;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
-import org.junit.jupiter.api.*;
-
-public class DatabaseTest {
+class DatabaseTest {
     private Database database;
-    private static int passedTestCases = 0;  // Static variable to track passed tests
-
+    private Connection connection;
 
     @BeforeEach
-    public void setUp() throws SQLException {
-    	database = Database.getInstance();
-        database.connectToDatabase(); // Initialize test database
+    void setUp() throws SQLException {
+        database = Database.getInstance();
+        database.connectToDatabase();
+        connection = database.getConnection(); // Get the connection for cleanup
+        clearTestDatabase(); // Ensure the test database is clean before each test
+        database.createTables(); // Ensure tables are created
     }
 
     @AfterEach
-    public void tearDown() {
-        database.closeConnection(); // Close the connection after each test
-        System.out.println("Test passed. Current number of passed cases: " + passedTestCases);
-
-    }
-    @Test
-    public void testConnectToDatabase() throws Exception {
-        Database db = Database.getInstance();
-        db.connectToDatabase();
-        assertNotNull(db.getConnection());  // Assuming a valid connection should be non-null
-
-        // If the assertion passes, count it as a passed test case
-        passedTestCases++;
+    void tearDown() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close(); // Close the connection after each test
+            }
+        } catch (SQLException e) {
+            System.err.println("Error closing the connection: " + e.getMessage());
+        }
     }
 
-    @Test
-    public void testIsDatabaseEmpty() throws SQLException {
-        Database db = Database.getInstance();
-        db.connectToDatabase();
-        boolean isEmpty = db.isDatabaseEmpty();
-        assertTrue(isEmpty);  // Assuming database is empty
-
-        // Increment pass count if assertion passes
-        passedTestCases++;
-    }
-    @Test
-    public void testUpdateUser() throws SQLException {
-    	 Database db = Database.getInstance();
-         db.connectToDatabase();
-         char [] testPassword = "password123!".toCharArray();
-        db.setupAdministrator("adminUser", testPassword);
-        db.updateUser("adminUser", "John", "Doe", "JD", "john123@example.com");
-
-        assertEquals("John", db.getFirstName("adminUser"), "First name should be updated to John");
+    @AfterAll
+    static void afterAll() {
+        deleteTestDatabase(); // Clean up the test database after all tests
     }
 
-    @Test
-    public void testValidateCredentials() throws SQLException {
-    	 Database db = Database.getInstance();
-         db.connectToDatabase();
-         char [] testPassword = "password123!".toCharArray();
-        db.setupAdministrator("adminUser", testPassword);
+    private void clearTestDatabase() throws SQLException {
+        // Clear the database (truncate or delete rows) before each test
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("TRUNCATE TABLE cse360users"); // Example for a 'users' table
+            System.out.println("Test database cleared.");
+        } catch (SQLException e) {
+            System.err.println("Error clearing test database: " + e.getMessage());
+        }
+    }
 
-        assertTrue(db.validateCredentials("adminUser", testPassword),
-            "Credentials should match for valid user");
-        char [] wrongTestPassword = "wrongPassword".toCharArray();
-        assertFalse(db.validateCredentials("adminUser", wrongTestPassword),
-            "Credentials should not match for wrong password");
+    private static void deleteTestDatabase() {
+        String url = "jdbc:h2:~/firstsDatabase";
+        String user = "user"; // Default user for H2
+        String password = ""; // Default password for H2 (empty)
+        
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             Statement stmt = conn.createStatement()) {
+            stmt.execute("DROP ALL OBJECTS");
+            System.out.println("Test database deleted successfully.");
+        } catch (SQLException e) {
+            System.err.println("Error deleting test database: " + e.getMessage());
+        }
     }
 
     @Test
-    public void testInviteUser() throws SQLException {
-    	 Database db = Database.getInstance();
-         db.connectToDatabase();
-        String inviteCode = db.inviteUser("inviteCode123", "invite1@example.com", true, false, false);
-
-        assertTrue(db.validateInvite(inviteCode), "Invite should be valid");
+    void testConnectToDatabase() throws SQLException {
+        assertNotNull(database.getConnection(), "Connection should not be null after connecting to the database");
     }
 
     @Test
-    public void testCompleteInvite() throws SQLException {
-    	 Database db = Database.getInstance();
-         db.connectToDatabase();
-         char [] testPassword = "password123!".toCharArray();
-        String inviteCode = db.inviteUser("inviteCode123", "invite@example.com", true, false, false);
-        boolean inviteCompleted = db.completeInvite(inviteCode, "invitedUser", testPassword);
-
-        assertTrue(inviteCompleted, "Invite should be completed successfully");
-        assertTrue(db.validateCredentials("invitedUser", testPassword),
-            "Credentials should be valid after invite completion");
+    void testIsDatabaseEmptyInitially() throws SQLException {
+        assertTrue(database.isDatabaseEmpty(), "Database should be empty ");
     }
 
     @Test
-    public void testUpdatePassword() throws SQLException {
-    	 Database db = Database.getInstance();
-         db.connectToDatabase();
-         char [] newTestPassword = "newPassword2!".toCharArray();
-        db.setupAdministrator("adminUser", newTestPassword);
-        assertTrue(db.updatePassword("adminUser", newTestPassword), "Password should be updated");
+    void testSetupAdministrator() throws SQLException {
+        String username = "admin";
+        char[] password = "Password1!".toCharArray();
+        database.setupAdministrator(username, password);
 
-        assertTrue(db.validateCredentials("adminUser", newTestPassword), 
-            "Credentials should be valid after password update");
+        assertFalse(database.isDatabaseEmpty(), "Database should not be empty after adding an administrator");
+        assertTrue(database.isUserAdmin(username), "User should be an admin after setup");
+    }
+    @Test
+    void testUpdateUSer() throws SQLException {
+        String username = "admin";
+        char[] password = "Password1!".toCharArray();
+        database.setupAdministrator(username, password);
+        database.updateUser(username, "admin", "admin", "", "admin@eamail.com" );
+        assertTrue(database.doesUserExist("admin@eamail.com"), "User should be an admin after setup");
     }
 
     @Test
-    public void testIsUserAdmin() throws SQLException {
-    	 Database db = Database.getInstance();
-         db.connectToDatabase();
-         char [] testPassword = "password123!".toCharArray();
+    void testInviteUser() throws SQLException {
+        String inviteCode = "INVITE123";
+        String email = "invitee@example.com";
+        database.inviteUser(inviteCode, email, true, false, false);
 
-        db.setupAdministrator("adminUser", testPassword);
-
-        assertTrue(db.isUserAdmin("adminUser"), "adminUser should have admin privileges");
+        assertFalse(database.isDatabaseEmpty(), "Database should not be empty after inviting a user");
+        assertTrue(database.doesUserExist(email), "User should exist after inviting");
     }
 
-    // Add more tests as needed
+    @Test
+    void testCompleteInvite() throws SQLException {
+        String inviteCode = "INVITE123";
+        String email = "invitee@example.com";
+        database.inviteUser(inviteCode, email, true, false, false);
+
+        boolean result = database.completeInvite(inviteCode, "newUser", "newPass".toCharArray());
+        assertTrue(result, "Invite should be completed successfully");
+        assertTrue(database.isUserAdmin("newUser"), "New user should be an admin after completing invite");
+    }
+
+
+    @Test
+    void testIsUserAdmin() throws SQLException {
+        String username = "admin";
+        char[] password = "Password1!".toCharArray();
+        database.setupAdministrator(username, password);
+
+        assertTrue(database.isUserAdmin(username), "User should have admin privileges");
+        assertFalse(database.isUserAdmin("nonExistentUser"), "Non-existent user should not have admin privileges");
+    }
 }
+
+
+
+

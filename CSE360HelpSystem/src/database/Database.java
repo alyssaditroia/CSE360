@@ -28,7 +28,6 @@ public class Database {
 
     // ***** IF TESTING CHANGE THE DB_URL TO DB_URL_TEST  in the ConectToDatabase() method *****
     static final String DB_URL = "jdbc:h2:~/firstDatabase";// If using Windows: jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\firstDatabase
-    static final String DB_URL_TEST = "jdbc:h2:~/testDatabase";// If using Windows: jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\testDatabase
 
 
     // Database credentials
@@ -79,14 +78,14 @@ public class Database {
      *  Method to create tables
      * @throws SQLException
      */
-    private void createTables() throws SQLException {
+    public void createTables() throws SQLException {
     	System.out.println("Creating Tables");
         String userTable = "CREATE TABLE IF NOT EXISTS cse360users ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, " 
                 + "firstName VARCHAR(255),"
                 + "lastName VARCHAR(255),"
                 + "preferredName VARCHAR(255),"
-                + "email VARCHAR(255) UNIQUE, "
+                + "email VARCHAR(255), "
                 + "username VARCHAR(255),"
                 + "password VARCHAR(255), " 
                 + "isAdmin BOOLEAN DEFAULT FALSE, "
@@ -375,6 +374,13 @@ public class Database {
         
         return false; // User not found
     }
+    public void deleteUser(String email) throws SQLException {
+        String sql = "DELETE FROM users WHERE email = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            pstmt.executeUpdate();
+        }
+    }
     
     /**
      * getFirstName()
@@ -447,7 +453,7 @@ public class Database {
      * @return true if they exist false if not
      * @throws SQLException
      */
-    private boolean doesUserExist(String email) throws SQLException {
+    public boolean doesUserExist(String email) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
         String query = "SELECT COUNT(*) FROM cse360users WHERE email = ?";
