@@ -13,10 +13,13 @@ import models.TextValidation;
 /********
  * 
  *  <p> Title: FinishAccountSetupController </p>
- *  <p> Description: Handles the Finish Account Setup View
- *   where the user enter's the rest of their information to
- *   finish setting up their account. </p>
  *  
+ *  <p> Description: Handles the Finish Account Setup View
+ *   	where the user enter's the rest of their information to
+ *   	finish setting up their account. This information includes
+ *      first name, last name, email, preferred name.</p>
+ *      
+ *  @author Alyssa DiTroia
  **************/
 public class FinishAccountSetupController extends PageController {
   private Database db;

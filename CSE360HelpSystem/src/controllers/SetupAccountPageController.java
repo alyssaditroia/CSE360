@@ -15,7 +15,11 @@ import models.UserSession;
 import models.TextValidation;
 /**
  * <p> Title: SetupAccountPageController </p>
- * <p> Description: Controls the view for the page where the user's account is being setup </p>
+ * 
+ * <p> Description: Controls the view for the page where the user's account is being setup 
+ *     Initial setup consists of the user setting their username and password. </p>
+ *     
+ *     @author Alyssa DiTroia
  */
 public class SetupAccountPageController extends PageController {
   private Database db;

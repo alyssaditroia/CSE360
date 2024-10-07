@@ -19,7 +19,12 @@ import models.TextValidation;
 
 /**
  * <p> Title: UpdatePasswordPageController </p>
+ * 
+ * 
  * <p> Description: Controls the view for the page where the user's password is being changed </p>
+ * 
+ * 
+ * @author Alyssa DiTroia
  */
 public class UpdatePasswordPageController extends PageController {
     private Database db;

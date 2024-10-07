@@ -11,22 +11,27 @@ import java.util.Map;
 import models.User;
 
 /**
- * FINISHED PAGE DO NOT EDIT
- * Database
+ *<p> Title:  Database  </p>
  * 
  * This class manages all interactions with the database,
  * including saving users, managing OTP, and updating user details.
  * 
- * To visualize database run commands:
- * cd h2
- * cd bin
+ * To visualize database run commands in your terminal:
+ * cd /h2/bin
  * java -jar h2*.jar
+ * 
+ * Make sure the terminal is closed and database connection is not open before running the application
+ * 
+ * You can close connection in terminal with control C
+ * 
+ * If using Windows OS change the DB_URL path: "jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\firstDatabase"
+ * 
+ * To clear contents of the database delete the database file from your computer located in /Users/YourUserNameHere
  */
 public class Database {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "org.h2.Driver";
 
-    // ***** IF TESTING CHANGE THE DB_URL TO DB_URL_TEST  in the ConectToDatabase() method *****
     static final String DB_URL = "jdbc:h2:~/firstDatabase";// If using Windows: jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\firstDatabase
 
 
@@ -47,12 +52,6 @@ public class Database {
         try {
             Class.forName(JDBC_DRIVER); // Load the JDBC driver
             System.out.println("Connecting to database...");
-            /**
-             * ***** IF TESTING CHANGE THE DB_URL TO DB_URL_TEST *****
-             * 
-             * ***** IF TESTING CHANGE THE DB_URL TO DB_URL_TEST *****
-             * 
-             */
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
             System.out.println("Connection established");
             statement = connection.createStatement();
@@ -82,10 +81,10 @@ public class Database {
     	System.out.println("Creating Tables");
         String userTable = "CREATE TABLE IF NOT EXISTS cse360users ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, " 
-                + "firstName VARCHAR(255),"
+                + "firstName VARCHAR(255),"             
                 + "lastName VARCHAR(255),"
                 + "preferredName VARCHAR(255),"
-                + "email VARCHAR(255), "
+                + "email VARCHAR(255) UNIQUE, "
                 + "username VARCHAR(255),"
                 + "password VARCHAR(255), " 
                 + "isAdmin BOOLEAN DEFAULT FALSE, "

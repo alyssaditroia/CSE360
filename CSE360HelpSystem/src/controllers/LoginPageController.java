@@ -16,8 +16,10 @@ import models.TextValidation;
 import models.User;
 import models.UserSession;
 /**
- *  LoginPageController
- *  Implements login page
+ *  <p> Title: LoginPageController </p>
+ *  
+ *  
+ * <p> Description:  Implements login page and all of the functionalities associated with it </p>
  */
 public class LoginPageController extends PageController {
   // FXML elements 
