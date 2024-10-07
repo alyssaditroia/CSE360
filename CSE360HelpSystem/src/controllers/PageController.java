@@ -12,8 +12,9 @@ import javafx.stage.Stage;
 import models.UserSession;
 /***********
  * 
- *  FINISHED PAGE DO NOT EDIT
- *  
+ * <p> Title: PageController </p>
+ * 
+ * <p> The page controller handles navigation, sessions, and errors across all of its subclasses </p> 
  *  
  **************/
 public class PageController {

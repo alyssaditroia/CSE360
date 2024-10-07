@@ -13,10 +13,13 @@ import models.TextValidation;
 /********
  * 
  *  <p> Title: FinishAccountSetupController </p>
- *  <p> Description: Handles the Finish Account Setup View
- *   where the user enter's the rest of their information to
- *   finish setting up their account. </p>
  *  
+ *  <p> Description: Handles the Finish Account Setup View
+ *   	where the user enter's the rest of their information to
+ *   	finish setting up their account. This information includes
+ *      first name, last name, email, preferred name.</p>
+ *      
+ *  @author Alyssa DiTroia
  **************/
 public class FinishAccountSetupController extends PageController {
   private Database db;
@@ -84,11 +87,17 @@ public class FinishAccountSetupController extends PageController {
     user.setFirstName(firstName);
     user.setLastName(lastName);
     user.setPreferredName(preferredName);
+    String username = user.getUsername();
 
     try {
       // Update user in the database
-      db.updateUser(user.getUsername(), firstName, lastName, preferredName, email);
-      redirectToSelectRolePageView(); // Navigate to role selection page after successful setup
+      db.updateUser(username, firstName, lastName, preferredName, email);
+      int numRoles = checkNumRoles(username);
+      if (numRoles == 1) {
+          redirectBasedOnSingleRole(username);
+      } else {
+          redirectToSelectRolePageView();
+      }
     } catch (SQLException e) {
       errorLabel.setText("Database update failed: " + e.getMessage());
     }
@@ -97,6 +106,26 @@ public class FinishAccountSetupController extends PageController {
   private void redirectToSelectRolePageView() {
     navigateTo("/views/SelectRolePageView.fxml");
   }
+  private int checkNumRoles(String username) throws SQLException {
+	    int numRoles = 0;
+	    db = Database.getInstance();
+	    if (db.isUserAdmin(username)) { numRoles++; }
+	    if (db.isUserInstructor(username)) { numRoles++; }
+	    if (db.isUserStudent(username)) { numRoles++; }
+	    System.out.println("Number of roles for user: "+ username + ": " + numRoles );
+	    return numRoles;
+	}
+
+	private void redirectBasedOnSingleRole(String username) throws SQLException {
+		db = Database.getInstance();
+	    if (db.isUserAdmin(username)) {
+	        navigateTo("/views/AdminHomePageView.fxml");
+	    } else if (db.isUserInstructor(username)) {
+	        navigateTo("/views/InstructorHomePageView.fxml");
+	    } else if (db.isUserStudent(username)) {
+	        navigateTo("/views/StudentHomePageView.fxml");
+	    }
+	 }
 
   @Override
   public void initialize(Stage stage, Database db) {

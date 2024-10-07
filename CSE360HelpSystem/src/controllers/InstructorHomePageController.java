@@ -4,7 +4,11 @@ import database.Database;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-
+/**
+ * <p> Title: InstructorHomePageController </p>
+ * 
+ * <p> Description: Home page for individuals with instructor permissions </p>
+ */
 public class InstructorHomePageController extends PageController {
 	Database db;
 	

@@ -5,7 +5,12 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 /**
- * Student Home Page Controller Class
+ * <p> Title: Student Home Page Controller </p>
+ * 
+ * <p> Description: Home page for individuals with Student permissions </p>
+ * 
+ * 
+ * @author Alyssa DiTroia
  */
 public class StudentHomePageController extends PageController {
 	 Database db;

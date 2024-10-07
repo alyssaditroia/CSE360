@@ -17,7 +17,7 @@ import java.util.Random;
  * OneTimePassword Class
  */
 public class OTP {
-    private String OTP;
+    private char[] OTP;
     private LocalDateTime expiration; 
     private boolean flag;
     private Database db;
@@ -38,19 +38,19 @@ public class OTP {
      */
     public void generateAndSaveOTP(String email) throws SQLException {
         // Generate a random 6-digit OTP
-        this.OTP = String.valueOf(100000 + random.nextInt(900000));
+        this.OTP = String.valueOf(100000 + random.nextInt(900000)).toCharArray();
         this.expiration = LocalDateTime.now().plusDays(10);  // Set expiration time to 10 days from now
         this.flag = true;  // Set the OTP flag to true
-        System.out.println("OTP Generated for User: " + email + " OTP: " + this.OTP);
+        System.out.println("OTP Generated for User: " + email + " OTP: " + String.valueOf(this.OTP));
         
         // SQL query to update OTP, expiration, and flag for the specified user
         String query = "UPDATE cse360users SET otp = ?, otpExpiration = ?, otpFlag = ?, password = ? WHERE email = ?";
         
         try (PreparedStatement pstmt = db.getConnection().prepareStatement(query)) {
-            pstmt.setString(1, OTP);
+            pstmt.setString(1, String.valueOf(OTP));
             pstmt.setString(2, expiration.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))); // Formatting expiration
             pstmt.setBoolean(3, flag);
-            pstmt.setString(4, OTP); // Assuming you're saving the OTP as the password, which is not recommended for security reasons
+            pstmt.setString(4, String.valueOf(OTP)); // Assuming you're saving the OTP as the password, which is not recommended for security reasons
             pstmt.setString(5, email);
             pstmt.executeUpdate();
         }
@@ -59,13 +59,13 @@ public class OTP {
     /**
      * Validates if the OTP is correct, not expired, and the flag is still active
      * @param username The username to validate the OTP for
-     * @param inputOTP The OTP provided by the user
+     * @param password The OTP provided by the user
      * @return Error message if validation fails, or an empty string if valid
      * @throws SQLException
      */
-    public String validateOTP(String username, String inputOTP) throws SQLException {
+    public String validateOTP(String username, char[] password) throws SQLException {
         // Check if username or inputOTP is null
-        if (username == null || inputOTP == null) {
+        if (username == null || password == null) {
             return "Fields cannot be empty.";
         }
 
@@ -79,7 +79,7 @@ public class OTP {
                 String expirationString = rs.getString("otpExpiration");
 
                 // Check if the input OTP matches the stored OTP
-                if (storedOTP != null && storedOTP.equals(inputOTP)) {
+                if (storedOTP != null && storedOTP.equals(String.valueOf(password))) {
                     // Check if the expiration date is not expired
                     if (expirationString != null) {
                         // Get the current time in the same format

@@ -19,7 +19,12 @@ import models.TextValidation;
 
 /**
  * <p> Title: UpdatePasswordPageController </p>
+ * 
+ * 
  * <p> Description: Controls the view for the page where the user's password is being changed </p>
+ * 
+ * 
+ * @author Alyssa DiTroia
  */
 public class UpdatePasswordPageController extends PageController {
     private Database db;
@@ -66,8 +71,8 @@ public class UpdatePasswordPageController extends PageController {
 
         // Trim whitespace from username field
         String username = usernameField.getText().trim();
-        String password = passwordField.getText();
-        String confirmPassword = confirmPasswordField.getText();
+        char [] password = passwordField.getText().toCharArray();
+        char [] confirmPassword = confirmPasswordField.getText().toCharArray();
 
         // Validate the username and password using TextValidation model
         String validationMessage = TextValidation.validateSetupFields(username, password, confirmPassword);
@@ -76,7 +81,7 @@ public class UpdatePasswordPageController extends PageController {
         if (validationMessage.isEmpty()) {
             try {
                 // No invite code, update the password for the user
-                User newUser = new User("", "", "", "", username, password.toCharArray(), null, null, null);
+                User newUser = new User("", "", "", "", username, password, null, null, null);
                 db.updatePassword(username, password);
 
                 // Show success message for password update

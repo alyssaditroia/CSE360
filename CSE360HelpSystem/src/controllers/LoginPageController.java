@@ -16,8 +16,10 @@ import models.TextValidation;
 import models.User;
 import models.UserSession;
 /**
- *  LoginPageController
- *  Implements login page
+ *  <p> Title: LoginPageController </p>
+ *  
+ *  
+ * <p> Description:  Implements login page and all of the functionalities associated with it </p>
  */
 public class LoginPageController extends PageController {
   // FXML elements 
@@ -63,7 +65,7 @@ public class LoginPageController extends PageController {
     errorLabel.setText(""); // Clearing any previous error messaages
 
     String username = usernameField.getText(); // Fetch username from the text field
-    String password = passwordField.getText(); // Fetch password from text field
+    char[] password = passwordField.getText().toCharArray(); // Convert password to char array
 
     // Validate username and password fields to ensure they are not empty
     String usernameError = TextValidation.isFieldEmpty(username);
@@ -77,6 +79,8 @@ public class LoginPageController extends PageController {
     // If the error message returned from text validation is not an empty string then display an error
     if (!passwordError.isEmpty()) {
       showError(passwordError);
+      // Clear password after use for security
+      java.util.Arrays.fill(password, '\0');
       return;
     }
 
@@ -84,6 +88,8 @@ public class LoginPageController extends PageController {
     try {
       if (db.isDatabaseEmpty()) {
         setupAdministrator();
+     // Clear password after use for security
+        java.util.Arrays.fill(password, '\0');
         return;
       }
 
@@ -191,7 +197,7 @@ public class LoginPageController extends PageController {
     statusLabel.setText("");
 
     String username = usernameField.getText();
-    String password = passwordField.getText();
+    char [] password = passwordField.getText().toCharArray();
 
     try {
       // Create administrator in the database
@@ -206,13 +212,16 @@ public class LoginPageController extends PageController {
 
 private int checkNumRoles(String username) throws SQLException {
     int numRoles = 0;
-    if (db.isUserAdmin(username)) numRoles++;
-    if (db.isUserInstructor(username)) numRoles++;
-    if (db.isUserStudent(username)) numRoles++;
+    db = Database.getInstance();
+    if (db.isUserAdmin(username)) { numRoles++; }
+    if (db.isUserInstructor(username)) { numRoles++; }
+    if (db.isUserStudent(username)) { numRoles++; }
+    System.out.println("Number of roles for user: "+ username + ": " + numRoles );
     return numRoles;
 }
 
 private void redirectBasedOnSingleRole(String username) throws SQLException {
+	db = Database.getInstance();
     if (db.isUserAdmin(username)) {
         navigateTo("/views/AdminHomePageView.fxml");
     } else if (db.isUserInstructor(username)) {

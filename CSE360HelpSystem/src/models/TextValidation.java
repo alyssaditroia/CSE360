@@ -15,19 +15,18 @@ public class TextValidation {
     public static int passwordIndexofError = -1;
 
     // Helper function to print the state of input during password evaluation
-    private static void displayInputState(String inputLine, int currentCharNdx, char currentChar) {
-        System.out.println(inputLine);
-        System.out.println(inputLine.substring(0, currentCharNdx) + "?");
-        System.out.println("Password length: " + inputLine.length() + " | Current index: " +
+    private static void displayInputState(char[] password, int currentCharNdx, char currentChar) {
+        System.out.println(password);
+        System.out.println("Password length: " + password.length + " | Current index: " +
                 currentCharNdx + " | Current character: \"" + currentChar + "\"");
     }
 
     // Evaluates the password based on set criteria
-    public static String evaluatePassword(String input) {
+    public static String evaluatePassword(char[] password) {
         passwordErrorMessage = "";
         passwordIndexofError = 0;
 
-        if (input == null || input.isEmpty()) {
+        if (password == null || password.length == 0) {
             return "*** Error *** The password is empty!";
         }
 
@@ -35,13 +34,13 @@ public class TextValidation {
         boolean hasLowerCase = false;
         boolean hasDigit = false;
         boolean hasSpecialChar = false;
-        boolean isLongEnough = input.length() >= 8;
+        boolean isLongEnough = password.length >= 8;
 
         String specialChars = "~`!@#$%^&*()_-+={}[]|\\:;\"'<>,.?/";
 
-        for (int i = 0; i < input.length(); i++) {
-            char currentChar = input.charAt(i);
-            displayInputState(input, i, currentChar);
+        for (int i = 0; i < password.length; i++) {
+            char currentChar = password[i];
+            displayInputState(password, i, currentChar);
 
             if (Character.isUpperCase(currentChar)) {
                 hasUpperCase = true;
@@ -65,7 +64,7 @@ public class TextValidation {
         if (!isLongEnough) errorMessage.append("At least 8 characters long; ");
 
         if (errorMessage.length() > 0) {
-            passwordIndexofError = input.length();
+            passwordIndexofError = password.length;
             return "*** Error *** The following conditions were not met: " + errorMessage.toString().trim();
         }
 
@@ -83,8 +82,8 @@ public class TextValidation {
     }
 
     // Validates OTP (length of 6 characters)
-    public boolean validateOTP(String otp) {
-        return otp != null && otp.length() == 6; // OTP must be 6 digits long
+    public boolean validateOTP(char[] otp) {
+        return otp != null && otp.length == 6; // OTP must be 6 digits long
     }
 
     // Validates email format using regex
@@ -116,15 +115,15 @@ public class TextValidation {
     }
 
     // Validates password by checking conditions and running evaluatePassword
-    public static String validatePassword(String password) {
-        if (password == null || password.isEmpty()) {
+    public static String validatePassword(char[] password) {
+        if (password == null || password.length == 0) {
             return "*** Error *** Password cannot be empty!";
         }
         return evaluatePassword(password); // Evaluate password strength
     }
 
     // Validates username, password, and confirm password during setup
-    public static String validateSetupFields(String username, String password, String confirmPassword) {
+    public static String validateSetupFields(String username, char [] password, char[] confirmPassword) {
         String usernameError = validateUsername(username);
         if (!usernameError.isEmpty()) {
             return usernameError; // Username validation failed
@@ -135,7 +134,7 @@ public class TextValidation {
             return passwordError; // Password validation failed
         }
 
-        if (!password.equals(confirmPassword)) {
+        if (!areCharArraysEqual(password, confirmPassword)) {
             return "*** Error *** Passwords do not match!";
         }
 
@@ -143,19 +142,29 @@ public class TextValidation {
     }
 
     // Validates password change
-    public static String validateChangePassword(String password, String confirmPassword) {
+    public static String validateChangePassword(char [] password, char [] confirmPassword) {
         String passwordError = validatePassword(password);
         if (!passwordError.isEmpty()) {
             return passwordError; // Password validation failed
         }
 
-        if (!password.equals(confirmPassword)) {
+        if (!areCharArraysEqual(password, confirmPassword)) {
             return "*** Error *** Passwords do not match!";
         }
 
         return ""; // All validations passed
     }
-
+    // Method to check if two char arrays are equal
+    private static boolean areCharArraysEqual(char[] array1, char[] array2) {
+        if (array1 == null || array2 == null) return false;
+        if (array1.length != array2.length) return false;
+        for (int i = 0; i < array1.length; i++) {
+            if (array1[i] != array2[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
     // Checks if a given field is empty or invalid
     public static String isFieldEmpty(String field) {
         if(field == null || field.trim().length() < 1) {
@@ -173,7 +182,7 @@ public class TextValidation {
             return usernameError; // Username is invalid
         }
 
-        String passwordError = validatePassword(new String(password));
+        String passwordError = validatePassword(password);
         if (!passwordError.isEmpty()) {
             return passwordError; // Password is invalid
         }
@@ -184,6 +193,15 @@ public class TextValidation {
     // Placeholder for future error message display implementation
     public void displayErrorMessages() {
         // Implement UI logic for displaying error messages, if needed
+    }
+
+    public static String isFieldEmpty(char[] password) {
+        // Check if the password array is null or has no characters
+        if (password == null || password.length == 0) {
+            return "Password field cannot be empty.";
+        }
+        // Return an empty string if the password is not empty
+        return "";
     }
 }
 
