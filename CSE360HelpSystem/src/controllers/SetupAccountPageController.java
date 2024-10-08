@@ -13,98 +13,103 @@ import javafx.stage.Stage;
 import models.User;
 import models.UserSession;
 import models.TextValidation;
+
 /**
- * <p> Title: SetupAccountPageController </p>
+ * <p>
+ * Title: SetupAccountPageController
+ * </p>
  * 
- * <p> Description: Controls the view for the page where the user's account is being setup 
- *     Initial setup consists of the user setting their username and password. </p>
- *     
- *     @author Alyssa DiTroia
+ * <p>
+ * Description: Controls the view for the page where the user's account is being
+ * setup Initial setup consists of the user setting their username and password.
+ * </p>
+ * 
+ * @author Alyssa DiTroia
  */
 public class SetupAccountPageController extends PageController {
-  private Database db;
-  // Constructor with for FXMLLoader
-  public SetupAccountPageController() {
-    super();
-  }
+	private Database db;
 
-  // Constructor with dependency injection for Stage and Database
-  public SetupAccountPageController(Stage primaryStage, Database db) {
-    super(primaryStage, db);
-  }
+	// Constructor with for FXMLLoader
+	public SetupAccountPageController() {
+		super();
+	}
 
-  @FXML
-  private TextField usernameField;
+	// Constructor with dependency injection for Stage and Database
+	public SetupAccountPageController(Stage primaryStage, Database db) {
+		super(primaryStage, db);
+	}
 
-  @FXML
-  private PasswordField passwordField;
+	@FXML
+	private TextField usernameField;
 
-  @FXML
-  private PasswordField confirmPasswordField;
+	@FXML
+	private PasswordField passwordField;
 
-  @FXML
-  private Button setupButton;
+	@FXML
+	private PasswordField confirmPasswordField;
 
-  @FXML
-  private Label statusLabel;
+	@FXML
+	private Button setupButton;
 
-  /**
-   * handleSetupButtonAction()
-   * Below is the implementation for handling the user's account setup and updating their information in the database
-   * The details are validated and the user's information associated with that invite code is updated in the database
-   * The invite code is set to null after use
-   * 
-   */
-  @FXML
-  private void handleSetupButtonAction() {
-      db = Database.getInstance(); // Get the current instance of the Database
-      statusLabel.setText(""); // Clear previous status messages
-      UserSession currentUser = UserSession.getInstance(); // Get the current user instance
-      String inviteCode = currentUser.getInviteCode(); // Get the current user instance invite code
-      String currentUsername = currentUser.getUsername();
-      System.out.println("Current user invite code: " + inviteCode);
-      System.out.println("Current user username: " + currentUsername);
+	@FXML
+	private Label statusLabel;
 
-      // Trim whitespace from username field
-      String username = usernameField.getText().trim();
-      char [] password = passwordField.getText().toCharArray();
-      char [] confirmPassword = confirmPasswordField.getText().toCharArray();
+	/**
+	 * handleSetupButtonAction() Below is the implementation for handling the user's
+	 * account setup and updating their information in the database The details are
+	 * validated and the user's information associated with that invite code is
+	 * updated in the database The invite code is set to null after use
+	 * 
+	 */
+	@FXML
+	private void handleSetupButtonAction() {
+		db = Database.getInstance(); // Get the current instance of the Database
+		statusLabel.setText(""); // Clear previous status messages
+		UserSession currentUser = UserSession.getInstance(); // Get the current user instance
+		String inviteCode = currentUser.getInviteCode(); // Get the current user instance invite code
+		String currentUsername = currentUser.getUsername();
+		System.out.println("Current user invite code: " + inviteCode);
+		System.out.println("Current user username: " + currentUsername);
 
-      // Validate the username and password using TextValidation model
-      String validationMessage = TextValidation.validateSetupFields(username, password, confirmPassword);
-      
-      // If the fields are valid
-      if (validationMessage.isEmpty()) {
-          try {
-              if (inviteCode != null) {
-                  // User has an invite code, complete the invite process
-                  User newUser = new User("", "", "", "", username, password, null, null, null);
-                  db.completeInvite(inviteCode, username, password);
+		// Trim whitespace from username field
+		String username = usernameField.getText().trim();
+		char[] password = passwordField.getText().toCharArray();
+		char[] confirmPassword = confirmPasswordField.getText().toCharArray();
 
-                  // Show success message for account setup
-                  statusLabel.setText("Account setup successful! Redirecting to login...");
-                  statusLabel.setStyle("-fx-text-fill: green;");
+		// Validate the username and password using TextValidation model
+		String validationMessage = TextValidation.validateSetupFields(username, password, confirmPassword);
 
-                  // Redirect to login page after 2 seconds
-                  PauseTransition pause = new PauseTransition(Duration.seconds(2));
-                  pause.setOnFinished(event -> redirectToLogin());
-                  pause.play();
-              }
+		// If the fields are valid
+		if (validationMessage.isEmpty()) {
+			try {
+				if (inviteCode != null) {
+					// User has an invite code, complete the invite process
+					User newUser = new User("", "", "", "", username, password, null, null, null);
+					db.completeInvite(inviteCode, username, password);
 
-          } catch (SQLException e) {
-              e.printStackTrace();
-              statusLabel.setText("Error processing request. Please try again."); 
-              statusLabel.setStyle("-fx-text-fill: red;");
-          }
-      } else {
-          // If the fields don't meet validation criteria, show error message
-          statusLabel.setText(validationMessage);
-          statusLabel.setStyle("-fx-text-fill: red;");
-      }
-  }
+					// Show success message for account setup
+					statusLabel.setText("Account setup successful! Redirecting to login...");
+					statusLabel.setStyle("-fx-text-fill: green;");
 
+					// Redirect to login page after 2 seconds
+					PauseTransition pause = new PauseTransition(Duration.seconds(2));
+					pause.setOnFinished(event -> redirectToLogin());
+					pause.play();
+				}
 
-  private void redirectToLogin() {
-    navigateTo("/views/LoginPageView.fxml");
-  }
+			} catch (SQLException e) {
+				e.printStackTrace();
+				statusLabel.setText("Error processing request. Please try again.");
+				statusLabel.setStyle("-fx-text-fill: red;");
+			}
+		} else {
+			// If the fields don't meet validation criteria, show error message
+			statusLabel.setText(validationMessage);
+			statusLabel.setStyle("-fx-text-fill: red;");
+		}
+	}
+
+	private void redirectToLogin() {
+		navigateTo("/views/LoginPageView.fxml");
+	}
 }
