@@ -157,7 +157,7 @@ public class AdminHomePageController extends PageController {
             private final CheckBox updateStudent = new CheckBox("Student");
             private final CheckBox updateInstructor = new CheckBox("Instructor");
             private final Button updateButton = new Button("Update Permissions");
-
+            
             {
                 // Action for updating permissions
                 updateButton.setOnAction(event -> {

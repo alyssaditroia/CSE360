@@ -59,6 +59,7 @@ public class UserSession {
 	/**
 	 * 
 	 * @param inviteCode
+	 * 
 	 */
 	public void setInviteCode(String inviteCode) {
 		this.inviteCode = inviteCode;

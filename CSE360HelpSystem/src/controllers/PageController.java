@@ -23,7 +23,6 @@ public class PageController {
 
     // Default constructor, called by FXMLLoader
     public PageController() {
-        // This constructor will be called by FXMLLoader
     }
 
     // Constructor to initialize the primary stage and database
