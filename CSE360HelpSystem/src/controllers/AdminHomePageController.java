@@ -66,6 +66,12 @@ public class AdminHomePageController extends PageController {
     private TableView<User> userTable;
 
     @FXML
+    private TableColumn<User, String> usernameColumn;
+    
+    @FXML
+    private TableColumn<User, String> preferrednameColumn;
+    
+    @FXML
     private TableColumn<User, String> emailColumn;
 
     @FXML
@@ -82,6 +88,9 @@ public class AdminHomePageController extends PageController {
 
     @FXML
     private TableColumn<User, Void> resetPasswordColumn;
+    
+    @FXML
+    private TableColumn<User, Void> deleteColumn;
 
     @FXML
     private Button logoutButton;
@@ -146,6 +155,8 @@ public class AdminHomePageController extends PageController {
 
     // Initialize table columns and action buttons
     private void initializeTable() {
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+        preferrednameColumn.setCellValueFactory(new PropertyValueFactory<>("preferredName"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         adminColumn.setCellValueFactory(new PropertyValueFactory<>("admin"));
         studentColumn.setCellValueFactory(new PropertyValueFactory<>("student"));
@@ -203,7 +214,30 @@ public class AdminHomePageController extends PageController {
                 }
             }
         });
+        
+        deleteColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button deleteButton = new Button("Delete");
+
+            {
+                deleteButton.setOnAction(event -> {
+                    User user = getTableView().getItems().get(getIndex());
+                    deleteUser(user);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(deleteButton);
+                }
+            }
+        });
     }
+    
+    //
     private void resetPassword(User user) {
         
         // Show a confirmation dialog before applying changes
@@ -241,14 +275,12 @@ public class AdminHomePageController extends PageController {
             for (Map<String, Object> row : rawUsers) {
                 User user = new User();
                 // Use the correct keys to retrieve values from the map
+                user.setUsername((String) row.get("username"));
+                user.setPreferredName((String) row.get("preferredName"));
                 user.setEmail((String) row.get("email"));
                 user.setAdmin((Boolean) row.get("isAdmin")); // Changed to match the key in the map
                 user.setStudent((Boolean) row.get("isStudent")); // Changed to match the key in the map
                 user.setInstructor((Boolean) row.get("isInstructor")); // Changed to match the key in the map
-                
-                // Set any other fields as necessary
-                user.setUsername((String) row.get("username")); // Assuming you want to set the username as well
-                user.setPreferredName((String) row.get("preferredName")); // Assuming you want to set the preferred name
                 user.setInviteToken((String) row.get("inviteToken")); // Set invite token if applicable
                 
                 // Add the User object to the list
@@ -261,7 +293,6 @@ public class AdminHomePageController extends PageController {
         // Populate TableView with the list of users
         userTable.getItems().setAll(users);  
     }
-
 
     // Generate random invite token
     private String generateInviteToken() {
@@ -277,6 +308,7 @@ public class AdminHomePageController extends PageController {
     // Show alert messages
     private List<String> alertMessages = new ArrayList<>();
 
+    //
     private void showAlert(String title, String message, String message2) {
         alertMessages.add(message);
         alertMessages.add(message2);
@@ -317,6 +349,27 @@ public class AdminHomePageController extends PageController {
                 } catch (SQLException e) {
                     e.printStackTrace();
                     showAlert("Error", "Failed to update permissions for " + user.getEmail(), "");
+                }
+            }
+        });
+    }
+    
+    //
+    private void deleteUser(User user) {
+        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmationAlert.setTitle("Delete User");
+        confirmationAlert.setHeaderText("Delete User: " + user.getUsername());
+        confirmationAlert.setContentText("Are you sure you want to delete this user?");
+        
+        confirmationAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    db.deleteUser(user.getEmail());
+                    showAlert("Success", "User deleted successfully", "");
+                    loadUsers();  // Refresh the user list
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert("Error", "Failed to delete user: " + user.getEmail(), "");
                 }
             }
         });

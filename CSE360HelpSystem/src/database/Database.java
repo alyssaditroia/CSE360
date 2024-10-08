@@ -32,8 +32,7 @@ public class Database {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "org.h2.Driver";
 
-    static final String DB_URL = "jdbc:h2:~/firstDatabase";// If using Windows: jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\firstDatabase
-
+    static final String DB_URL = "jdbc:h2:C:\\Users\\jjust\\h2\\firstDatabase";
 
     // Database credentials
     static final String USER = "user";
@@ -43,6 +42,7 @@ public class Database {
 
     private Connection connection;
     private Statement statement;
+    
     /**
      * connectToDatabase()
      * Method to connect to the database
@@ -61,6 +61,10 @@ public class Database {
             System.err.println("JDBC Driver not found: " + e.getMessage());
         }
     }
+    
+    /**
+     * 
+     */
     public Database() {
         // Private constructor to prevent instantiation
     }
@@ -72,6 +76,7 @@ public class Database {
         return instance;
     }
 
+    
     /**
      *  createTables()
      *  Method to create tables
@@ -97,6 +102,7 @@ public class Database {
         statement.execute(userTable);
     }
     
+    
     /**
      * isDatabaseEmpty()
      * Method to check if the database is empty
@@ -115,6 +121,8 @@ public class Database {
         }
         return false;
     }
+    
+    
     /**
      * Connection()
      * This method returns the active connection object
@@ -125,6 +133,7 @@ public class Database {
         return connection;
     }
 
+    
     /**
      *  Method to setup the first ever user as an administrator user
      *  Uses just the username and password input from the login page to setup first user in database
@@ -167,6 +176,8 @@ public class Database {
             throw e; // Rethrow the exception after logging it
         }
     }
+    
+    
     /**
      * Method to update different sections of the user's credentials. 
      * If the field passed through is null, it will not be updated
@@ -223,6 +234,13 @@ public class Database {
         }
     }
     
+    /**
+     * 
+     * @param username
+     * @param password
+     * @return
+     * @throws SQLException
+     */
     public boolean updatePassword(String username, char [] password) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
@@ -246,8 +264,6 @@ public class Database {
         }
         return false;
     }
-
-    
 
 
     /**
@@ -279,6 +295,7 @@ public class Database {
         return inviteCode;
     }
 
+    
     /**
      * Method to complete the invite by setting the users username and password for that specific invite code
      * Updates the user based on the invite code linked to that user
@@ -296,7 +313,7 @@ public class Database {
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, inviteToken);
             ResultSet rs = pstmt.executeQuery();
-            
+             	
             // If the invite code exists then the user is updated accordingly and the invite token is set to NULL
             if (rs.next()) {
                 String updateUser = "UPDATE cse360users SET username = ?, password = ?, inviteToken = NULL WHERE inviteToken = ?";
@@ -311,6 +328,14 @@ public class Database {
         }
         return false;
     }
+    
+    
+    /**
+     * 
+     * @param inviteToken
+     * @return
+     * @throws SQLException
+     */
     public boolean validateInvite(String inviteToken) throws SQLException {
     	connection = DriverManager.getConnection(DB_URL, USER, PASS);
         statement = connection.createStatement();
@@ -326,7 +351,9 @@ public class Database {
                 }
             }
         return false;
-        }
+    }
+    
+    
     /**
      * validateCredentials()
      * Method to validate user credentials to confirm the username and password match a user in the database
@@ -373,13 +400,21 @@ public class Database {
         
         return false; // User not found
     }
+    
+    
+    /**
+     * 
+     * @param email
+     * @throws SQLException
+     */
     public void deleteUser(String email) throws SQLException {
-        String sql = "DELETE FROM users WHERE email = ?";
+        String sql = "DELETE FROM cse360users WHERE email = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, email);
             pstmt.executeUpdate();
         }
     }
+    
     
     /**
      * getFirstName()
@@ -412,6 +447,8 @@ public class Database {
         }
         return "";
     }
+    
+    
     /**
      * getFirstName()
      * Method to get the first name of the user based on the username
@@ -462,6 +499,8 @@ public class Database {
             return rs.next() && rs.getInt(1) > 0;
         }
     }
+    
+    
     /**
      * Closes connection to the database
      */
@@ -506,6 +545,7 @@ public class Database {
         return false; // User not found or role not set
     }
     
+    
     /**
      * Function added by Justin Faris - 10/3/24
      * 
@@ -531,6 +571,7 @@ public class Database {
         }
         return false; // User not found or role not set
     }
+    
     
     /**
      * Function added by Justin Faris - 10/3/24
@@ -629,6 +670,14 @@ public class Database {
 
         return usersList;
     }
+    
+    
+    /**
+     * 
+     * @param username
+     * @return
+     * @throws SQLException
+     */
     public Boolean getOTPFlag(String username) throws SQLException {
         // Initialize the connection
         connection = DriverManager.getConnection(DB_URL, USER, PASS);
