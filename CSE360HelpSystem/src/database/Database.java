@@ -732,16 +732,21 @@ public class Database {
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    User user = new User();
+                	User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setInviteToken(rs.getString("inviteToken"));
                     user.setUsername(rs.getString("username"));
+                    user.setPassword(rs.getString("password"));
                     user.setEmail(rs.getString("email"));
                     user.setFirstName(rs.getString("firstName"));
                     user.setLastName(rs.getString("lastName"));
+                    user.setMiddleName(rs.getString("middleName"));
                     user.setPreferredName(rs.getString("preferredName"));
                     user.setAdmin(rs.getBoolean("isAdmin"));
                     user.setStudent(rs.getBoolean("isStudent"));
                     user.setInstructor(rs.getBoolean("isInstructor"));
-                    // Set other fields as necessary
+                    user.setOtp(rs.getString("Otp"));
+                    user.setOtpExpiration(rs.getTimestamp("OtpExpiration"));
                     return user;
                 }
             }
@@ -809,7 +814,6 @@ public class Database {
         article.setTitle(rs.getString("title"));
         article.setDescription(rs.getString("shortDescription"));
         article.setContent(rs.getString("content"));
-        // You'll need to implement a method to get a User object by username
         article.setCreatedBy(getUserByUsername(rs.getString("createdBy")));
         article.setCreatedDate(rs.getTimestamp("createdDate").toLocalDateTime());
         article.setLastUpdated(rs.getTimestamp("lastUpdated").toLocalDateTime());
