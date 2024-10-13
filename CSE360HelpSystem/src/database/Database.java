@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+import models.HelpArticle;
 import models.User;
 
 /**
@@ -84,6 +84,7 @@ public class Database {
      */
     public void createTables() throws SQLException {
     	System.out.println("Creating Tables");
+    	// Create users table
         String userTable = "CREATE TABLE IF NOT EXISTS cse360users ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, " 
                 + "firstName VARCHAR(255),"             
@@ -100,6 +101,26 @@ public class Database {
                 + "otpFlag BOOLEAN DEFAULT FALSE, "
                 + "otpExpiration TIMESTAMP)";
         statement.execute(userTable);
+        
+        // Create help articles table
+        String helpArticleTable = "CREATE TABLE IF NOT EXISTS help_articles ("
+	            + "articleID VARCHAR(255) PRIMARY KEY, "
+	            + "title VARCHAR(255), "
+	            + "shortDescription TEXT, "
+	            + "content TEXT, "
+	            + "createdBy VARCHAR(255), "
+	            + "createdDate TIMESTAMP, "
+	            + "lastUpdated TIMESTAMP, "
+	            + "level VARCHAR(20), "
+	            + "groupingIdentifiers TEXT, "
+	            + "keywords TEXT, "
+	            + "referenceMaterials TEXT, "
+	            + "relatedArticles TEXT, "
+	            + "instructorAccess BOOLEAN, "
+	            + "studentAccess BOOLEAN)";
+        statement.execute(helpArticleTable);
+
+        System.out.println("Tables created successfully");
     }
     
     
@@ -697,6 +718,109 @@ public class Database {
                 return null;
             }
         }
+    }
+    
+    /**
+     * Retrieves a User object from the database based on the username
+     * @param username The username of the user to retrieve
+     * @return User object if found, null otherwise
+     * @throws SQLException if a database access error occurs
+     */
+    public User getUserByUsername(String username) throws SQLException {
+        String query = "SELECT * FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+                    user.setFirstName(rs.getString("firstName"));
+                    user.setLastName(rs.getString("lastName"));
+                    user.setPreferredName(rs.getString("preferredName"));
+                    user.setAdmin(rs.getBoolean("isAdmin"));
+                    user.setStudent(rs.getBoolean("isStudent"));
+                    user.setInstructor(rs.getBoolean("isInstructor"));
+                    // Set other fields as necessary
+                    return user;
+                }
+            }
+        }
+        return null; // User not found
+    }
+    
+    /**
+     * 
+     * @param article
+     * @throws SQLException
+     */
+    public void addHelpArticle(HelpArticle article) throws SQLException {
+        String sql = "INSERT INTO help_articles (articleID, title, shortDescription, content, createdBy, createdDate, lastUpdated, level, groupingIdentifiers, keywords, referenceMaterials, relatedArticles, instructorAccess, studentAccess) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, article.getArticleID());
+            pstmt.setString(2, article.getTitle());
+            pstmt.setString(3, article.getDescription());
+            pstmt.setString(4, article.getContent());
+            pstmt.setString(5, article.getCreatedBy().getUsername());
+            pstmt.setTimestamp(6, Timestamp.valueOf(article.getCreatedDate()));
+            pstmt.setTimestamp(7, Timestamp.valueOf(article.getLastUpdated()));
+            pstmt.setString(8, article.getLevel().toString());
+            pstmt.setString(9, String.join(",", article.getGroupingIdentifiers()));
+            pstmt.setString(10, String.join(",", article.getKeywords()));
+            pstmt.setString(11, String.join(",", article.getReferenceMaterials()));
+            pstmt.setString(12, String.join(",", article.getRelatedArticles()));
+            pstmt.setBoolean(13, article.getInstructorAccess());
+            pstmt.setBoolean(14, article.getStudentAccess());
+            
+            pstmt.executeUpdate();
+        }
+    }
+    
+    /**
+     * 
+     * @return
+     * @throws SQLException
+     */
+    public List<HelpArticle> getAllHelpArticles() throws SQLException {
+        List<HelpArticle> articles = new ArrayList<>();
+        String sql = "SELECT * FROM help_articles";
+        
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                articles.add(extractHelpArticleFromResultSet(rs));
+            }
+        }
+        
+        return articles;
+    }
+    
+    /**
+     * 
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    private HelpArticle extractHelpArticleFromResultSet(ResultSet rs) throws SQLException {
+        HelpArticle article = new HelpArticle();
+        article.setArticleID(rs.getString("articleID"));
+        article.setTitle(rs.getString("title"));
+        article.setDescription(rs.getString("shortDescription"));
+        article.setContent(rs.getString("content"));
+        // You'll need to implement a method to get a User object by username
+        article.setCreatedBy(getUserByUsername(rs.getString("createdBy")));
+        article.setCreatedDate(rs.getTimestamp("createdDate").toLocalDateTime());
+        article.setLastUpdated(rs.getTimestamp("lastUpdated").toLocalDateTime());
+        article.setLevel(HelpArticle.ArticleLevels.valueOf(rs.getString("level")));
+        article.setGroupingIdentifiers(Arrays.asList(rs.getString("groupingIdentifiers").split(",")));
+        article.setKeywords(Arrays.asList(rs.getString("keywords").split(",")));
+        article.setReferenceMaterials(Arrays.asList(rs.getString("referenceMaterials").split(",")));
+        article.setRelatedArticles(Arrays.asList(rs.getString("relatedArticles").split(",")));
+        article.setInstructorAccess(rs.getBoolean("instructorAccess"));
+        article.setStudentAccess(rs.getBoolean("studentAccess"));
+        return article;
     }
 }
 
