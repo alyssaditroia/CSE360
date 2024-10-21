@@ -77,6 +77,12 @@ public class PageController {
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
+    protected void showErrorAlert(String title, String message) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
 	// Initialize method can be overridden in subclasses
 	public void initialize(Stage stage, Database db) {

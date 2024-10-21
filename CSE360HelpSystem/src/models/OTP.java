@@ -1,6 +1,3 @@
-/**
- * 
- */
 package models;
 
 import java.sql.*;
@@ -12,16 +9,20 @@ import database.Database;
 
 import java.util.Random;
 
+import Encryption.EncryptionHelper;
+
 /**
- * OneTimePassword Class
+ * The {@code OTP} class represents the one time password and handles OTP operations
+ * The OTP class also interacts with the database for updating and handling OTPs
  * 
- * @author Alyssa diTroia
+ * @author Alyssa DiTroia
  */
 public class OTP {
 	private char[] OTP;
 	private LocalDateTime expiration;
 	private boolean flag;
 	private Database db;
+	private EncryptionHelper encryptionHelper;
 	private Random random = new Random();
 
 	/**
@@ -31,6 +32,11 @@ public class OTP {
 	 */
 	public OTP() {
 		db = Database.getInstance();
+		try {
+			encryptionHelper = new EncryptionHelper();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -40,6 +46,7 @@ public class OTP {
 	 * @param email The username to associate the OTP with
 	 * @throws SQLException
 	 */
+	// TODO Encrypt OTP
 	public void generateAndSaveOTP(String email) throws SQLException {
 		// Generate a random 6-digit OTP
 		this.OTP = String.valueOf(100000 + random.nextInt(900000)).toCharArray();
@@ -70,6 +77,7 @@ public class OTP {
 	 * @return Error message if validation fails, or an empty string if valid
 	 * @throws SQLException
 	 */
+	// TODO Decrypt OTP 
 	public String validateOTP(String username, char[] password) throws SQLException {
 		// Check if username or inputOTP is null
 		if (username == null || password == null) {

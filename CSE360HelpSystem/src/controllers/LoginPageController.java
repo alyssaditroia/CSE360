@@ -29,23 +29,19 @@ import models.UserSession;
  */
 public class LoginPageController extends PageController {
 	// FXML elements
+	
 	@FXML
 	private TextField usernameField;
-
 	@FXML
 	private PasswordField passwordField;
 	@FXML
 	private TextField inviteCodeField;
-
 	@FXML
 	private Button loginButton;
-
 	@FXML
 	private Button inviteButton;
-
 	@FXML
 	private Label errorLabel;
-
 	@FXML
 	private Label statusLabel;
 

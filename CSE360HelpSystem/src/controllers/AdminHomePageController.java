@@ -99,6 +99,9 @@ public class AdminHomePageController extends PageController {
 
 	@FXML
 	private Button logoutButton;
+	
+	@FXML
+	private Button viewArticlesButton;
 
 	/**
 	 * Handles invite button click ensures email field contains proper input and the
@@ -156,6 +159,14 @@ public class AdminHomePageController extends PageController {
 		navigateTo("/views/LoginPageView.fxml");
 	}
 
+	/**
+	 * Go to Article View
+	 */
+	@FXML
+	public void article() {
+		System.out.println("Going to Article View.");
+		navigateTo("/views/HelpArticleView.fxml");
+	}
 	/**
 	 * Set permissions for a new user
 	 * 

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HelpArticleController" spacing="10" alignment="CENTER">
+    <padding>
+        <Insets topRightBottomLeft="10"/>
+    </padding>
+    
+    <!-- Title Input -->
+    <TextField fx:id="titleField" promptText="Title" />
+    
+    <!-- Authors Input -->
+    <TextField fx:id="authorsField" promptText="Authors" />
+    
+    <!-- Abstract Input -->
+    <TextArea fx:id="abstractField" promptText="Abstract" prefHeight="100"/>
+    
+    <!-- Keywords Input -->
+    <TextArea fx:id="keywordsField" promptText="Keywords" prefHeight="60"/>
+    
+    <!-- Body Input -->
+    <TextArea fx:id="bodyField" promptText="Body" prefHeight="150"/>
+    
+    <!-- References Input -->
+    <TextArea fx:id="referencesField" promptText="References" prefHeight="80"/>
+    
+    <!-- TableView for Articles -->
+    <TableView fx:id="articleTable" prefHeight="200" prefWidth="400">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
+            <TableColumn fx:id="titleColumn" text="Title" prefWidth="200" />
+            <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="150" />
+        </columns>
+    </TableView>
+    
+    <!-- Buttons for Article Actions -->
+    <HBox spacing="10">
+        <Button fx:id="createButton" text="Create Article" onAction="#createArticle"/>
+        <Button fx:id="listButton" text="List Articles" onAction="#listArticles"/>
+        <Button fx:id="viewButton" text="View Article" onAction="#viewArticle"/>
+        <Button fx:id="deleteButton" text="Delete Article" onAction="#deleteArticle"/>
+    </HBox>
+    
+    <!-- Buttons for Backup/Restore Actions -->
+    <HBox spacing="10">
+        <Button fx:id="backupButton" text="Backup Articles" onAction="#backupArticles"/>
+        <Button fx:id="restoreButton" text="Restore Articles" onAction="#restoreArticles"/>
+    </HBox>
+
+</VBox>
+
+
+

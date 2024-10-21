@@ -12,6 +12,7 @@
             <Label fx:id="adminHomeTitle" text="Admin Home Page" 
                    style="-fx-font-size: 24; -fx-font-weight: bold;" />
 
+			<Button fx:id="viewArticlesButton" text="View Help Articles" onAction="#article" />
             <!-- GridPane for Permissions and Email -->
             <GridPane alignment="CENTER_LEFT" hgap="10" vgap="10">
                 <!-- Label for Permissions -->

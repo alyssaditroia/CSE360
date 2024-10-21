@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import controllers.LoginPageController;
 import controllers.PageController;
 import database.Database;
+import database.HelpArticleDatabase;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -19,6 +20,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
 	private Database db;
+	private HelpArticleDatabase had;
 	private PageController pageController;
 
 	@Override
@@ -60,7 +62,11 @@ public class Main extends Application {
 		// Close database connection when the application stops
 		if (db != null) {
 			db.closeConnection();
-			System.err.println("Database connection closed.");
+			System.err.println("User Database connection closed.");
+		}
+		if (had != null) {
+			had.closeConnection();
+			System.err.println("Help Article Database connection closed.");
 		}
 	}
 

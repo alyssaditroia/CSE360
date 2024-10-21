@@ -36,7 +36,7 @@ public class Database {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "org.h2.Driver";
 
-	static final String DB_URL = "jdbc:h2:~/firstDatabase";
+	static final String DB_URL = "jdbc:h2:~/CSE360HelpDatabase";
 
 	// Database credentials
 	static final String USER = "user";
@@ -45,7 +45,7 @@ public class Database {
 	private static Database instance;
 
 	private Connection connection;
-	private Statement statement;
+	protected Statement statement;
 
 	/**
 	 * Function added by Alyssa DiTroia 
@@ -90,14 +90,24 @@ public class Database {
 	 * 
 	 * @throws SQLException
 	 */
+	// TODO Add encryption
 	public void createTables() throws SQLException {
 		System.out.println("Creating Tables");
-		String userTable = "CREATE TABLE IF NOT EXISTS cse360users (" + "id INT AUTO_INCREMENT PRIMARY KEY, "
-				+ "firstName VARCHAR(255)," + "lastName VARCHAR(255)," + "preferredName VARCHAR(255),"
-				+ "email VARCHAR(255) UNIQUE, " + "username VARCHAR(255)," + "password VARCHAR(255), "
-				+ "isAdmin BOOLEAN DEFAULT FALSE, " + "isStudent BOOLEAN DEFAULT FALSE, "
-				+ "isInstructor BOOLEAN DEFAULT FALSE, " + "inviteToken VARCHAR(255)," + "otp VARCHAR(255), "
-				+ "otpFlag BOOLEAN DEFAULT FALSE, " + "otpExpiration TIMESTAMP)";
+		String userTable = "CREATE TABLE IF NOT EXISTS cse360users (" 
+		+ "id INT AUTO_INCREMENT PRIMARY KEY, "
+		+ "firstName VARCHAR(255)," 
+		+ "lastName VARCHAR(255)," 
+		+ "preferredName VARCHAR(255),"
+		+ "email VARCHAR(255) UNIQUE, " 
+		+ "username VARCHAR(255)," 
+		+ "password VARCHAR(255), "
+		+ "isAdmin BOOLEAN DEFAULT FALSE, " 
+		+ "isStudent BOOLEAN DEFAULT FALSE, "
+		+ "isInstructor BOOLEAN DEFAULT FALSE, " 
+		+ "inviteToken VARCHAR(255)," 
+		+ "otp VARCHAR(255), "
+		+ "otpFlag BOOLEAN DEFAULT FALSE, " 
+		+ "otpExpiration TIMESTAMP)";
 		statement.execute(userTable);
 	}
 
@@ -142,6 +152,7 @@ public class Database {
 	 * @param password
 	 * @throws SQLException
 	 */
+	// TODO add encryption
 	public void setupAdministrator(String username, char[] password) throws SQLException {
 		connection = DriverManager.getConnection(DB_URL, USER, PASS);
 		statement = connection.createStatement();
@@ -245,6 +256,7 @@ public class Database {
 	 * @return
 	 * @throws SQLException
 	 */
+	// TODO add encryption
 	public boolean updatePassword(String username, char[] password) throws SQLException {
 		connection = DriverManager.getConnection(DB_URL, USER, PASS);
 		statement = connection.createStatement();
@@ -314,6 +326,7 @@ public class Database {
 	 * @return boolean true or false
 	 * @throws SQLException
 	 */
+	// TODO add encryption
 	public boolean completeInvite(String inviteToken, String username, char[] password) throws SQLException {
 		connection = DriverManager.getConnection(DB_URL, USER, PASS);
 		statement = connection.createStatement();
@@ -462,7 +475,7 @@ public class Database {
 
 	/**
 	 * Function added by Alyssa DiTroia 
-	 * getFEmail() Method to get the email of the user to check if it is there
+	 * getEmail() Method to get the email of the user to check if it is there
 	 * 
 	 * @param username
 	 * @return
