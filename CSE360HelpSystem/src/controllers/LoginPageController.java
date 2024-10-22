@@ -239,10 +239,19 @@ public class LoginPageController extends PageController {
 	private void redirectBasedOnSingleRole(String username) throws SQLException {
 		db = Database.getInstance();
 		if (db.isUserAdmin(username)) {
+			String currentRole = "admin";
+			UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/AdminHomePageView.fxml");
 		} else if (db.isUserInstructor(username)) {
+			String currentRole = "instructor";
+			UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/InstructorHomePageView.fxml");
 		} else if (db.isUserStudent(username)) {
+			String currentRole = "student";
+			UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/StudentHomePageView.fxml");
 		}
 	}

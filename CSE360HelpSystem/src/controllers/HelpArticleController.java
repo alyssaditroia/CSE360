@@ -2,6 +2,7 @@ package controllers;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.sql.Date;
 
 import database.Database;
 import database.HelpArticleDatabase;
@@ -11,6 +12,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -19,6 +25,19 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import models.Article;
 
+/**
+ * 
+ * NOT CURRENTLY USING... JUST AN EXAMPLE
+ * 
+ * USING THE FOLLOWING INSTEAD FOR ORGANIZATION:
+ * 
+ * SearchArticleController
+ * CreateEditArticleController
+ * ViewArticleController
+ * 
+ * 
+ * 
+ */
 public class HelpArticleController extends PageController {
     
     // Database handler instance
@@ -46,6 +65,20 @@ public class HelpArticleController extends PageController {
     @FXML
     private TextArea referencesField;
     @FXML
+    private ComboBox<String> levelField;
+    @FXML
+    private TextField groupingSearchField;  // Search or add identifier
+    @FXML
+    private ListView<String> groupingListView;  // List of identifiers
+    @FXML
+    private Button addGroupingButton;
+    @FXML
+    private TextField permissionsField;
+    @FXML
+    private DatePicker dateAddedField;
+    @FXML
+    private TextField versionField;
+    @FXML
     private Button createButton;
     @FXML
     private Button listButton;
@@ -57,6 +90,12 @@ public class HelpArticleController extends PageController {
     private Button backupButton;
     @FXML
     private Button restoreButton;
+    @FXML
+    private CheckBox adminCheckbox;
+    @FXML
+    private CheckBox instructorCheckbox;
+    @FXML
+    private CheckBox studentCheckbox;
     @FXML
     private TableView<Article> articleTable;
     @FXML
@@ -73,6 +112,9 @@ public class HelpArticleController extends PageController {
     public void initialize() {
         try {
         	had = new HelpArticleDatabase();
+            levelField.setItems(FXCollections.observableArrayList("beginner", "intermediate", "advanced", "expert"));
+            groupingListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
 
             // Set up TableView columns
             idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -90,30 +132,35 @@ public class HelpArticleController extends PageController {
      */
     @FXML
     public void createArticle() {
-        char [] title = titleField.getText().toCharArray();
-		char [] authors = authorsField.getText().toCharArray();
-		char [] abstractText = abstractField.getText().toCharArray();
-		char [] keywords = keywordsField.getText().toCharArray();
-		char [] body = bodyField.getText().toCharArray();
-		char [] references = referencesField.getText().toCharArray();
+        char[] title = titleField.getText().toCharArray();
+        char[] authors = authorsField.getText().toCharArray();
+        char[] abstractText = abstractField.getText().toCharArray();
+        char[] keywords = keywordsField.getText().toCharArray();
+        char[] body = bodyField.getText().toCharArray();
+        char[] references = referencesField.getText().toCharArray();
+        String level = levelField.getValue();  // Get selected level from ComboBox
 
-		// Create a new article instance for runtime memory
-		Article newArticle = new Article(title, authors, abstractText, keywords, body, references);
+        // Get selected grouping identifiers from ListView
+        List<String> selectedIdentifiers = groupingListView.getSelectionModel().getSelectedItems();
+        String permissions = getSelectedPermissions();  // Get selected permissions
 
-		// Insert into the database
-		try {
-			had.createArticle(title, authors, abstractText, keywords, body, references);
-		} catch (Exception e) {
-		    showErrorAlert("Error", "Failed to create article: " + e.getMessage());
-		}
+        java.sql.Date dateAdded = java.sql.Date.valueOf(dateAddedField.getValue());
+        String version = versionField.getText();
 
-		// Refresh the article list in the TableView
-		listArticles();
+        // Create a new article
+        Article newArticle = new Article(title, authors, abstractText, keywords, body, references, level, 
+                                         selectedIdentifiers, permissions, dateAdded, version);
 
-		// Clear input fields
-		clearFields();
-
-		showInfoAlert("Success", "Article created successfully!");
+        // Insert into the database
+        try {
+            had.createArticle(title, authors, abstractText, keywords, body, references, level, 
+                              selectedIdentifiers, permissions, dateAdded, version);
+            listArticles();  // Refresh the table
+            clearFields();   // Clear the form
+            showInfoAlert("Success", "Article created successfully!");
+        } catch (Exception e) {
+            showErrorAlert("Error", "Failed to create article: " + e.getMessage());
+        }
     }
 
     /**
@@ -139,12 +186,34 @@ public class HelpArticleController extends PageController {
     public void viewArticle() {
         Article selectedArticle = articleTable.getSelectionModel().getSelectedItem();
         if (selectedArticle != null) {
-            titleField.setText(selectedArticle.getTitle().toString());
-            authorsField.setText(selectedArticle.getAuthors().toString());
-            abstractField.setText(selectedArticle.getAbstractText().toString());
-            keywordsField.setText(selectedArticle.getKeywords().toString());
-            bodyField.setText(selectedArticle.getBody().toString());
-            referencesField.setText(selectedArticle.getReferences().toString());
+            titleField.setText(selectedArticle.getTitle());
+            authorsField.setText(selectedArticle.getAuthors());
+            abstractField.setText(selectedArticle.getAbstractText());
+            keywordsField.setText(selectedArticle.getKeywords());
+            bodyField.setText(selectedArticle.getBody());
+            referencesField.setText(selectedArticle.getReferences());
+            levelField.setValue(selectedArticle.getLevel());
+
+            // Set permissions checkboxes
+            String permissions = selectedArticle.getPermissions();
+            adminCheckbox.setSelected(permissions.contains("Admin"));
+            instructorCheckbox.setSelected(permissions.contains("Instructor"));
+            studentCheckbox.setSelected(permissions.contains("Student"));
+
+            // Set grouping identifiers (multi-select)
+            List<String> identifiers = selectedArticle.getGroupingIdentifiers();
+            groupingListView.getSelectionModel().clearSelection();
+            for (String id : identifiers) {
+                groupingListView.getSelectionModel().select(id);
+            }
+
+            if (selectedArticle.getDateAdded() != null) {
+                dateAddedField.setValue(selectedArticle.getDateAdded().toInstant()
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toLocalDate());            
+                } else {
+                dateAddedField.setValue(null);
+            }            versionField.setText(selectedArticle.getVersion());
         } else {
             showInfoAlert("No selection", "Please select an article to view.");
         }
@@ -197,6 +266,31 @@ public class HelpArticleController extends PageController {
         } catch (Exception e) {
             showErrorAlert("Error", "Failed to restore articles: " + e.getMessage());
         }
+    }
+    @FXML
+    public void addGroupingIdentifier() {
+        String newIdentifier = groupingSearchField.getText();
+        if (!newIdentifier.isEmpty()) {
+            groupingListView.getItems().add(newIdentifier);
+            groupingSearchField.clear();  // Clear search box after adding
+        }
+    }
+    public String getSelectedPermissions() {
+        StringBuilder permissions = new StringBuilder();
+        if (adminCheckbox.isSelected()) {
+            permissions.append("Admin,");
+        }
+        if (instructorCheckbox.isSelected()) {
+            permissions.append("Instructor,");
+        }
+        if (studentCheckbox.isSelected()) {
+            permissions.append("Student,");
+        }
+        // Remove trailing comma
+        if (permissions.length() > 0) {
+            permissions.setLength(permissions.length() - 1);
+        }
+        return permissions.toString();
     }
 
     // Helper method to clear input fields

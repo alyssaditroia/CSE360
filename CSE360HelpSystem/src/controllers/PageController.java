@@ -3,6 +3,7 @@ package controllers;
 import java.io.IOException;
 
 import database.Database;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,6 +22,15 @@ import models.UserSession;
  * The page controller handles navigation, sessions, and errors across all of
  * its subclasses
  * </p>
+ * 
+ * Helpful Universal Controller Methods:
+ * 
+ * - navigateTo("/views/toView.fxml")
+ * - showError(message) -> Shows an error pop up with a message passed in as a string
+ * - logout() -> Logs the user out and resets the user session
+ * - goHome() -> Navigates the user to their home page based on their current selected role
+ * - showErrorAlert(title, message) -> Shows error pop up with a Title and Message (Strings)
+ * 
  * 
  **************/
 public class PageController {
@@ -83,6 +93,58 @@ public class PageController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    @FXML
+    public void logout() {
+        // Reset the UserSession to null
+        UserSession.setInstance(null);
+
+        // Navigate to the login page
+        navigateTo("/views/LoginPageView.fxml");  // Make sure this path is correct based on your project structure
+    }
+    /**
+     * Navigate to AdminHomePage
+     */
+    @FXML
+    public void goToAdminHomepage() {
+        navigateTo("/views/AdminHomePageView.fxml");
+    }
+    /**
+     * Navigate to Instructor Home Page
+     */
+    @FXML
+    public void goToInstructorHomepage() {
+        navigateTo("/views/InstructorHomePageView.fxml");
+    }
+    /**
+     * Navigate to Student Homepage
+     */
+    @FXML
+    public void goToStudentHomepage() {
+        navigateTo("/views/InstructorHomePageView.fxml");
+    }
+    @FXML
+    public void goHome() {
+        String currentRole = UserSession.getInstance().getCurrentRole();
+        
+        if (currentRole == null) {
+            System.out.println("Error: User session not set or current role is null.");
+            showErrorAlert("Session Error", "The user session is not set. Please log in again.");
+            navigateTo("/views/LoginPageView.fxml"); // Navigate to login page
+            return; // Stop further execution
+        }
+        
+        // Check the role and navigate accordingly
+        if ("admin".equals(currentRole)) { 
+            goToAdminHomepage();
+        } else if ("instructor".equals(currentRole)) {
+            goToInstructorHomepage();
+        } else {
+            goToStudentHomepage();
+        }
+    }
+    
+    
+
 
 	// Initialize method can be overridden in subclasses
 	public void initialize(Stage stage, Database db) {

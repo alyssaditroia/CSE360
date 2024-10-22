@@ -151,21 +151,13 @@ public class AdminHomePageController extends PageController {
 	}
 
 	/**
-	 * Logout functionality
-	 */
-	@FXML
-	public void logout() {
-		System.out.println("Admin logged out.");
-		navigateTo("/views/LoginPageView.fxml");
-	}
-
-	/**
 	 * Go to Article View
 	 */
 	@FXML
 	public void article() {
 		System.out.println("Going to Article View.");
-		navigateTo("/views/HelpArticleView.fxml");
+		//navigateTo("/views/HelpArticleView.fxml");
+		navigateTo("/views/SearchArticleView.fxml");
 	}
 	/**
 	 * Set permissions for a new user

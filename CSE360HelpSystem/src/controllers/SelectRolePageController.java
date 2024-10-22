@@ -113,6 +113,9 @@ public class SelectRolePageController extends PageController {
 	 */
 	@FXML
 	public void redirectToAdminHomepage() {
+		String currentRole = "admin";
+		UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
+		userSession.setCurrentRole(currentRole);
 		navigateTo("/views/AdminHomePageView.fxml");
 	}
 
@@ -121,6 +124,9 @@ public class SelectRolePageController extends PageController {
 	 */
 	@FXML
 	public void redirectToInstructorHomepage() {
+		String currentRole = "instructor";
+		UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
+		userSession.setCurrentRole(currentRole);
 		navigateTo("/views/InstructorHomePageView.fxml");
 	}
 
@@ -129,6 +135,9 @@ public class SelectRolePageController extends PageController {
 	 */
 	@FXML
 	public void redirectToStudentHomepage() {
+		String currentRole = "student";
+		UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
+		userSession.setCurrentRole(currentRole);
 		navigateTo("/views/StudentHomePageView.fxml");
 	}
 

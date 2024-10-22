@@ -28,6 +28,32 @@
     <!-- References Input -->
     <TextArea fx:id="referencesField" promptText="References" prefHeight="80"/>
     
+    <!-- Level Dropdown (ComboBox) -->
+    <ComboBox fx:id="levelField" promptText="Select Level"></ComboBox>
+    
+ 	<!-- Grouping Identifiers Section -->
+	<HBox spacing="10">
+    	<TextField fx:id="groupingSearchField" promptText="Search or Add Grouping Identifier"/>
+    	<Button fx:id="addGroupingButton" text="Add" onAction="#addGroupingIdentifier"/>
+	</HBox>
+
+	<!-- ListView for grouping identifiers -->
+	<ListView fx:id="groupingListView" prefHeight="100"/>
+
+    
+    <!-- Permissions Checkboxes -->
+    <HBox spacing="10">
+        <CheckBox fx:id="adminCheckbox" text="Admin"/>
+        <CheckBox fx:id="instructorCheckbox" text="Instructor"/>
+        <CheckBox fx:id="studentCheckbox" text="Student"/>
+    </HBox>
+    
+    <!-- Date Picker for Date Added -->
+    <DatePicker fx:id="dateAddedField" promptText="Select Date Added"/>
+    
+    <!-- Version Input -->
+    <TextField fx:id="versionField" promptText="Version"/>
+
     <!-- TableView for Articles -->
     <TableView fx:id="articleTable" prefHeight="200" prefWidth="400">
         <columns>
