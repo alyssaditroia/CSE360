@@ -70,7 +70,14 @@ public class ViewArticleController extends PageController {
     // Navigation method to go back to the search list
     @FXML
     public void goBackToList() {
-        navigateTo("/views/SearchArticleView.fxml"); // Navigate back to the list
+        String currentRole = UserSession.getInstance().getCurrentRole();
+        if ("instructor".equals(currentRole)) {
+            // Instructors go back to their homepage
+            navigateTo("/views/InstructorHomePageView.fxml");
+        } else {
+            // Admins go to the article management view
+            navigateTo("/views/SearchArticleView.fxml");
+        }
     }
 
     // Navigate to the edit article view

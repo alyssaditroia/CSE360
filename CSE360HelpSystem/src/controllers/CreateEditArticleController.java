@@ -10,6 +10,7 @@ import java.util.List;
 import database.Database;
 import database.HelpArticleDatabase;
 import models.Article;
+import models.UserSession;
 
 public class CreateEditArticleController extends PageController {
 
@@ -202,7 +203,14 @@ public class CreateEditArticleController extends PageController {
      */
     @FXML
     public void goBackToList() {
-        navigateTo("/views/SearchArticleView.fxml");  // Navigate back to the search list view
+        String currentRole = UserSession.getInstance().getCurrentRole();
+        if ("instructor".equals(currentRole)) {
+            // Instructors go back to their homepage
+            navigateTo("/views/InstructorHomePageView.fxml");
+        } else {
+            // Admins go to the article management view
+            navigateTo("/views/SearchArticleView.fxml");
+        }
     }
 
     /**
