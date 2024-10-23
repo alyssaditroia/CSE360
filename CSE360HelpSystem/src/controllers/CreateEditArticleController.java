@@ -1,11 +1,13 @@
 package controllers;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -218,7 +220,9 @@ public class CreateEditArticleController extends PageController {
             String level = levelField.getValue();  // Get selected level from ComboBox
 
             // Get selected grouping identifiers from ListView
-            List<String> selectedIdentifiers = groupingListView.getSelectionModel().getSelectedItems();
+            ObservableList<String> selectedItems = groupingListView.getItems();
+            List<String> selectedIdentifiers = new ArrayList<>(selectedItems);
+            System.out.println("Selected groups for save: " + selectedIdentifiers);
             String permissions = getSelectedPermissions();  // Get selected permissions
 
             // Convert LocalDate to java.sql.Date

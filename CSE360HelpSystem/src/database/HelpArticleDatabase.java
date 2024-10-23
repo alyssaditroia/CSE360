@@ -66,6 +66,8 @@ public class HelpArticleDatabase extends Database{
             throw e;
         }
     }
+    
+    
     /**
      * Creates the grouping identifiers table if it doesn't exist.
      *
@@ -132,6 +134,10 @@ public class HelpArticleDatabase extends Database{
 	public void createArticle(char[] title, char[] authors, char[] abstractText, char[] keywords, char[] body,
 			char[] references, String level, List<String> groupingIdentifiers, String permissions, Date dateAdded,
 			String version) throws Exception {
+		System.out.println("Creating article with groups: " + groupingIdentifiers);
+	    String groupingIdentifiersString = String.join(",", groupingIdentifiers);
+	    System.out.println("Storing groups as: '" + groupingIdentifiersString + "'");
+		
 		byte[] iv = EncryptionUtils.getInitializationVector(title);
 
 		byte[] encryptedTitle = encryptionHelper.encrypt(EncryptionUtils.toByteArray(title), iv);
@@ -152,7 +158,7 @@ public class HelpArticleDatabase extends Database{
 			pstmt.setString(6, Base64.getEncoder().encodeToString(encryptedBody));
 			pstmt.setString(7, Base64.getEncoder().encodeToString(encryptedReferences));
 			pstmt.setString(8, level); // Store the level
-			pstmt.setString(9, String.join(",", groupingIdentifiers)); // Join grouping identifiers as a comma-separated
+			pstmt.setString(9, groupingIdentifiersString); // Join grouping identifiers as a comma-separated
 																		// string
 			pstmt.setString(10, permissions); // Store the permissions
 			pstmt.setDate(11, new java.sql.Date(dateAdded.getTime())); // Store the date added
@@ -256,10 +262,23 @@ public class HelpArticleDatabase extends Database{
 	            String body = new String(encryptionHelper.decrypt(encryptedBody, iv));
 	            String references = new String(encryptionHelper.decrypt(encryptedReferences, iv));
 
-	            // Create and add Article object
-	            Article article = new Article(id, title.toCharArray(), authors.toCharArray(), abstractText.toCharArray(),
-	                    keywords.toCharArray(), body.toCharArray(), references.toCharArray(), level, 
-	                    List.of(groupingIdentifiers.split(",")), permissions, dateAdded, version);
+	            String groupingIdentifiersStr = rs.getString("grouping_identifiers");
+	            System.out.println("Raw grouping identifiers from DB: '" + groupingIdentifiersStr + "'");
+	            
+	            List<String> groupList;
+	            if (groupingIdentifiersStr != null && !groupingIdentifiersStr.trim().isEmpty()) {
+	                groupList = new ArrayList<>(List.of(groupingIdentifiersStr.split(",")));
+	                System.out.println("Parsed groups: " + groupList);
+	            } else {
+	                groupList = new ArrayList<>();
+	                System.out.println("No groups found, using empty list");
+	            }
+
+	            // Create article with the groupList
+	            Article article = new Article(id, title.toCharArray(), authors.toCharArray(), 
+	                abstractText.toCharArray(), keywords.toCharArray(), body.toCharArray(), 
+	                references.toCharArray(), level, groupList, permissions, dateAdded, version);
+	            
 	            articles.add(article);
 	        }
 	    }
@@ -398,7 +417,10 @@ public class HelpArticleDatabase extends Database{
 		    String permissions = rs.getString("permissions");
 		    java.sql.Date dateAdded = rs.getDate("date_added");
 		    String version = rs.getString("version");
-
+		    
+		    // DEBUG CHECK
+		    System.out.println("Retrieved grouping identifiers for article: " + groupingIdentifiers);
+		    
 		    // Create and return the Article object
 		    return new Article(
 		        title, authors, abstractText, keywords, body, references, level,

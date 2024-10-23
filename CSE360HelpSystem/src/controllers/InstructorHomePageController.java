@@ -2,9 +2,12 @@ package controllers;
 
 import database.Database;
 import database.HelpArticleDatabase;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -15,9 +18,12 @@ import javafx.stage.Stage;
 import models.Article;
 import models.UserSession;
 
+import javafx.scene.control.TextField;
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -54,6 +60,15 @@ public class InstructorHomePageController extends PageController {
 
     @FXML
     private TableColumn<Article, String> groupsColumn;
+    
+    @FXML
+    private TextField searchField;
+    
+    @FXML
+    private ComboBox<String> groupFilterComboBox;
+    
+    @FXML
+    private ListView<String> groupFilterListView;
 
 	// Default constructor for FXML loader
 	public InstructorHomePageController() {
@@ -79,6 +94,9 @@ public class InstructorHomePageController extends PageController {
             db = new HelpArticleDatabase();
             initializeTable();
             loadArticles();
+            
+            List<String> groups = db.fetchGroupingIdentifiers();
+            groupFilterComboBox.setItems(FXCollections.observableArrayList(groups));
         } catch (Exception e) {
             showErrorAlert("Error", "Failed to initialize: " + e.getMessage());
         }
@@ -211,6 +229,49 @@ public class InstructorHomePageController extends PageController {
         alert.setTitle(title);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    
+    /**
+     * Method to search and filter articles based on the search field input.
+     */
+    @FXML
+    public void filterArticles() {
+        try {
+            String searchQuery = searchField.getText().toLowerCase();
+            List<String> selectedGroups = new ArrayList<>(groupFilterListView.getItems());
+            
+            List<Article> articles = db.searchArticles(searchQuery);  // Your existing search
+            
+            // Additional group filtering if groups are selected
+            if (!selectedGroups.isEmpty()) {
+                articles = articles.stream()
+                    .filter(article -> 
+                        article.getGroupingIdentifiers().stream()
+                            .anyMatch(selectedGroups::contains))
+                    .collect(Collectors.toList());
+            }
+
+            articleTable.getItems().setAll(articles);
+        } catch (Exception e) {
+            showErrorAlert("Error", "Failed to filter articles: " + e.getMessage());
+        }
+    }
+    
+    @FXML
+    public void addGroupToFilter() {
+        String selectedGroup = groupFilterComboBox.getValue();
+        if (selectedGroup != null && !selectedGroup.isEmpty() 
+                && !groupFilterListView.getItems().contains(selectedGroup)) {
+            groupFilterListView.getItems().add(selectedGroup);
+            groupFilterComboBox.setValue(null);
+            filterArticles(); // Use your existing filter method
+        }
+    }
+    
+    @FXML
+    public void clearGroupFilters() {
+        groupFilterListView.getItems().clear();
+        filterArticles(); // Reapply any keyword filters
     }
 
 }
