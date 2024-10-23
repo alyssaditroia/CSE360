@@ -12,6 +12,7 @@
             <Label fx:id="adminHomeTitle" text="Admin Home Page" 
                    style="-fx-font-size: 24; -fx-font-weight: bold;" />
 
+			<Button fx:id="viewArticlesButton" text="View Help Articles" onAction="#article" />
             <!-- GridPane for Permissions and Email -->
             <GridPane alignment="CENTER_LEFT" hgap="10" vgap="10">
                 <!-- Label for Permissions -->
@@ -32,15 +33,18 @@
 
             <!-- TableView for displaying invited users -->
             <TableView fx:id="userTable" prefHeight="300">
-                <columns>
-                    <TableColumn fx:id="emailColumn" text="Email" />
-                    <TableColumn fx:id="adminColumn" text="Admin" />
-                    <TableColumn fx:id="studentColumn" text="Student" />
-                    <TableColumn fx:id="instructorColumn" text="Instructor" />
-                    <TableColumn fx:id="updatePermissionsColumn" text="Update User Permissions" />
-                    <TableColumn fx:id="resetPasswordColumn" text="Reset User Password" />
-                </columns>
-            </TableView>
+			    <columns>
+			        <TableColumn fx:id="usernameColumn" text="Username" />
+			        <TableColumn fx:id="preferrednameColumn" text="Preferred Name" />
+			        <TableColumn fx:id="emailColumn" text="Email" />
+			        <TableColumn fx:id="adminColumn" text="Admin" />
+			        <TableColumn fx:id="studentColumn" text="Student" />
+			        <TableColumn fx:id="instructorColumn" text="Instructor" />
+			        <TableColumn fx:id="updatePermissionsColumn" text="Update User Permissions" />
+			        <TableColumn fx:id="resetPasswordColumn" text="Reset User Password" />
+			        <TableColumn fx:id="deleteColumn" text="Delete User" />
+			    </columns>
+			</TableView>
 
             <!-- Buttons for Actions  -->
             <HBox alignment="CENTER_RIGHT" spacing="20">

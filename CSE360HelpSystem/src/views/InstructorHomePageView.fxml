@@ -1,13 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.InstructorHomePageController"
-			prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
-    <HBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
-          AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
-        <Button fx:id="logoutButton" text="Logout" onAction="#logout" />
-    </HBox>
+            prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
+    <children>
+        <VBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
+              AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
+            
+            <!-- Title Label -->
+            <Label text="Instructor Homepage" 
+                   style="-fx-font-size: 24; -fx-font-weight: bold;" />
+
+            <!-- Action Buttons -->
+            <HBox alignment="CENTER" spacing="10">
+                <Button fx:id="createArticleButton" text="Create New Article" onAction="#createNewArticle" 
+                        style="-fx-font-size: 14;"/>
+            </HBox>
+
+            <!-- TableView for displaying articles -->
+            <TableView fx:id="articleTable" prefHeight="500" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="titleColumn" text="Title" prefWidth="200"/>
+                    <TableColumn fx:id="levelColumn" text="Level" prefWidth="100"/>
+                    <TableColumn fx:id="groupsColumn" text="Groups" prefWidth="200"/>
+                </columns>
+            </TableView>
+
+            <!-- Logout Button -->
+            <HBox alignment="CENTER_RIGHT" spacing="20">
+                <Button fx:id="logoutButton" text="Logout" onAction="#logout" 
+                        style="-fx-font-size: 14;"/>
+            </HBox>
+        </VBox>
+    </children>
 </AnchorPane>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ViewArticleController" spacing="10" alignment="CENTER">
+    
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <!-- Title Field -->
+    <Label text="Title:"/>
+    <TextField fx:id="titleField" promptText="Article Title" editable="false"/>
+
+    <!-- Authors Field -->
+    <Label text="Authors:"/>
+    <TextField fx:id="authorsField" promptText="Article Authors" editable="false"/>
+
+    <!-- Abstract Field -->
+    <Label text="Abstract:"/>
+    <TextArea fx:id="abstractField" promptText="Abstract" prefHeight="100" editable="false"/>
+
+    <!-- Keywords Field -->
+    <Label text="Keywords:"/>
+    <TextArea fx:id="keywordsField" promptText="Keywords" prefHeight="60" editable="false"/>
+
+    <!-- Body Field -->
+    <Label text="Body:"/>
+    <TextArea fx:id="bodyField" promptText="Body" prefHeight="150" editable="false"/>
+
+    <!-- References Field -->
+    <Label text="References:"/>
+    <TextArea fx:id="referencesField" promptText="References" prefHeight="80" editable="false"/>
+
+    <!-- Buttons Section -->
+    <HBox spacing="10">
+        <Button fx:id="backToList" text="Back to List" onAction="#goBackToList"/>
+        <Button fx:id="editArticle" text="Edit Article" onAction="#goToEditArticle"/>
+    </HBox>
+
+</VBox>

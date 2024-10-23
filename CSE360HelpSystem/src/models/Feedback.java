@@ -1,15 +1,24 @@
 package models;
 
 import java.time.LocalDateTime;
-
+/**
+ * The {@code Feedback} class handles user feedback in program memory without interacting with the database
+ */
 public class Feedback {
     private String feedbackID;
     private User user;
-    private HelpArticle article;
+    private Article article;
     private String message;
     private LocalDateTime createdDate;
 
-    public Feedback(String feedbackID, User user, HelpArticle article, String message) {
+    /**
+     * Feedback constructor
+     * @param feedbackID
+     * @param user
+     * @param article
+     * @param message
+     */
+    public Feedback(String feedbackID, User user, Article article, String message) {
         this.setFeedbackID(feedbackID);
         this.setUser(user);
         this.setArticle(article);
@@ -48,14 +57,14 @@ public class Feedback {
 	/**
 	 * @return the article
 	 */
-	public HelpArticle getArticle() {
+	public Article getArticle() {
 		return article;
 	}
 
 	/**
 	 * @param article the article to set
 	 */
-	public void setArticle(HelpArticle article) {
+	public void setArticle(Article article) {
 		this.article = article;
 	}
 
