@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bouncycastle.util.Arrays;
 
@@ -264,6 +267,8 @@ public class HelpArticleDatabase extends Database{
 	        }
 	    }
 	}
+	
+	
     /**
      * Fetches all articles with decrypted titles, authors, and other details.
      * 
@@ -328,329 +333,453 @@ public class HelpArticleDatabase extends Database{
 	}
 
 
-    	/**
-    	 * Helper function to clear character arrays from memory
-    	 * @param array
-    	 */
-		private void clearCharArray(char[] array) {
-		    Arrays.fill(array, ' ');
-		}
+	/**
+	 * Helper function to clear character arrays from memory
+	 * @param array
+	 */
+	private void clearCharArray(char[] array) {
+	    Arrays.fill(array, ' ');
+	}
 		
-		/**
-		 * Lists all articles
-		 * @throws Exception
-		 */
-		public void listArticles() throws Exception {
-	        String sql = "SELECT id, iv, title, authors FROM articles";
-	        try (Statement stmt = connection.createStatement();
-	             ResultSet rs = stmt.executeQuery(sql)) {
-	            int sequenceNumber = 1;
+	/**
+	 * Lists all articles
+	 * @throws Exception
+	 */
+	public void listArticles() throws Exception {
+        String sql = "SELECT id, iv, title, authors FROM articles";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            int sequenceNumber = 1;
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String ivBase64 = rs.getString("iv");
+                byte[] iv = Base64.getDecoder().decode(ivBase64);
+
+                byte[] encryptedTitle = Base64.getDecoder().decode(rs.getString("title"));
+                byte[] encryptedAuthors = Base64.getDecoder().decode(rs.getString("authors"));
+
+                // Decrypt title and authors
+                String title = new String(encryptionHelper.decrypt(encryptedTitle, iv));
+                String authors = new String(encryptionHelper.decrypt(encryptedAuthors, iv));
+
+                // Display the article's ID, title, and authors
+                System.out.println("ID: " + id + " | Article " + sequenceNumber++ + ": " + title + " by " + authors);
+            }
+        }
+    }
+		
+	/**
+	 * filterArticlesByLevel will only select articles from the specified level
+	 * @param level
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Article> filterArticlesByLevel(String level) throws Exception {
+	    List<Article> articles = new ArrayList<>();
+	    String sql = "SELECT * FROM articles WHERE level = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        pstmt.setString(1, level);
+	        try (ResultSet rs = pstmt.executeQuery()) {
 	            while (rs.next()) {
-	                int id = rs.getInt("id");
-	                String ivBase64 = rs.getString("iv");
-	                byte[] iv = Base64.getDecoder().decode(ivBase64);
-
-	                byte[] encryptedTitle = Base64.getDecoder().decode(rs.getString("title"));
-	                byte[] encryptedAuthors = Base64.getDecoder().decode(rs.getString("authors"));
-
-	                // Decrypt title and authors
-	                String title = new String(encryptionHelper.decrypt(encryptedTitle, iv));
-	                String authors = new String(encryptionHelper.decrypt(encryptedAuthors, iv));
-
-	                // Display the article's ID, title, and authors
-	                System.out.println("ID: " + id + " | Article " + sequenceNumber++ + ": " + title + " by " + authors);
+	                // Same decryption process as in getAllDecryptedArticles
+	                // Fetch, decrypt, and create the Article object here
+	                // Add the article to the list
 	            }
 	        }
 	    }
-		/**
-		 * filterArticlesByLevel will only select articles from the specified level
-		 * @param level
-		 * @return
-		 * @throws Exception
-		 */
-		public List<Article> filterArticlesByLevel(String level) throws Exception {
-		    List<Article> articles = new ArrayList<>();
-		    String sql = "SELECT * FROM articles WHERE level = ?";
-		    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-		        pstmt.setString(1, level);
-		        try (ResultSet rs = pstmt.executeQuery()) {
-		            while (rs.next()) {
-		                // Same decryption process as in getAllDecryptedArticles
-		                // Fetch, decrypt, and create the Article object here
-		                // Add the article to the list
-		            }
-		        }
-		    }
-		    return articles;
-		}
-		/**
-		 * 
-		 * @param searchQuery
-		 * @return
-		 * @throws Exception
-		 */
-		public List<Article> searchArticles(String searchQuery) throws Exception {
-		    List<Article> articles = new ArrayList<>();
-		    String sql = "SELECT * FROM articles";  // Fetch all articles
-
-		    try (PreparedStatement pstmt = connection.prepareStatement(sql);
-		         ResultSet rs = pstmt.executeQuery()) {
-		        
-		        // Iterate through all articles
-		        while (rs.next()) {
-		            // Decrypt each article
-		            Article article = decryptArticleFromResultSet(rs);
-
-		            // Check if the decrypted fields contain the search query
-		            if (matchesSearchQuery(article, searchQuery.toLowerCase())) {
-		                articles.add(article);  // Add matching article to the list
-		            }
-		        }
-		    } catch (SQLException e) {
-		        throw new SQLException("Error searching for articles: " + e.getMessage());
-		    }
-		    
-		    return articles;  // Return the list of matching decrypted articles
-		}
-		/**
-		 * 
-		 * @param article
-		 * @param searchQuery
-		 * @return
-		 */
-		private boolean matchesSearchQuery(Article article, String searchQuery) {
-		    // Check if title, authors, or keywords contain the search query
-		    return new String(article.getTitle()).toLowerCase().contains(searchQuery) ||
-		           new String(article.getAuthors()).toLowerCase().contains(searchQuery) ||
-		           new String(article.getKeywords()).toLowerCase().contains(searchQuery);
-		}
-
+	    return articles;
+	}
 		
-		/**
-		 * 
-		 * @param rs
-		 * @return
-		 * @throws Exception
-		 */
-		public Article decryptArticleFromResultSet(ResultSet rs) throws Exception {
-		    // Retrieve the IV (Initialization Vector)
-		    String ivBase64 = rs.getString("iv");
-		    byte[] iv = Base64.getDecoder().decode(ivBase64);
+	/**
+	 * 
+	 * @param searchQuery
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Article> searchArticles(String searchQuery) throws Exception {
+	    List<Article> articles = new ArrayList<>();
+	    String sql = "SELECT * FROM articles";  // Fetch all articles
 
-		    // Retrieve and decrypt fields
-		    byte[] encryptedTitle = Base64.getDecoder().decode(rs.getString("title"));
-		    byte[] encryptedAuthors = Base64.getDecoder().decode(rs.getString("authors"));
-		    byte[] encryptedAbstract = Base64.getDecoder().decode(rs.getString("abstract"));
-		    byte[] encryptedKeywords = Base64.getDecoder().decode(rs.getString("keywords"));
-		    byte[] encryptedBody = Base64.getDecoder().decode(rs.getString("body"));
-		    byte[] encryptedReferences = Base64.getDecoder().decode(rs.getString("references"));
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql);
+	         ResultSet rs = pstmt.executeQuery()) {
+	        
+	        // Iterate through all articles
+	        while (rs.next()) {
+	            // Decrypt each article
+	            Article article = decryptArticleFromResultSet(rs);
 
-		    // Decrypt fields using the IV and the encryption helper
-		    char[] title = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedTitle, iv));
-		    char[] authors = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedAuthors, iv));
-		    char[] abstractText = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedAbstract, iv));
-		    char[] keywords = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedKeywords, iv));
-		    char[] body = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedBody, iv));
-		    char[] references = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedReferences, iv));
-
-		    // Get non-encrypted fields (e.g., level, grouping identifiers, permissions)
-		    String level = rs.getString("level");
-		    String groupingIdentifiers = rs.getString("grouping_identifiers");
-		    String permissions = rs.getString("permissions");
-		    java.sql.Date dateAdded = rs.getDate("date_added");
-		    String version = rs.getString("version");
-		    
-		    // DEBUG CHECK
-		    System.out.println("Retrieved grouping identifiers for article: " + groupingIdentifiers);
-		    
-		    // Create and return the Article object
-		    return new Article(
-		        title, authors, abstractText, keywords, body, references, level,
-		        List.of(groupingIdentifiers.split(",")), permissions, dateAdded, version
-		    );
-		}
-
-
-		/**
-		 * Backups articles from database
-		 * @param filename
-		 * @throws SQLException
-		 * @throws IOException
-		 */
-		public void backupArticles(String filename) throws SQLException, IOException {
-		    String sql = "SELECT * FROM articles";
-		    try (Statement stmt = connection.createStatement();
-		         ResultSet rs = stmt.executeQuery(sql);
-		         BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-		        
-		        while (rs.next()) {
-		            int id = rs.getInt("id");
-		            String iv = rs.getString("iv");
-		            String title = rs.getString("title");
-		            String authors = rs.getString("authors");
-		            String abstractText = rs.getString("abstract");
-		            String keywords = rs.getString("keywords");
-		            String body = rs.getString("body");
-		            String references = rs.getString("references");
-		            String level = rs.getString("level");
-		            String groupingIdentifiers = rs.getString("grouping_identifiers");
-		            String permissions = rs.getString("permissions");
-		            Date dateAdded = rs.getDate("date_added");
-		            String version = rs.getString("version");
-
-		            // Write each field to the backup file
-		            writer.write(id + "\n");
-		            writer.write(iv + "\n");
-		            writer.write(title + "\n");
-		            writer.write(authors + "\n");
-		            writer.write(abstractText + "\n");
-		            writer.write(keywords + "\n");
-		            writer.write(body + "\n");
-		            writer.write(references + "\n");
-		            writer.write(level + "\n");
-		            writer.write(groupingIdentifiers + "\n");
-		            writer.write(permissions + "\n");
-		            writer.write(dateAdded + "\n");
-		            writer.write(version + "\n");
-		            writer.write("END_OF_ARTICLE\n");
-		        }
-		    }
-		    System.out.println("[INFO in HelpArticleDB] Articles backed up to " + filename);
-		}
-
-	    /**
-	     * restores articles
-	     * @param filename
-	     * @throws SQLException
-	     * @throws IOException
-	     */
-		public void restoreArticles(String filename) throws SQLException, IOException {
-		    String deleteSql = "DELETE FROM articles"; // Clears current data before restore
-		    try (Statement stmt = connection.createStatement()) {
-		        stmt.executeUpdate(deleteSql);
-		    }
-
-		    try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-		        String line;
-		        while ((line = reader.readLine()) != null) {
-		            int id = Integer.parseInt(line);
-		            String iv = reader.readLine();
-		            String title = reader.readLine();
-		            String authors = reader.readLine();
-		            String abstractText = reader.readLine();
-		            String keywords = reader.readLine();
-		            String body = reader.readLine();
-		            String references = reader.readLine();
-		            String level = reader.readLine();
-		            String groupingIdentifiers = reader.readLine();
-		            String permissions = reader.readLine();
-		            Date dateAdded = Date.valueOf(reader.readLine());  // Parsing the date from string
-		            String version = reader.readLine();
-		            reader.readLine(); // Skip "END_OF_ARTICLE"
-
-		            String insertSql = "INSERT INTO articles (id, iv, title, authors, abstract, keywords, body, references, level, grouping_identifiers, permissions, date_added, version) "
-		                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		            try (PreparedStatement pstmt = connection.prepareStatement(insertSql)) {
-		                pstmt.setInt(1, id);
-		                pstmt.setString(2, iv);
-		                pstmt.setString(3, title);
-		                pstmt.setString(4, authors);
-		                pstmt.setString(5, abstractText);
-		                pstmt.setString(6, keywords);
-		                pstmt.setString(7, body);
-		                pstmt.setString(8, references);
-		                pstmt.setString(9, level);
-		                pstmt.setString(10, groupingIdentifiers);
-		                pstmt.setString(11, permissions);
-		                pstmt.setDate(12, new java.sql.Date(dateAdded.getTime()));
-		                pstmt.setString(13, version);
-		                pstmt.executeUpdate();
-		            }
-		        }
-		    }
-		    System.out.println("[INFO in HelpArticleDB] Articles restored from " + filename);
-		}
-		public void updateArticle(Article article) throws Exception {
-			char[] title = article.getTitle().toCharArray();
-		    // Generate the IV (Initialization Vector) from the article title, just like in createArticle()
-		    byte[] iv = EncryptionUtils.getInitializationVector(title);
-
-		    // Encrypt all fields before updating
-		    byte[] encryptedTitle = encryptionHelper.encrypt(EncryptionUtils.toByteArray(title), iv);
-		    byte[] encryptedAuthors = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAuthors().toCharArray()), iv);
-		    byte[] encryptedAbstract = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAbstractText().toCharArray()), iv);
-		    byte[] encryptedKeywords = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getKeywords().toCharArray()), iv);
-		    byte[] encryptedBody = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getBody().toCharArray()), iv);
-		    byte[] encryptedReferences = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getReferences().toCharArray()), iv);
-
-		    String sql = "UPDATE articles SET iv = ?, title = ?, authors = ?, abstract = ?, keywords = ?, body = ?, " +
-		                 "references = ?, level = ?, grouping_identifiers = ?, permissions = ?, date_added = ?, version = ? " +
-		                 "WHERE id = ?";
-
-		    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-		        // Set the encrypted values in the update statement
-		        pstmt.setString(1, Base64.getEncoder().encodeToString(iv)); // IV
-		        pstmt.setString(2, Base64.getEncoder().encodeToString(encryptedTitle)); // Title
-		        pstmt.setString(3, Base64.getEncoder().encodeToString(encryptedAuthors)); // Authors
-		        pstmt.setString(4, Base64.getEncoder().encodeToString(encryptedAbstract)); // Abstract
-		        pstmt.setString(5, Base64.getEncoder().encodeToString(encryptedKeywords)); // Keywords
-		        pstmt.setString(6, Base64.getEncoder().encodeToString(encryptedBody)); // Body
-		        pstmt.setString(7, Base64.getEncoder().encodeToString(encryptedReferences)); // References
-		        pstmt.setString(8, article.getLevel()); // Level
-		        pstmt.setString(9, String.join(",", article.getGroupingIdentifiers())); // Grouping Identifiers as a comma-separated string
-		        pstmt.setString(10, article.getPermissions()); // Permissions
-		        pstmt.setDate(11, new java.sql.Date(article.getDateAdded().getTime())); // Convert java.util.Date to java.sql.Date
-		        pstmt.setString(12, article.getVersion()); // Version
-		        pstmt.setInt(13, article.getId()); // Article ID in the WHERE clause to identify which article to update
-
-		        pstmt.executeUpdate(); // Execute the update
-		    } catch (SQLException e) {
-		        throw new SQLException("Error updating article: " + e.getMessage());
-		    }
-		}
-
-
-	    /**
-	     * Deletes an article
-	     * @param id
-	     * @throws SQLException
-	     */
-	    public void deleteArticle(int id) throws SQLException {
-	        String sql = "DELETE FROM articles WHERE id = ?";
-	        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-	            pstmt.setInt(1, id);
-	            int rowsAffected = pstmt.executeUpdate();
-	            if (rowsAffected > 0) {
-	                System.out.println("[INFO in HelpArticleDB] Article with ID " + id + " deleted successfully.");
-	            } else {
-	                System.out.println("[INFO in HelpArticleDB] No article found with ID " + id + ".");
+	            // Check if the decrypted fields contain the search query
+	            if (matchesSearchQuery(article, searchQuery.toLowerCase())) {
+	                articles.add(article);  // Add matching article to the list
 	            }
-	        } catch (SQLException e) {
-	            System.err.println("Error deleting article: " + e.getMessage());
-	            throw e;  // Re-throw the exception to handle it further up the call chain
 	        }
+	    } catch (SQLException e) {
+	        throw new SQLException("Error searching for articles: " + e.getMessage());
 	    }
 	    
-	    
-	    /**
-	     * Fetches all grouping identifiers from the database.
-	     * 
-	     * @return a list of all grouping identifiers
-	     * @throws SQLException if a database access error occurs
-	     */
-	    public List<String> fetchGroupingIdentifiers() throws SQLException {
-	        List<String> identifiers = new ArrayList<>();
-	        String sql = "SELECT identifier FROM GroupingIdentifiers";
-	        try (Statement stmt = connection.createStatement();
-	             ResultSet rs = stmt.executeQuery(sql)) {
+	    return articles;  // Return the list of matching decrypted articles
+	}
+		
+		
+	/**
+	 * 
+	 * @param article
+	 * @param searchQuery
+	 * @return
+	 */
+	private boolean matchesSearchQuery(Article article, String searchQuery) {
+	    // Check if title, authors, or keywords contain the search query
+	    return new String(article.getTitle()).toLowerCase().contains(searchQuery) ||
+	           new String(article.getAuthors()).toLowerCase().contains(searchQuery) ||
+	           new String(article.getKeywords()).toLowerCase().contains(searchQuery);
+	}
 
-	            while (rs.next()) {
-	                identifiers.add(rs.getString("identifier"));
-	            }
-	        } catch (SQLException e) {
-	            System.out.println("[INFO in HelpArticleDB] Error fetching grouping identifiers: " + e.getMessage());
-	            throw e;
+		
+	/**
+	 * 
+	 * @param rs
+	 * @return
+	 * @throws Exception
+	 */
+	public Article decryptArticleFromResultSet(ResultSet rs) throws Exception {
+	    // Retrieve the IV (Initialization Vector)
+	    String ivBase64 = rs.getString("iv");
+	    byte[] iv = Base64.getDecoder().decode(ivBase64);
+
+	    // Retrieve and decrypt fields
+	    byte[] encryptedTitle = Base64.getDecoder().decode(rs.getString("title"));
+	    byte[] encryptedAuthors = Base64.getDecoder().decode(rs.getString("authors"));
+	    byte[] encryptedAbstract = Base64.getDecoder().decode(rs.getString("abstract"));
+	    byte[] encryptedKeywords = Base64.getDecoder().decode(rs.getString("keywords"));
+	    byte[] encryptedBody = Base64.getDecoder().decode(rs.getString("body"));
+	    byte[] encryptedReferences = Base64.getDecoder().decode(rs.getString("references"));
+
+	    // Decrypt fields using the IV and the encryption helper
+	    char[] title = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedTitle, iv));
+	    char[] authors = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedAuthors, iv));
+	    char[] abstractText = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedAbstract, iv));
+	    char[] keywords = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedKeywords, iv));
+	    char[] body = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedBody, iv));
+	    char[] references = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedReferences, iv));
+
+	    // Get non-encrypted fields (e.g., level, grouping identifiers, permissions)
+	    String level = rs.getString("level");
+	    String groupingIdentifiers = rs.getString("grouping_identifiers");
+	    String permissions = rs.getString("permissions");
+	    java.sql.Date dateAdded = rs.getDate("date_added");
+	    String version = rs.getString("version");
+	    
+	    // DEBUG CHECK
+	    System.out.println("Retrieved grouping identifiers for article: " + groupingIdentifiers);
+	    
+	    // Create and return the Article object
+	    return new Article(
+	        title, authors, abstractText, keywords, body, references, level,
+	        List.of(groupingIdentifiers.split(",")), permissions, dateAdded, version
+	    );
+	}
+
+
+	/**
+	 * Backups articles from database
+	 * @param filename
+	 * @throws SQLException
+	 * @throws IOException
+	 */
+	public void backupArticles(String filename) throws SQLException, IOException {
+	    String sql = "SELECT * FROM articles";
+	    try (Statement stmt = connection.createStatement();
+	         ResultSet rs = stmt.executeQuery(sql);
+	         BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+	        
+	        while (rs.next()) {
+	            int id = rs.getInt("id");
+	            String iv = rs.getString("iv");
+	            String title = rs.getString("title");
+	            String authors = rs.getString("authors");
+	            String abstractText = rs.getString("abstract");
+	            String keywords = rs.getString("keywords");
+	            String body = rs.getString("body");
+	            String references = rs.getString("references");
+	            String level = rs.getString("level");
+	            String groupingIdentifiers = rs.getString("grouping_identifiers");
+	            String permissions = rs.getString("permissions");
+	            Date dateAdded = rs.getDate("date_added");
+	            String version = rs.getString("version");
+
+	            // Write each field to the backup file
+	            writer.write(id + "\n");
+	            writer.write(iv + "\n");
+	            writer.write(title + "\n");
+	            writer.write(authors + "\n");
+	            writer.write(abstractText + "\n");
+	            writer.write(keywords + "\n");
+	            writer.write(body + "\n");
+	            writer.write(references + "\n");
+	            writer.write(level + "\n");
+	            writer.write(groupingIdentifiers + "\n");
+	            writer.write(permissions + "\n");
+	            writer.write(dateAdded + "\n");
+	            writer.write(version + "\n");
+	            writer.write("END_OF_ARTICLE\n");
 	        }
-	        return identifiers;
+	    }
+	    System.out.println("[INFO in HelpArticleDB] Articles backed up to " + filename);
+	}
+
+    /**
+     * restores articles
+     * @param filename
+     * @throws SQLException
+     * @throws IOException
+     */
+	public void restoreArticles(String filename) throws SQLException, IOException {
+	    String deleteSql = "DELETE FROM articles"; // Clears current data before restore
+	    try (Statement stmt = connection.createStatement()) {
+	        stmt.executeUpdate(deleteSql);
+	    }
+
+	    try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+	        String line;
+	        while ((line = reader.readLine()) != null) {
+	            int id = Integer.parseInt(line);
+	            String iv = reader.readLine();
+	            String title = reader.readLine();
+	            String authors = reader.readLine();
+	            String abstractText = reader.readLine();
+	            String keywords = reader.readLine();
+	            String body = reader.readLine();
+	            String references = reader.readLine();
+	            String level = reader.readLine();
+	            String groupingIdentifiers = reader.readLine();
+	            String permissions = reader.readLine();
+	            Date dateAdded = Date.valueOf(reader.readLine());  // Parsing the date from string
+	            String version = reader.readLine();
+	            reader.readLine(); // Skip "END_OF_ARTICLE"
+
+	            String insertSql = "INSERT INTO articles (id, iv, title, authors, abstract, keywords, body, references, level, grouping_identifiers, permissions, date_added, version) "
+	                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	            try (PreparedStatement pstmt = connection.prepareStatement(insertSql)) {
+	                pstmt.setInt(1, id);
+	                pstmt.setString(2, iv);
+	                pstmt.setString(3, title);
+	                pstmt.setString(4, authors);
+	                pstmt.setString(5, abstractText);
+	                pstmt.setString(6, keywords);
+	                pstmt.setString(7, body);
+	                pstmt.setString(8, references);
+	                pstmt.setString(9, level);
+	                pstmt.setString(10, groupingIdentifiers);
+	                pstmt.setString(11, permissions);
+	                pstmt.setDate(12, new java.sql.Date(dateAdded.getTime()));
+	                pstmt.setString(13, version);
+	                pstmt.executeUpdate();
+	            }
+	        }
+	    }
+	    System.out.println("[INFO in HelpArticleDB] Articles restored from " + filename);
+	}
+		
+	/**
+	 * 
+	 * @param article
+	 * @throws Exception
+	 */
+	public void updateArticle(Article article) throws Exception {
+		char[] title = article.getTitle().toCharArray();
+	    // Generate the IV (Initialization Vector) from the article title, just like in createArticle()
+	    byte[] iv = EncryptionUtils.getInitializationVector(title);
+
+	    // Encrypt all fields before updating
+	    byte[] encryptedTitle = encryptionHelper.encrypt(EncryptionUtils.toByteArray(title), iv);
+	    byte[] encryptedAuthors = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAuthors().toCharArray()), iv);
+	    byte[] encryptedAbstract = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAbstractText().toCharArray()), iv);
+	    byte[] encryptedKeywords = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getKeywords().toCharArray()), iv);
+	    byte[] encryptedBody = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getBody().toCharArray()), iv);
+	    byte[] encryptedReferences = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getReferences().toCharArray()), iv);
+
+	    String sql = "UPDATE articles SET iv = ?, title = ?, authors = ?, abstract = ?, keywords = ?, body = ?, " +
+	                 "references = ?, level = ?, grouping_identifiers = ?, permissions = ?, date_added = ?, version = ? " +
+	                 "WHERE id = ?";
+
+	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+	        // Set the encrypted values in the update statement
+	        pstmt.setString(1, Base64.getEncoder().encodeToString(iv)); // IV
+	        pstmt.setString(2, Base64.getEncoder().encodeToString(encryptedTitle)); // Title
+	        pstmt.setString(3, Base64.getEncoder().encodeToString(encryptedAuthors)); // Authors
+	        pstmt.setString(4, Base64.getEncoder().encodeToString(encryptedAbstract)); // Abstract
+	        pstmt.setString(5, Base64.getEncoder().encodeToString(encryptedKeywords)); // Keywords
+	        pstmt.setString(6, Base64.getEncoder().encodeToString(encryptedBody)); // Body
+	        pstmt.setString(7, Base64.getEncoder().encodeToString(encryptedReferences)); // References
+	        pstmt.setString(8, article.getLevel()); // Level
+	        pstmt.setString(9, String.join(",", article.getGroupingIdentifiers())); // Grouping Identifiers as a comma-separated string
+	        pstmt.setString(10, article.getPermissions()); // Permissions
+	        pstmt.setDate(11, new java.sql.Date(article.getDateAdded().getTime())); // Convert java.util.Date to java.sql.Date
+	        pstmt.setString(12, article.getVersion()); // Version
+	        pstmt.setInt(13, article.getId()); // Article ID in the WHERE clause to identify which article to update
+
+	        pstmt.executeUpdate(); // Execute the update
+	    } catch (SQLException e) {
+	        throw new SQLException("Error updating article: " + e.getMessage());
 	    }
 	}
+
+
+    /**
+     * Deletes an article
+     * @param id
+     * @throws SQLException
+     */
+    public void deleteArticle(int id) throws SQLException {
+        String sql = "DELETE FROM articles WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("[INFO in HelpArticleDB] Article with ID " + id + " deleted successfully.");
+            } else {
+                System.out.println("[INFO in HelpArticleDB] No article found with ID " + id + ".");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error deleting article: " + e.getMessage());
+            throw e;  // Re-throw the exception to handle it further up the call chain
+        }
+    }
+	    
+	    
+    /**
+     * Fetches all grouping identifiers from the database.
+     * 
+     * @return a list of all grouping identifiers
+     * @throws SQLException if a database access error occurs
+     */
+    public List<String> fetchGroupingIdentifiers() throws SQLException {
+        List<String> identifiers = new ArrayList<>();
+        String sql = "SELECT identifier FROM GroupingIdentifiers";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                identifiers.add(rs.getString("identifier"));
+            }
+        } catch (SQLException e) {
+            System.out.println("[INFO in HelpArticleDB] Error fetching grouping identifiers: " + e.getMessage());
+            throw e;
+        }
+        return identifiers;
+    }
+	
+    /**
+     * 
+     * @param filename
+     * @param groups
+     * @throws Exception
+     */
+    public void backupGroupArticles(String filename, List<String> groups) throws Exception {
+        List<Article> articlesToBackup = getAllDecryptedArticles().stream()
+            .filter(article -> article.getGroupingIdentifiers().stream()
+                .anyMatch(groups::contains))
+            .collect(Collectors.toList());
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (Article article : articlesToBackup) {
+                // Generate IV for encryption
+                byte[] iv = EncryptionUtils.getInitializationVector(article.getTitle().toCharArray());
+                
+                // Encrypt the article fields
+                byte[] encryptedTitle = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getTitle().toCharArray()), iv);
+                byte[] encryptedAuthors = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAuthors().toCharArray()), iv);
+                byte[] encryptedAbstract = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAbstractText().toCharArray()), iv);
+                byte[] encryptedKeywords = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getKeywords().toCharArray()), iv);
+                byte[] encryptedBody = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getBody().toCharArray()), iv);
+                byte[] encryptedReferences = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getReferences().toCharArray()), iv);
+                
+                // Write each field to the backup file
+                writer.write(article.getId() + "\n");
+                writer.write(Base64.getEncoder().encodeToString(iv) + "\n");
+                writer.write(Base64.getEncoder().encodeToString(encryptedTitle) + "\n");
+                writer.write(Base64.getEncoder().encodeToString(encryptedAuthors) + "\n");
+                writer.write(Base64.getEncoder().encodeToString(encryptedAbstract) + "\n");
+                writer.write(Base64.getEncoder().encodeToString(encryptedKeywords) + "\n");
+                writer.write(Base64.getEncoder().encodeToString(encryptedBody) + "\n");
+                writer.write(Base64.getEncoder().encodeToString(encryptedReferences) + "\n");
+                writer.write(article.getLevel() + "\n");
+                writer.write(String.join(",", article.getGroupingIdentifiers()) + "\n");
+                writer.write(article.getPermissions() + "\n");
+                writer.write(article.getDateAdded().toString() + "\n");
+                writer.write(article.getVersion() + "\n");
+                writer.write("END_OF_ARTICLE\n");
+            }
+        }
+        System.out.println("[INFO in HelpArticleDB] Group-specific articles backed up to " + filename);
+    }
+
+    /**
+     * Restores articles with merge option
+     */
+    public void restoreArticlesWithMerge(String filename, boolean merge) throws SQLException, IOException {
+        if (!merge) {
+            // If not merging, use existing restore method which replaces all content
+            restoreArticles(filename);
+            return;
+        }
+
+        // Read existing article IDs
+        Set<Integer> existingIds = new HashSet<>();
+        String selectSql = "SELECT id FROM articles";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(selectSql)) {
+            while (rs.next()) {
+                existingIds.add(rs.getInt("id"));
+            }
+        }
+
+        // Read and process backup file
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                int id = Integer.parseInt(line);
+                
+                // Read article data
+                String iv = reader.readLine();
+                String title = reader.readLine();
+                String authors = reader.readLine();
+                String abstractText = reader.readLine();
+                String keywords = reader.readLine();
+                String body = reader.readLine();
+                String references = reader.readLine();
+                String level = reader.readLine();
+                String groupingIdentifiers = reader.readLine();
+                String permissions = reader.readLine();
+                Date dateAdded = Date.valueOf(reader.readLine());
+                String version = reader.readLine();
+                reader.readLine(); // Skip "END_OF_ARTICLE"
+
+                // If ID exists and we're merging, skip this article
+                if (existingIds.contains(id)) {
+                    continue;
+                }
+
+                // Insert new article
+                String insertSql = "INSERT INTO articles (id, iv, title, authors, abstract, keywords, body, references, level, grouping_identifiers, permissions, date_added, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement pstmt = connection.prepareStatement(insertSql)) {
+                    pstmt.setInt(1, id);
+                    pstmt.setString(2, iv);
+                    pstmt.setString(3, title);
+                    pstmt.setString(4, authors);
+                    pstmt.setString(5, abstractText);
+                    pstmt.setString(6, keywords);
+                    pstmt.setString(7, body);
+                    pstmt.setString(8, references);
+                    pstmt.setString(9, level);
+                    pstmt.setString(10, groupingIdentifiers);
+                    pstmt.setString(11, permissions);
+                    pstmt.setDate(12, new java.sql.Date(dateAdded.getTime()));
+                    pstmt.setString(13, version);
+                    pstmt.executeUpdate();
+                }
+            }
+        }
+    }
+}
+	

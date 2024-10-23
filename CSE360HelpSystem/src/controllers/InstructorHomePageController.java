@@ -280,4 +280,9 @@ public class InstructorHomePageController extends PageController {
         groupFilterListView.getItems().clear();
         filterArticles(); // Reapply any keyword filters
     }
+    
+    @FXML
+    public void goToBackupRestore() {
+        navigateTo("/views/BackupRestoreView.fxml");
+    }
 }
