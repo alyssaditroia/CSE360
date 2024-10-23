@@ -68,6 +68,7 @@ public class Article {
     }
 
     public List<String> getGroupingIdentifiers() {
+        System.out.println("Getting grouping identifiers: " + groupingIdentifiers);
         return groupingIdentifiers;
     }
 
