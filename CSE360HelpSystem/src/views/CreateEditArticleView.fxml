@@ -39,12 +39,13 @@
     <ComboBox fx:id="levelField" promptText="Select Level"/>
 
     <!-- Grouping Identifiers Section -->
-    <Label text="Grouping Identifiers:"/>
-    <HBox spacing="10">
-        <TextField fx:id="groupingSearchField" promptText="Search or Add Grouping Identifier"/>
-        <Button fx:id="addGroupingButton" text="Add" onAction="#addGroupingIdentifier"/>
-    </HBox>
-    <ListView fx:id="groupingListView" prefHeight="100"/>
+	<Label text="Grouping Identifiers:"/>
+	<HBox spacing="10">
+    	<!-- Replace TextField with ComboBox for search and suggestions -->
+    	<ComboBox fx:id="groupingSearchComboBox" promptText="Search or Add Grouping Identifier" editable="true" />
+    	<Button fx:id="addGroupingButton" text="Add" onAction="#addGroupingIdentifier"/>
+	</HBox>
+	<ListView fx:id="groupingListView" prefHeight="100"/>
 
     <!-- Permissions Section -->
     <Label text="Permissions:"/>

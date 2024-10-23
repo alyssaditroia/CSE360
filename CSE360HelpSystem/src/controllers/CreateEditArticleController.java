@@ -5,11 +5,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import database.Database;
 import database.HelpArticleDatabase;
 import models.Article;
+import models.UserSession;
 
 public class CreateEditArticleController extends PageController {
 
@@ -38,7 +41,7 @@ public class CreateEditArticleController extends PageController {
     private ComboBox<String> levelField;
 
     @FXML
-    private TextField groupingSearchField;  // Search or add identifier
+    private ComboBox<String> groupingSearchComboBox;
 
     @FXML
     private ListView<String> groupingListView;  // List of identifiers
@@ -78,6 +81,28 @@ public class CreateEditArticleController extends PageController {
         try {
             had = new HelpArticleDatabase();
 
+            // Load existing grouping identifiers from the database
+            List<String> existingIdentifiers = had.fetchGroupingIdentifiers();
+            groupingSearchComboBox.setItems(FXCollections.observableArrayList(existingIdentifiers));
+
+            // Make the ComboBox editable, allowing users to type
+            groupingSearchComboBox.setEditable(true);
+
+            // Set a listener to update the dropdown based on input
+            groupingSearchComboBox.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.isEmpty()) {
+                    filterGroupingSuggestions(newValue);
+                }
+            });
+
+            // When user selects an existing identifier, add it to the ListView
+            groupingSearchComboBox.setOnAction(event -> {
+                String selectedIdentifier = groupingSearchComboBox.getSelectionModel().getSelectedItem();
+                if (selectedIdentifier != null && !groupingListView.getItems().contains(selectedIdentifier)) {
+                    groupingListView.getItems().add(selectedIdentifier);
+                }
+            });
+
             // Set up level dropdown options
             levelField.setItems(FXCollections.observableArrayList("beginner", "intermediate", "advanced", "expert"));
 
@@ -85,8 +110,11 @@ public class CreateEditArticleController extends PageController {
             groupingListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
             // If editing an existing article, load data into the fields
-            if (articleToEdit != null) {
-                loadArticleData(articleToEdit);
+            Article selectedArticle = UserSession.getInstance().getSelectedArticle();
+            if (selectedArticle != null) {
+                loadArticleData(selectedArticle);
+            } else {
+                showErrorAlert("Error", "No article selected.");
             }
         } catch (Exception e) {
             showErrorAlert("Error", "Failed to initialize the CreateEditArticleController: " + e.getMessage());
@@ -122,6 +150,57 @@ public class CreateEditArticleController extends PageController {
         }
         versionField.setText(article.getVersion());
     }
+
+    /**
+     * Adds a grouping identifier (either new or existing) to the article's list.
+     */
+    @FXML
+    public void addGroupingIdentifier() {
+        String newIdentifier = groupingSearchComboBox.getEditor().getText();
+
+        if (!newIdentifier.isEmpty()) {
+            // Check if the identifier already exists in the global list
+            if (!groupingSearchComboBox.getItems().contains(newIdentifier)) {
+                // Add the new identifier to the database
+                try {
+                    had.insertGroupingIdentifier(newIdentifier);
+                    groupingSearchComboBox.getItems().add(newIdentifier);  // Update ComboBox with new identifier
+                    showInfoAlert("Success", "New identifier added: " + newIdentifier);
+                } catch (SQLException e) {
+                    showErrorAlert("Error", "Failed to insert grouping identifier: " + e.getMessage());
+                    return;
+                }
+            }
+
+            // Add the identifier to the ListView if it's not already there
+            if (!groupingListView.getItems().contains(newIdentifier)) {
+                groupingListView.getItems().add(newIdentifier);
+            }
+
+            // Clear the search field
+            groupingSearchComboBox.getEditor().clear();
+        }
+    }
+
+    /**
+     * Filters the grouping suggestions in the ComboBox based on the user's input.
+     */
+    private void filterGroupingSuggestions(String input) {
+        List<String> filteredIdentifiers = FXCollections.observableArrayList();  // Initialize with an empty list
+        
+        try {
+            filteredIdentifiers = had.fetchGroupingIdentifiers().stream()
+                .filter(identifier -> identifier.toLowerCase().contains(input.toLowerCase()))
+                .collect(Collectors.toList());
+        } catch (SQLException e) {
+            // Log the exception or show an alert to the user
+            e.printStackTrace();
+            showErrorAlert("Error", "Failed to fetch grouping identifiers.");
+        }
+
+        groupingSearchComboBox.setItems(FXCollections.observableArrayList(filteredIdentifiers));
+    }
+
 
     /**
      * Method to save the article (either creating a new article or updating an existing one).
@@ -178,22 +257,11 @@ public class CreateEditArticleController extends PageController {
 
             // Clear the fields and return to the list
             clearFields();
+            UserSession.getInstance().setSelectedArticle(null);
             goBackToList();
 
         } catch (Exception e) {
             showErrorAlert("Error", "Failed to save article: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Adds a grouping identifier to the ListView
-     */
-    @FXML
-    public void addGroupingIdentifier() {
-        String newIdentifier = groupingSearchField.getText();
-        if (!newIdentifier.isEmpty()) {
-            groupingListView.getItems().add(newIdentifier);
-            groupingSearchField.clear();  // Clear search box after adding
         }
     }
 
@@ -260,7 +328,9 @@ public class CreateEditArticleController extends PageController {
         alert.showAndWait();
     }
 
+
 }
+
 
 
 
