@@ -36,7 +36,7 @@ public class Database {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "org.h2.Driver";
 
-	static final String DB_URL = "jdbc:h2:C:\\Users\\jjust\\h2\\firstDatabase";
+	static final String DB_URL = "jdbc:h2:~/CSE360HelpDatabase";
 
 	// Database credentials
 	static final String USER = "user";
@@ -249,7 +249,7 @@ public class Database {
 	}
 
 	/**
-	 * Function added by Alyssa DiTroia 
+	 * Function added by Aly	ssa DiTroia 
 	 * Updates the user's password in the database
 	 * @param username
 	 * @param password
@@ -729,5 +729,4 @@ public class Database {
 		}
 	}
 }
-
 
