@@ -23,17 +23,18 @@ public class HelpArticleDatabase extends Database{
     private EncryptionHelper encryptionHelper;
 
     public HelpArticleDatabase() throws Exception {
-    	System.out.println("Initializing HelpArticleDatabase...");
+    	System.out.println("[INFO] Help Article Table Initializing");
         // Initialize the Database instance and connection
         db = Database.getInstance(); 
         connection = db.getConnection(); // Get the shared connection
         if (connection != null) {
-            System.out.println("Connection established successfully in HelpArticleDatabase.");
+            System.out.println("[INFO] Connection established successfully in HelpArticleDatabase.");
         } else {
-            System.out.println("Connection is null in HelpArticleDatabase.");
+            System.out.println("[ERROR] Connection is null in HelpArticleDatabase.");
         }
         encryptionHelper = new EncryptionHelper();
         createArticleTables(); // Create tables for articles if they don't exist
+        createGroupingIdentifiersTable();
     }
 
     /**
@@ -42,7 +43,7 @@ public class HelpArticleDatabase extends Database{
      * @throws SQLException if a database access error occurs
      */
     public void createArticleTables() throws SQLException {
-    	System.out.println("Creating Help Article Table....");
+    	System.out.println("[INFO] Creating help article table if it does not exist");
     	String articleTable = "CREATE TABLE IF NOT EXISTS articles ("
     	        + "id INT AUTO_INCREMENT PRIMARY KEY, "
     	        + "iv VARCHAR(255), "  // Store Base64 encoded IV
@@ -59,9 +60,44 @@ public class HelpArticleDatabase extends Database{
     	        + "version VARCHAR(20))"; // New field for article version
         try (Statement statement = connection.createStatement()) {
             statement.execute(articleTable);
-            System.out.println("Article table created or already exists.");
+            System.out.println("[INFO] Article table created or already exists.");
         }catch (SQLException e) {
-            System.out.println("Error creating article table: " + e.getMessage());
+            System.out.println("[ERROR] Error creating article table: " + e.getMessage());
+            throw e;
+        }
+    }
+    /**
+     * Creates the grouping identifiers table if it doesn't exist.
+     *
+     * @throws SQLException if a database access error occurs
+     */
+    public void createGroupingIdentifiersTable() throws SQLException {
+        String groupingTable = "CREATE TABLE IF NOT EXISTS GroupingIdentifiers ("
+                + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                + "identifier VARCHAR(255) UNIQUE NOT NULL)";
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(groupingTable);
+            System.out.println("[INFO] Grouping Identifiers table created or already exists.");
+        } catch (SQLException e) {
+            System.out.println("[ERROR] Error creating Grouping Identifiers table: " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    /**
+     * Inserts a new grouping identifier into the database.
+     * 
+     * @param identifier The identifier to be added
+     * @throws SQLException if a database access error occurs
+     */
+    public void insertGroupingIdentifier(String identifier) throws SQLException {
+        String sql = "INSERT INTO GroupingIdentifiers (identifier) VALUES (?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, identifier);
+            pstmt.executeUpdate();
+            System.out.println("[INFO] Inserted grouping identifier into database: " + identifier);
+        } catch (SQLException e) {
+            System.out.println("[ERROR] Error inserting grouping identifier: " + e.getMessage());
             throw e;
         }
     }
@@ -286,35 +322,55 @@ public class HelpArticleDatabase extends Database{
 		    }
 		    return articles;
 		}
-
 		/**
-		 * searchArticles searches by keyword
+		 * 
 		 * @param searchQuery
 		 * @return
 		 * @throws Exception
 		 */
 		public List<Article> searchArticles(String searchQuery) throws Exception {
 		    List<Article> articles = new ArrayList<>();
-		    String sql = "SELECT * FROM articles WHERE LOWER(title) LIKE ? OR LOWER(authors) LIKE ? OR LOWER(keywords) LIKE ?";
+		    String sql = "SELECT * FROM articles";  // Fetch all articles
 
-		    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-		        String queryParam = "%" + searchQuery.toLowerCase() + "%";  // Prepare query with wildcards
-		        pstmt.setString(1, queryParam);
-		        pstmt.setString(2, queryParam);
-		        pstmt.setString(3, queryParam);
+		    try (PreparedStatement pstmt = connection.prepareStatement(sql);
+		         ResultSet rs = pstmt.executeQuery()) {
+		        
+		        // Iterate through all articles
+		        while (rs.next()) {
+		            // Decrypt each article
+		            Article article = decryptArticleFromResultSet(rs);
 
-		        try (ResultSet rs = pstmt.executeQuery()) {
-		            while (rs.next()) {
-		                // For each matching article, decrypt and add it to the list
-		                Article article = decryptArticleFromResultSet(rs);
-		                articles.add(article);  // Add the decrypted article to the list
+		            // Check if the decrypted fields contain the search query
+		            if (matchesSearchQuery(article, searchQuery.toLowerCase())) {
+		                articles.add(article);  // Add matching article to the list
 		            }
 		        }
 		    } catch (SQLException e) {
 		        throw new SQLException("Error searching for articles: " + e.getMessage());
 		    }
-		    return articles;  // Return the list of decrypted articles
+		    
+		    return articles;  // Return the list of matching decrypted articles
 		}
+		/**
+		 * 
+		 * @param article
+		 * @param searchQuery
+		 * @return
+		 */
+		private boolean matchesSearchQuery(Article article, String searchQuery) {
+		    // Check if title, authors, or keywords contain the search query
+		    return new String(article.getTitle()).toLowerCase().contains(searchQuery) ||
+		           new String(article.getAuthors()).toLowerCase().contains(searchQuery) ||
+		           new String(article.getKeywords()).toLowerCase().contains(searchQuery);
+		}
+
+		
+		/**
+		 * 
+		 * @param rs
+		 * @return
+		 * @throws Exception
+		 */
 		public Article decryptArticleFromResultSet(ResultSet rs) throws Exception {
 		    // Retrieve the IV (Initialization Vector)
 		    String ivBase64 = rs.getString("iv");
@@ -511,4 +567,26 @@ public class HelpArticleDatabase extends Database{
 	            throw e;  // Re-throw the exception to handle it further up the call chain
 	        }
 	    }
-}
+	    
+	    /**
+	     * Fetches all grouping identifiers from the database.
+	     * 
+	     * @return a list of all grouping identifiers
+	     * @throws SQLException if a database access error occurs
+	     */
+	    public List<String> fetchGroupingIdentifiers() throws SQLException {
+	        List<String> identifiers = new ArrayList<>();
+	        String sql = "SELECT identifier FROM GroupingIdentifiers";
+	        try (Statement stmt = connection.createStatement();
+	             ResultSet rs = stmt.executeQuery(sql)) {
+
+	            while (rs.next()) {
+	                identifiers.add(rs.getString("identifier"));
+	            }
+	        } catch (SQLException e) {
+	            System.out.println("[INFO] Error fetching grouping identifiers: " + e.getMessage());
+	            throw e;
+	        }
+	        return identifiers;
+	    }
+	}
