@@ -1,13 +1,11 @@
 package controllers;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,10 +41,10 @@ public class CreateEditArticleController extends PageController {
     private ComboBox<String> levelField;
 
     @FXML
-    private ComboBox<String> groupingSearchComboBox;
+    private ComboBox<String> groupingSearchComboBox;  // Dropdown for all identifiers
 
     @FXML
-    private ListView<String> groupingListView;  // List of identifiers
+    private ListView<String> articleGroupingListView;  // List of identifiers tied to the article
 
     @FXML
     private Button addGroupingButton;
@@ -97,29 +95,25 @@ public class CreateEditArticleController extends PageController {
                 }
             });
 
-            // When user selects an existing identifier, add it to the ListView
-            groupingSearchComboBox.setOnAction(event -> {
-                String selectedIdentifier = groupingSearchComboBox.getSelectionModel().getSelectedItem();
-                if (selectedIdentifier != null && !groupingListView.getItems().contains(selectedIdentifier)) {
-                    groupingListView.getItems().add(selectedIdentifier);
-                }
-            });
+            // Set action to add the selected or new identifier to the article-specific list
+            addGroupingButton.setOnAction(event -> addGroupingIdentifier());
+
+            // Add context menu for removing identifiers from the article-specific list
+            addContextMenuToArticleGroupingList();
 
             // Set up level dropdown options
             levelField.setItems(FXCollections.observableArrayList("beginner", "intermediate", "advanced", "expert"));
 
-            // Set grouping identifiers ListView to allow multiple selections
-            groupingListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-            // If editing an existing article, load data into the fields
-            Article selectedArticle = UserSession.getInstance().getSelectedArticle();
-            if (selectedArticle != null) {
-                loadArticleData(selectedArticle);
+            // Load data into the fields if editing an existing article
+            articleToEdit = UserSession.getInstance().getSelectedArticle();
+            if (articleToEdit != null) {
+                loadArticleData(articleToEdit);
             } else {
-                showErrorAlert("Error", "No article selected.");
+            	clearFields(); 
             }
         } catch (Exception e) {
             showErrorAlert("Error", "Failed to initialize the CreateEditArticleController: " + e.getMessage());
+            System.out.println("[ERROR] Failed to initialize the CreateEditArticleController: " + e.getMessage());
         }
     }
 
@@ -139,18 +133,10 @@ public class CreateEditArticleController extends PageController {
         instructorCheckbox.setSelected(permissions.contains("Instructor"));
         studentCheckbox.setSelected(permissions.contains("Student"));
 
-        // Set grouping identifiers (multi-select)
+        // Set article-specific grouping identifiers (multi-select)
         List<String> identifiers = article.getGroupingIdentifiers();
-        groupingListView.getSelectionModel().clearSelection();
-        for (String id : identifiers) {
-            groupingListView.getSelectionModel().select(id);
-        }
-
-        // Set date and version
-        if (article.getDateAdded() != null) {
-            dateAddedField.setValue(article.getDateAdded().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate());
-        }
-        versionField.setText(article.getVersion());
+        articleGroupingListView.getItems().clear();
+        articleGroupingListView.getItems().addAll(identifiers);  // Populate the ListView with article-specific identifiers
     }
 
     /**
@@ -163,7 +149,7 @@ public class CreateEditArticleController extends PageController {
         if (!newIdentifier.isEmpty()) {
             // Check if the identifier already exists in the global list
             if (!groupingSearchComboBox.getItems().contains(newIdentifier)) {
-                // Add the new identifier to the database
+                // Add the new identifier to the database and update the dropdown
                 try {
                     had.insertGroupingIdentifier(newIdentifier);
                     groupingSearchComboBox.getItems().add(newIdentifier);  // Update ComboBox with new identifier
@@ -174,9 +160,9 @@ public class CreateEditArticleController extends PageController {
                 }
             }
 
-            // Add the identifier to the ListView if it's not already there
-            if (!groupingListView.getItems().contains(newIdentifier)) {
-                groupingListView.getItems().add(newIdentifier);
+            // Add the identifier to the article's specific grouping list if it's not already there
+            if (!articleGroupingListView.getItems().contains(newIdentifier)) {
+                articleGroupingListView.getItems().add(newIdentifier);
             }
 
             // Clear the search field
@@ -203,6 +189,23 @@ public class CreateEditArticleController extends PageController {
         groupingSearchComboBox.setItems(FXCollections.observableArrayList(filteredIdentifiers));
     }
 
+    /**
+     * Adds a context menu to the ListView to remove a specific grouping identifier from the article.
+     */
+    private void addContextMenuToArticleGroupingList() {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem removeItem = new MenuItem("Remove");
+        removeItem.setOnAction(event -> {
+            String selectedItem = articleGroupingListView.getSelectionModel().getSelectedItem();
+            if (selectedItem != null) {
+                articleGroupingListView.getItems().remove(selectedItem); // Remove the selected item from the ListView
+            }
+        });
+        contextMenu.getItems().add(removeItem);
+
+        // Attach the context menu to the ListView
+        articleGroupingListView.setContextMenu(contextMenu);
+    }
 
     /**
      * Method to save the article (either creating a new article or updating an existing one).
@@ -217,18 +220,13 @@ public class CreateEditArticleController extends PageController {
             char[] keywords = keywordsField.getText().toCharArray();
             char[] body = bodyField.getText().toCharArray();
             char[] references = referencesField.getText().toCharArray();
-            String level = levelField.getValue();  // Get selected level from ComboBox
+            String level = levelField.getValue();
 
-            // Get selected grouping identifiers from ListView
-            ObservableList<String> selectedItems = groupingListView.getItems();
-            List<String> selectedIdentifiers = new ArrayList<>(selectedItems);
-            System.out.println("Selected groups for save: " + selectedIdentifiers);
-            String permissions = getSelectedPermissions();  // Get selected permissions
+            // Get the selected grouping identifiers from the article-specific ListView
+            List<String> selectedIdentifiers = articleGroupingListView.getItems();  
+            String permissions = getSelectedPermissions(); 
 
-            // Convert LocalDate to java.sql.Date
             java.sql.Date dateAdded = java.sql.Date.valueOf(dateAddedField.getValue());
-
-            // Get the version
             String version = versionField.getText();
 
             // Check if we are editing an existing article or creating a new one
@@ -237,8 +235,7 @@ public class CreateEditArticleController extends PageController {
                 Article newArticle = new Article(title, authors, abstractText, keywords, body, references, level,
                         selectedIdentifiers, permissions, dateAdded, version);
                 // Insert into the database
-                had.createArticle(title, authors, abstractText, keywords, body, references, level,
-                        selectedIdentifiers, permissions, dateAdded, version);
+                had.createArticle(newArticle);  
                 showInfoAlert("Success", "Article created successfully!");
             } else {
                 // Editing an existing article
@@ -249,19 +246,16 @@ public class CreateEditArticleController extends PageController {
                 articleToEdit.setBody(body);
                 articleToEdit.setReferences(references);
                 articleToEdit.setLevel(level);
-                articleToEdit.setGroupingIdentifiers(selectedIdentifiers);
+                articleToEdit.setGroupingIdentifiers(selectedIdentifiers);  // Update identifiers in the article
                 articleToEdit.setPermissions(permissions);
                 articleToEdit.setDateAdded(dateAdded);
                 articleToEdit.setVersion(version);
 
                 // Update the article in the database
-                had.updateArticle(articleToEdit); 
+                had.updateArticle(articleToEdit);
                 showInfoAlert("Success", "Article updated successfully!");
             }
 
-            // Clear the fields and return to the list
-            clearFields();
-            UserSession.getInstance().setSelectedArticle(null);
             goBackToList();
 
         } catch (Exception e) {
@@ -276,10 +270,8 @@ public class CreateEditArticleController extends PageController {
     public void goBackToList() {
         String currentRole = UserSession.getInstance().getCurrentRole();
         if ("admin".equals(currentRole)) {
-            // Admins go to the article management view
             navigateTo("/views/SearchArticleView.fxml");
         } else {
-        	// Instructors and students go back to their homepage
             goHome();
         }
     }
@@ -306,7 +298,6 @@ public class CreateEditArticleController extends PageController {
         if (studentCheckbox.isSelected()) {
             permissions.append("Student,");
         }
-        // Remove trailing comma
         if (permissions.length() > 0) {
             permissions.setLength(permissions.length() - 1);
         }
@@ -323,13 +314,13 @@ public class CreateEditArticleController extends PageController {
         keywordsField.clear();
         bodyField.clear();
         referencesField.clear();
-        levelField.setValue(null);
-        groupingListView.getSelectionModel().clearSelection();
+        levelField.setValue(null);  // Clear the level selection
+        articleGroupingListView.getItems().clear();  // Clear any grouping identifiers
         adminCheckbox.setSelected(false);
         instructorCheckbox.setSelected(false);
         studentCheckbox.setSelected(false);
-        dateAddedField.setValue(null);
-        versionField.clear();
+        dateAddedField.setValue(null);  // Clear the date
+        versionField.clear();  // Clear the version field
     }
 
     private void showInfoAlert(String title, String message) {
@@ -338,8 +329,6 @@ public class CreateEditArticleController extends PageController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-
 }
 
 

@@ -50,6 +50,9 @@ public class SearchArticleController extends PageController {
     
     @FXML
     private Button returnHome;
+    
+    @FXML
+    private Button deleteButton;
 
     @FXML
     public void initialize() {
@@ -102,12 +105,48 @@ public class SearchArticleController extends PageController {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Method to delete the selected article.
+     */
+    @FXML
+    public void deleteSelectedArticle() {
+        Article selectedArticle = articleTable.getSelectionModel().getSelectedItem();
+        
+        if (selectedArticle != null) {
+            // Confirm deletion with the user
+            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmationAlert.setTitle("Delete Article");
+            confirmationAlert.setHeaderText("Are you sure you want to delete this article?");
+            confirmationAlert.setContentText("This action cannot be undone.");
+            
+            // If user confirms, proceed with deletion
+            if (confirmationAlert.showAndWait().get() == ButtonType.OK) {
+                try {
+                    // Delete the article from the database
+                    had.deleteArticle(selectedArticle.getId());
+                    showInfoAlert("Success", "Article deleted successfully.");
+
+                    // Reload articles to reflect changes
+                    loadAllArticles();
+
+                } catch (SQLException e) {
+                    showErrorAlert("Error", "Failed to delete the article: " + e.getMessage());
+                }
+            }
+        } else {
+            showErrorAlert("No selection", "Please select an article to delete.");
+        }
+    }
+
  
 
     /**
      * Navigate to the create article page.
      */
     public void goToCreateArticle() {
+    	Article selectedArticle = null;
+    	UserSession.getInstance().setSelectedArticle(selectedArticle); 
         navigateTo("/views/CreateEditArticleView.fxml");
     }
 
@@ -137,6 +176,12 @@ public class SearchArticleController extends PageController {
         } else {
             showErrorAlert("No selection", "Please select an article to edit.");
         }
+    }
+    private void showInfoAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
 }

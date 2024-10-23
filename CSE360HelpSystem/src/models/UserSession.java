@@ -53,53 +53,56 @@ public class UserSession {
 
 		// Getter and Setter for inviteCode
 		public String getInviteCode() {
-			System.out.println("[INFO] User Session getInviteCode() called");
+			System.out.println("[INFO in UserSession] getInviteCode(), Invite code: " + inviteCode);
 			return inviteCode;
 		}
 
 		public void setInviteCode(String inviteCode) {
-			System.out.println("[INFO] User Session setInviteCode() called");
-			System.out.println("[INFO] User Session Invite Code: " + inviteCode);
+			System.out.println("[INFO in UserSession] setInviteCode() Invite Code: " + inviteCode);
 			this.inviteCode = inviteCode;
 		}
 
 		// Getter and Setter for email
 		public String getEmail() {
-			System.out.println("[INFO] User Session getEmail() called");
+			System.out.println("[INFO in UserSession] getEmail() Email: " + email);
 			return email;
 		}
 
 		public void setEmail(String email) {
-			System.out.println("[INFO] User Session setEmail() called");
-			System.out.println("[INFO] User Session Email: " + email);
+			System.out.println("[INFO in UserSession] setEmail() Email: " + email);
 			this.email = email;
 		}
 		
 		public String getCurrentRole() {
-			System.out.println("[INFO] User Session getCurrentRole() called");
+			System.out.println("[INFO in UserSession] getCurrentRole() current role: " + currentRole);
 			return currentRole;
 		}
 		public void setCurrentRole(String currentRole) {
-			System.out.println("[INFO] User Session setCurrentRole() called");
-			System.out.println("[INFO] User Session Current Role: " + currentRole);
+			System.out.println("[INFO in UserSession] setCurrentRole() current role: " + currentRole);
 			this.currentRole = currentRole;
 		}
 
 		// Methods for managing selectedArticle
 		public void setSelectedArticle(Article selectedArticle) {
-			System.out.println("[INFO] User Session setSelectedArticle() called");
-			System.out.println("[INFO] User Session Selected Article: " + selectedArticle.getTitle());
-			this.selectedArticle = selectedArticle;
+		    
+		    if (selectedArticle != null) {
+		        System.out.println("[INFO in UserSession] setSelectedArticle() Selected Article: " + selectedArticle.getTitle());
+		    } else {
+		        System.out.println("[INFO in UserSession] Selected Article is set to null");
+		    }
+		    
+		    this.selectedArticle = selectedArticle;
 		}
 
+
 		public Article getSelectedArticle() {
-			System.out.println("[INFO] User Session getSelectedArticle() called");
+			System.out.println("[INFO in UserSession] getSelectedArticle() Selected Article: " + selectedArticle.getTitle());
 			return selectedArticle;
 		}
 
 		// Method to set the instance (optional, but ensures flexibility)
 		public static void setInstance(UserSession userSession) {
-			System.out.println("[INFO] User Session setInstance() called");
+			System.out.println("[INFO in UserSession] setInstance() called");
 			instance = userSession;
 		}
 	}

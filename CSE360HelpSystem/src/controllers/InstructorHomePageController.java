@@ -240,14 +240,20 @@ public class InstructorHomePageController extends PageController {
             String searchQuery = searchField.getText().toLowerCase();
             List<String> selectedGroups = new ArrayList<>(groupFilterListView.getItems());
             
-            List<Article> articles = db.searchArticles(searchQuery);  // Your existing search
+            System.out.println("Filtering with search query: '" + searchQuery + "'");
+            System.out.println("Selected groups for filtering: " + selectedGroups);
+            
+            List<Article> articles = db.searchArticles(searchQuery);  
             
             // Additional group filtering if groups are selected
             if (!selectedGroups.isEmpty()) {
                 articles = articles.stream()
-                    .filter(article -> 
-                        article.getGroupingIdentifiers().stream()
-                            .anyMatch(selectedGroups::contains))
+                    .filter(article -> {
+                        // Using the updated grouping identifiers mechanism
+                        List<String> articleGroups = article.getGroupingIdentifiers();
+                        return articleGroups.stream()
+                            .anyMatch(selectedGroups::contains);
+                    })
                     .collect(Collectors.toList());
             }
 
@@ -268,10 +274,10 @@ public class InstructorHomePageController extends PageController {
         }
     }
     
+    
     @FXML
     public void clearGroupFilters() {
         groupFilterListView.getItems().clear();
         filterArticles(); // Reapply any keyword filters
     }
-
 }

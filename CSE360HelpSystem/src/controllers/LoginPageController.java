@@ -56,9 +56,10 @@ public class LoginPageController extends PageController {
 	}
 
 	/**
-	 * ****** BELOW HANDLES WHEN THE USER LOGS IN FOR ALL CASES ******* 1. USER IS
-	 * FIRST EVER USER = ADMIN 2. USER IS LOGGING IN FOR THE FIRST TIME AND HAS NOT
-	 * FINISHED ACCOUNT SETUP 3. USER IS FULLY SET UP AND LOGGING IN
+	 * ****** BELOW HANDLES WHEN THE USER LOGS IN FOR ALL CASES ******* 
+	 * 1. USER IS FIRST EVER USER = ADMIN 
+	 * 2. USER IS LOGGING IN FOR THE FIRST TIME AND HAS NOT FINISHED ACCOUNT SETUP 
+	 * 3. USER IS FULLY SET UP AND LOGGING IN
 	 */
 	@FXML
 	public void handleLogin() {
@@ -128,7 +129,8 @@ public class LoginPageController extends PageController {
 					User loggedInUser = new User(); // Creating a new User
 					loggedInUser.setUsername(username); // Setting the username of the User
 					UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
-					userSession.setCurrentUser(loggedInUser); // Setting the userSession to the current user
+					userSession.setCurrentUser(loggedInUser);
+					userSession.setUsername(username); // Setting the userSession to the current user
 					// ****** FINISH SETTING UP ACCOUNT *******
 					redirectToFinishSetupAccount();
 					return;
@@ -237,23 +239,27 @@ public class LoginPageController extends PageController {
 	}
 
 	private void redirectBasedOnSingleRole(String username) throws SQLException {
+		UserSession userSession = UserSession.getInstance();
 		db = Database.getInstance();
 		if (db.isUserAdmin(username)) {
 			String currentRole = "admin";
-			UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
 			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/AdminHomePageView.fxml");
 		} else if (db.isUserInstructor(username)) {
 			String currentRole = "instructor";
-			UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
 			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/InstructorHomePageView.fxml");
 		} else if (db.isUserStudent(username)) {
 			String currentRole = "student";
-			UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
 			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/StudentHomePageView.fxml");
-		}
+		} else {
+	        // Handle case where no role is found
+	        showErrorAlert("Error", "No valid role found for user.");
+	    }
+
+	    // Print current role to ensure it's correctly set
+	    System.out.println("[INFO] User role set to: " + userSession.getCurrentRole());
 	}
 
 	private void redirectToLoginPageViewAdmin() {

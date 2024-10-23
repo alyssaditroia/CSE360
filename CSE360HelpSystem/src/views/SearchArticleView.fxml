@@ -30,6 +30,7 @@
     <!-- Buttons Section for creating, viewing, and editing Articles -->
     <HBox spacing="10" alignment="CENTER">
         <Button text="Create New Article" onAction="#goToCreateArticle"/>
+        <Button fx:id="deleteButton" text="Delete Article" onAction="#deleteSelectedArticle" />
         <Button text="View Selected Article" onAction="#goToViewArticle"/>
         <Button text="Edit Selected Article" onAction="#goToEditArticle"/>
         <Button text="Return To Homepage" onAction="#goHome"/>

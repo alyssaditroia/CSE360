@@ -128,12 +128,19 @@ public class FinishAccountSetupController extends PageController {
 	}
 
 	private void redirectBasedOnSingleRole(String username) throws SQLException {
+		UserSession userSession = UserSession.getInstance();
 		db = Database.getInstance();
 		if (db.isUserAdmin(username)) {
+			String currentRole = "admin";
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/AdminHomePageView.fxml");
 		} else if (db.isUserInstructor(username)) {
+			String currentRole = "instructor";
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/InstructorHomePageView.fxml");
 		} else if (db.isUserStudent(username)) {
+			String currentRole = "student";
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/StudentHomePageView.fxml");
 		}
 	}
