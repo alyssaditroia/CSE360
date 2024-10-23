@@ -15,7 +15,7 @@
               AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
             
             <!-- Title Label -->
-            <Label text="Instructor Help Article Management" 
+            <Label text="Instructor Homepage" 
                    style="-fx-font-size: 24; -fx-font-weight: bold;" />
 
             <!-- Action Buttons -->

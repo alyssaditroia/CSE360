@@ -204,12 +204,12 @@ public class CreateEditArticleController extends PageController {
     @FXML
     public void goBackToList() {
         String currentRole = UserSession.getInstance().getCurrentRole();
-        if ("instructor".equals(currentRole)) {
-            // Instructors go back to their homepage
-            navigateTo("/views/InstructorHomePageView.fxml");
-        } else {
+        if ("admin".equals(currentRole)) {
             // Admins go to the article management view
             navigateTo("/views/SearchArticleView.fxml");
+        } else {
+        	// Instructors and students go back to their homepage
+            goHome();
         }
     }
 
