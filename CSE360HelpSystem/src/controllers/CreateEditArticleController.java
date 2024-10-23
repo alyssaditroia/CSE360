@@ -111,9 +111,10 @@ public class CreateEditArticleController extends PageController {
             } else {
             	clearFields(); 
             }
-        } catch (Exception e) {
-            showErrorAlert("Error", "Failed to initialize the CreateEditArticleController: " + e.getMessage());
-            System.out.println("[ERROR] Failed to initialize the CreateEditArticleController: " + e.getMessage());
+        } 
+        catch (Exception e) {
+            //showErrorAlert("Error", "Failed to initialize the CreateEditArticleController: " + e.getMessage());
+            System.out.println("[ERROR] (not actually error when creating new article): " + e.getMessage());
         }
     }
 
