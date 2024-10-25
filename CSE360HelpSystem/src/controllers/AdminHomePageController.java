@@ -429,4 +429,9 @@ public class AdminHomePageController extends PageController {
 		initializeTable(); // Table is set up when the controller is initialized
 		loadUsers(); // Load users into the TableView
 	}
+	
+	@FXML
+	private void navigateToBackupRestore() {
+	    navigateTo("/views/BackupRestoreView.fxml");
+	}
 }

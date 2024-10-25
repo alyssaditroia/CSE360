@@ -4,6 +4,9 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -22,7 +25,25 @@
             <HBox alignment="CENTER" spacing="10">
                 <Button fx:id="createArticleButton" text="Create New Article" onAction="#createNewArticle" 
                         style="-fx-font-size: 14;"/>
+             	<Button fx:id="backupRestoreButton" text="Backup and Restore" onAction="#goToBackupRestore" style="-fx-font-size: 14;"/>
             </HBox>
+            
+            <!-- Search Section -->
+			<HBox spacing="10" alignment="CENTER">
+			    <Label text="Search Articles:"/>
+			    <TextField fx:id="searchField" promptText="Enter keywords..." />
+			    <Button text="Search" onAction="#filterArticles"/>
+			</HBox>
+			
+			<!-- Filter by Group(s) Section -->
+			<HBox spacing="10" alignment="CENTER">
+			    <Label text="Filter by Groups:"/>
+			    <ComboBox fx:id="groupFilterComboBox" promptText="Select Groups"/>
+			    <Button text="Add Group" onAction="#addGroupToFilter"/>
+		        <Button text="Clear Groups" onAction="#clearGroupFilters"/> 
+			</HBox>
+			<ListView fx:id="groupFilterListView" prefHeight="100"/>
+		
 
             <!-- TableView for displaying articles -->
             <TableView fx:id="articleTable" prefHeight="500" VBox.vgrow="ALWAYS">

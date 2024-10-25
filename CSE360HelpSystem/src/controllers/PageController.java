@@ -143,8 +143,6 @@ public class PageController {
         }
     }
     
-    
-
 
 	// Initialize method can be overridden in subclasses
 	public void initialize(Stage stage, Database db) {

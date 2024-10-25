@@ -8,7 +8,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import database.Database;
 import database.HelpArticleDatabase;
@@ -50,6 +52,15 @@ public class SearchArticleController extends PageController {
     
     @FXML
     private Button returnHome;
+    
+    @FXML
+    private Button deleteButton;
+    
+    @FXML
+    private ComboBox<String> groupFilterComboBox;
+        
+    @FXML
+    private ListView<String> groupFilterListView;
 
     @FXML
     public void initialize() {
@@ -61,6 +72,10 @@ public class SearchArticleController extends PageController {
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
             abstractColumn.setCellValueFactory(new PropertyValueFactory<>("abstractText"));  // Use correct property
             authorsColumn.setCellValueFactory(new PropertyValueFactory<>("authors"));
+            
+            // Load groups into the ComboBox
+            List<String> groups = had.fetchGroupingIdentifiers();
+            groupFilterComboBox.setItems(FXCollections.observableArrayList(groups));
 
             // Initially load all articles into the table
             loadAllArticles();  // Load all articles at first
@@ -90,24 +105,72 @@ public class SearchArticleController extends PageController {
     @FXML
     public void loadArticles() {
         try {
-            String searchQuery = searchField.getText().toLowerCase();  // Get search input
-            List<Article> articles = had.searchArticles(searchQuery);  // Fetch filtered articles from the database
+            String searchQuery = searchField.getText().toLowerCase();
+            List<String> selectedGroups = new ArrayList<>(groupFilterListView.getItems());
+            
+            System.out.println("Filtering with search query: '" + searchQuery + "'");
+            System.out.println("Selected groups for filtering: " + selectedGroups);
+            
+            List<Article> articles = had.searchArticles(searchQuery);  
+            
+            // Additional group filtering if groups are selected
+            if (!selectedGroups.isEmpty()) {
+                articles = articles.stream()
+                    .filter(article -> {
+                        List<String> articleGroups = article.getGroupingIdentifiers();
+                        return articleGroups.stream()
+                            .anyMatch(selectedGroups::contains);
+                    })
+                    .collect(Collectors.toList());
+            }
 
-            ObservableList<Article> articleList = FXCollections.observableArrayList(articles);
-            articleTable.setItems(articleList);  // Set filtered data in TableView
-
-        } catch (SQLException e) {
-            showErrorAlert("Error", "Failed to search articles: " + e.getMessage());
+            articleTable.setItems(FXCollections.observableArrayList(articles));
         } catch (Exception e) {
-            e.printStackTrace();
+            showErrorAlert("Error", "Failed to filter articles: " + e.getMessage());
         }
     }
+    
+    /**
+     * Method to delete the selected article.
+     */
+    @FXML
+    public void deleteSelectedArticle() {
+        Article selectedArticle = articleTable.getSelectionModel().getSelectedItem();
+        
+        if (selectedArticle != null) {
+            // Confirm deletion with the user
+            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmationAlert.setTitle("Delete Article");
+            confirmationAlert.setHeaderText("Are you sure you want to delete this article?");
+            confirmationAlert.setContentText("This action cannot be undone.");
+            
+            // If user confirms, proceed with deletion
+            if (confirmationAlert.showAndWait().get() == ButtonType.OK) {
+                try {
+                    // Delete the article from the database
+                    had.deleteArticle(selectedArticle.getId());
+                    showInfoAlert("Success", "Article deleted successfully.");
+
+                    // Reload articles to reflect changes
+                    loadAllArticles();
+
+                } catch (SQLException e) {
+                    showErrorAlert("Error", "Failed to delete the article: " + e.getMessage());
+                }
+            }
+        } else {
+            showErrorAlert("No selection", "Please select an article to delete.");
+        }
+    }
+
  
 
     /**
      * Navigate to the create article page.
      */
     public void goToCreateArticle() {
+    	Article selectedArticle = null;
+    	UserSession.getInstance().setSelectedArticle(selectedArticle); 
         navigateTo("/views/CreateEditArticleView.fxml");
     }
 
@@ -137,6 +200,29 @@ public class SearchArticleController extends PageController {
         } else {
             showErrorAlert("No selection", "Please select an article to edit.");
         }
+    }
+    private void showInfoAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    @FXML
+    public void addGroupToFilter() {
+        String selectedGroup = groupFilterComboBox.getValue();
+        if (selectedGroup != null && !selectedGroup.isEmpty() 
+                && !groupFilterListView.getItems().contains(selectedGroup)) {
+            groupFilterListView.getItems().add(selectedGroup);
+            groupFilterComboBox.setValue(null);
+            loadArticles(); // Reapply filters
+        }
+    }
+
+    @FXML
+    public void clearGroupFilters() {
+        groupFilterListView.getItems().clear();
+        loadArticles(); // Reapply any keyword filters
     }
 
 }

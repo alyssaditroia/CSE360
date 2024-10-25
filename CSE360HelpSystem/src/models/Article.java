@@ -68,6 +68,7 @@ public class Article {
     }
 
     public List<String> getGroupingIdentifiers() {
+        System.out.println("Getting grouping identifiers: " + groupingIdentifiers);
         return groupingIdentifiers;
     }
 
@@ -109,7 +110,7 @@ public class Article {
     }
 
     public String getTitle() {
-        return new String(title);
+        return title != null ? new String(title) : null;  // Handle null title
     }
 
     public void setTitle(char[] title) {
@@ -117,7 +118,7 @@ public class Article {
     }
 
     public String getAuthors() {
-        return new String(authors);
+        return authors != null ? new String(authors) : null;  // Handle null authors
     }
 
     public void setAuthors(char[] authors) {
@@ -125,7 +126,7 @@ public class Article {
     }
 
     public String getAbstractText() {
-        return new String(abstractText);
+        return abstractText != null ? new String(abstractText) : null;  // Handle null abstractText
     }
 
     public void setAbstractText(char[] abstractText) {
@@ -133,7 +134,7 @@ public class Article {
     }
 
     public String getKeywords() {
-        return new String(keywords);
+        return keywords != null ? new String(keywords) : null;  // Handle null keywords
     }
 
     public void setKeywords(char[] keywords) {
@@ -141,7 +142,7 @@ public class Article {
     }
 
     public String getBody() {
-        return new String(body);
+        return body != null ? new String(body) : null;  // Handle null body
     }
 
     public void setBody(char[] body) {
@@ -149,7 +150,7 @@ public class Article {
     }
 
     public String getReferences() {
-        return new String(references);
+        return references != null ? new String(references) : null;  // Handle null references
     }
 
     public void setReferences(char[] references) {
