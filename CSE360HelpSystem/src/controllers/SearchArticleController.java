@@ -16,7 +16,11 @@ import database.Database;
 import database.HelpArticleDatabase;
 import models.Article;
 import models.UserSession;
-
+/**
+ * The {@code SearchArticleController} handles the user input for searching and filtering articles
+ * 
+ * 
+ */
 public class SearchArticleController extends PageController {
     private HelpArticleDatabase had;
 

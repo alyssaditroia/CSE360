@@ -27,7 +27,7 @@ import models.Article;
 
 /**
  * 
- * NOT CURRENTLY USING... JUST AN EXAMPLE
+ * The {@code HelpArticleController} NOT USED!!!
  * 
  * USING THE FOLLOWING INSTEAD FOR ORGANIZATION:
  * 

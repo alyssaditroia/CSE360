@@ -13,7 +13,9 @@ import database.Database;
 import database.HelpArticleDatabase;
 import models.Article;
 import models.UserSession;
-
+/**
+ * The {@code CreateEditArticleController} handles the user input for creating and editing help articles
+ */
 public class CreateEditArticleController extends PageController {
 
     private HelpArticleDatabase had;

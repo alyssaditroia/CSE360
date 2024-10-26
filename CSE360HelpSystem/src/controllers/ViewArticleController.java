@@ -10,7 +10,10 @@ import javafx.stage.Stage;
 import database.Database;
 import models.Article;
 import models.UserSession;
-
+/**
+ * The {@code ViewArticleController} handles the user input for viewing the selected help article
+ * 
+ */
 public class ViewArticleController extends PageController {
     private Article articleToView;
 

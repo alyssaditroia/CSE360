@@ -162,8 +162,8 @@ public class AdminHomePageController extends PageController {
 	/**
 	 * Set permissions for a new user
 	 * 
-	 * @param user
-	 * @param inviteToken
+	 * @param user type User
+	 * @param inviteToken type String
 	 */
 	public void setPermissions(User user, String inviteToken) {
 		user.setAdmin(admin.isSelected());

@@ -16,7 +16,7 @@ import models.TextValidation;
 
 /**
  * <p>
- * Title: SetupAccountPageController
+ * The {@code SetupAccountPageController} handles the user input for setting up their account with a username and password
  * </p>
  * 
  * <p>

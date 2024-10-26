@@ -4,11 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /***********
- * 
- * <p>
- * Title: TextValidation
- * </p>
- * Validates different text fields and formatting for text entities
+ * The {@code TextValidation} model validates different text fields and formatting for text entities
  * 
  * @author Alyssa Ditroia
  * 
