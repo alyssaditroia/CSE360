@@ -13,8 +13,20 @@ import database.Database;
 import database.HelpArticleDatabase;
 import models.Article;
 import models.UserSession;
-/**
- * The {@code CreateEditArticleController} handles the user input for creating and editing help articles
+
+/*******
+ * <p>
+ * Title: AdminHomePageController class
+ * </p>
+ * 
+ * <p>
+ * Description: a JavaFX controller that manages the functionality of the article 
+ * creation and editing page. This class extends the PageController base
+ * class, allowing it to inherit common page-related behavior.
+ * </p>
+ * 
+ * @author Alyssa DiTroia
+ * 
  */
 public class CreateEditArticleController extends PageController {
 	
