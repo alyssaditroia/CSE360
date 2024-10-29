@@ -34,14 +34,28 @@ import models.UserSession;
  * 
  **************/
 public class PageController {
-	protected Stage stage; // Protected to allow access in subclasses
-	protected Database db; // Make this protected if needed in subclasses
+	/**
+	 * Stage instance used for scene navigation
+	 */
+	protected Stage stage; 
+	
+	/**
+	 * Database instance for data operations
+	 */
+	protected Database db; 
 
-	// Default constructor, called by FXMLLoader
+	/**
+	 * Default constructor required for FXML loader
+	 */
 	public PageController() {
 	}
 
-	// Constructor to initialize the primary stage and database
+	/**
+	 * Constructor with stage and database parameters
+	 * 
+	 * @param primaryStage the main application window
+	 * @param db the database instance
+	 */
 	public PageController(Stage primaryStage, Database db) {
 		this.stage = primaryStage;
 		this.db = db;
@@ -51,12 +65,21 @@ public class PageController {
 		System.out.println("Current user: " + username);
 	}
 
+	/**
+	 * Sets the user session for the current page
+	 * 
+	 * @param userSession the session to be set
+	 */
 	public void setUserSession(UserSession userSession) {
 		// Optionally handle setting the user session or any specific user
 		UserSession.setInstance(userSession);
 	}
 
-	// Method to navigate to a different view
+	/**
+	 * Navigates to a different view within the application
+	 * 
+	 * @param fxmlPath the path to the FXML file to load
+	 */
 	public void navigateTo(String fxmlPath) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
@@ -79,7 +102,11 @@ public class PageController {
 		}
 	}
 
-	// Method to show error alerts to the user
+	/**
+	 * Shows an error alert with a single message
+	 * 
+	 * @param message the error message to display
+	 */
 	public void showError(String message) {
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Error");
@@ -87,12 +114,22 @@ public class PageController {
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
+	
+	/**
+	 * Shows an error alert with a title and message
+	 * @param title the title of the error alert
+	 * @param message the error message to display
+	 */
     protected void showErrorAlert(String title, String message) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(title);
         alert.setContentText(message);
         alert.showAndWait();
     }
+    
+    /**
+     * Logs out the current user and navigates to the login page
+     */
     @FXML
     public void logout() {
         // Reset the UserSession to null
@@ -101,6 +138,7 @@ public class PageController {
         // Navigate to the login page
         navigateTo("/views/LoginPageView.fxml");  // Make sure this path is correct based on your project structure
     }
+    
     /**
      * Navigate to AdminHomePage
      */
@@ -108,6 +146,7 @@ public class PageController {
     public void goToAdminHomepage() {
         navigateTo("/views/AdminHomePageView.fxml");
     }
+    
     /**
      * Navigate to Instructor Home Page
      */
@@ -115,6 +154,7 @@ public class PageController {
     public void goToInstructorHomepage() {
         navigateTo("/views/InstructorHomePageView.fxml");
     }
+    
     /**
      * Navigate to Student Homepage
      */
@@ -122,6 +162,11 @@ public class PageController {
     public void goToStudentHomepage() {
         navigateTo("/views/InstructorHomePageView.fxml");
     }
+    
+    /**
+     * Navigates user to their appropriate homepage based on their current role.
+     * Shows error and returns to login page if session is invalid.
+     */
     @FXML
     public void goHome() {
         String currentRole = UserSession.getInstance().getCurrentRole();
@@ -144,7 +189,12 @@ public class PageController {
     }
     
 
-	// Initialize method can be overridden in subclasses
+    /**
+     * Initializes the controller with stage and database instances
+     * 
+     * @param stage the application window
+     * @param db the database instance
+     */
 	public void initialize(Stage stage, Database db) {
 		this.stage = stage;
 		this.db = db;

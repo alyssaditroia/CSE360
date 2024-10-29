@@ -35,8 +35,14 @@ import java.util.stream.Collectors;
  * </p>
  */
 public class InstructorHomePageController extends PageController {
+	/**
+	 * Instance of the help article database
+	 */
 	HelpArticleDatabase db;
 	
+	/**
+     * FXML injected UI elements for the Instructor Homepage
+     */
 	@FXML
     private Button logoutButton;
     
@@ -70,22 +76,25 @@ public class InstructorHomePageController extends PageController {
     @FXML
     private ListView<String> groupFilterListView;
 
-	// Default constructor for FXML loader
+    /**
+     * Default constructor required for FXML loader
+     */
 	public InstructorHomePageController() {
 		super();
 	}
 	
 	/**
+	 * Constructor with stage and database parameters
 	 * 
-	 * @param primaryStage
-	 * @param db
+	 * @param primaryStage the main application window
+	 * @param db the database instance
 	 */
 	public InstructorHomePageController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
 	
 	/**
-	 * 
+	 * Handles user logout and navigation to login page
 	 */
 	@FXML
 	public void logout() {
@@ -233,9 +242,10 @@ public class InstructorHomePageController extends PageController {
     }
     
     /**
+     * Shows the specified message alert
      * 
-     * @param title
-     * @param message
+     * @param title The title of the message being sent
+     * @param message The body of the message being sent
      */
     private void showInfoAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -277,7 +287,7 @@ public class InstructorHomePageController extends PageController {
     }
     
     /**
-     * 
+     * Adds a selected group to the filter list and updates the article display
      */
     @FXML
     public void addGroupToFilter() {
@@ -291,7 +301,7 @@ public class InstructorHomePageController extends PageController {
     }
     
     /**
-     * 
+     * Removes all group filters and updates the article display
      */
     @FXML
     public void clearGroupFilters() {
@@ -300,7 +310,7 @@ public class InstructorHomePageController extends PageController {
     }
     
     /**
-     * 
+     * Navigates to the backup and restore view
      */
     @FXML
     public void goToBackupRestore() {

@@ -11,12 +11,24 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.UserSession;
-/**
- * The {@code BackupRestoreController} Handles the user input for backup and restore functionality
+/*******
+ * <p>
+ * Title: BackupRestoreController class
+ * </p>
+ * 
+ * <p>
+ * Description: a JavaFX controller that manages the functionality of the 
+ * page where a user can backup and restore the help system. This class extends 
+ * the PageController base class, allowing it to inherit common page-related behavior.
+ * </p>
+ * 
+ * @author Justin Faris
  * 
  */
 public class BackupRestoreController extends PageController {
-    
+	/**
+	 * FXML injected UI elements for the Backup Restore Page
+	 */
     @FXML private TextField backupLocationField;
     @FXML private TextField restoreLocationField;
     @FXML private RadioButton mergeRadio;
@@ -25,21 +37,38 @@ public class BackupRestoreController extends PageController {
     @FXML private ListView<String> groupsForBackupList;
     @FXML private TextField groupBackupLocationField;
     
-    
+    /**
+     * Help article database instance
+     */
     private HelpArticleDatabase had;
+    
+    /**
+     * File used to backup the system information
+     */
     private File backupFile;
+    
+    /**
+     * Backup file used to restore the system information
+     */
     private File restoreFile;
+    
+    /**
+     * Backup file for a group of files to be backed up to
+     */
     private File groupBackupFile;
 
-    // Default constructor for FXML loader
+    /**
+     * Default constructor for FXML loader
+     */
     public BackupRestoreController() {
         super();
     }
     
     /**
+     * Initializes the BackupRestoreController with the specified primary stage and database.
      * 
-     * @param primaryStage
-     * @param db
+     * @param primaryStage The main stage of the application
+     * @param db The database instance to be used
      */
     public BackupRestoreController(Stage primaryStage, Database db) {
         super(primaryStage, db);
@@ -79,8 +108,9 @@ public class BackupRestoreController extends PageController {
     }
     
     /**
+     * Loads all available groups from the database into the groups list view.
      * 
-     * @throws SQLException
+     * @throws SQLException if there is an error accessing the database
      */
     private void loadAvailableGroups() throws SQLException {
         if (had != null && groupsForBackupList != null) {
@@ -90,7 +120,8 @@ public class BackupRestoreController extends PageController {
     }
     
     /**
-     * 
+     * Opens a file chooser dialog to select a location for saving the backup file.
+     * Updates the backup location text field with the selected path.
      */
     @FXML
     void chooseBackupLocation() {
@@ -107,7 +138,8 @@ public class BackupRestoreController extends PageController {
     }
     
     /**
-     * 
+     * Opens a file chooser dialog to select a backup file for restoration.
+     * Updates the restore location text field with the selected path.
      */
     @FXML
     void chooseRestoreFile() {
@@ -124,7 +156,8 @@ public class BackupRestoreController extends PageController {
     }
     
     /**
-     * 
+     * Creates a backup of all articles at the specified backup location.
+     * Shows a success message if backup is created successfully, or an error message if it fails.
      */
     @FXML
     void createBackup() {
@@ -145,7 +178,8 @@ public class BackupRestoreController extends PageController {
     }
     
     /**
-     * 
+     * Restores articles from the selected backup file.
+     * Uses the selected restore mode (merge or replace) and shows appropriate success/error messages.
      */
     @FXML
     void restoreArticles() {
@@ -166,7 +200,8 @@ public class BackupRestoreController extends PageController {
     }
     
     /**
-     * 
+     * Opens a file chooser dialog to select a location for saving the group backup file.
+     * Updates the group backup location text field with the selected path.
      */
     @FXML
     void chooseGroupBackupLocation() {
@@ -183,7 +218,9 @@ public class BackupRestoreController extends PageController {
     }
     
     /**
-     * 
+     * Creates a backup of selected groups at the specified backup location.
+     * Shows a success message if backup is created successfully, or an error message if it fails.
+     * Requires at least one group to be selected before backup can be created.
      */
     @FXML
     void createGroupBackup() {

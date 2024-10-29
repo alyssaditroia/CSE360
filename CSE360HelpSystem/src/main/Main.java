@@ -19,10 +19,30 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+	/**
+     * Database instance for managing user-related data and operations.
+     */
 	private Database db;
+	
+	/**
+     * Database instance specifically for managing help article data and operations.
+     */
 	private HelpArticleDatabase had;
+	
+	/**
+     * Controller instance for managing page navigation and view transitions.
+     */
 	private PageController pageController;
 
+	/**
+     * Starts the JavaFX application.
+     * Initializes database connections and sets up the initial view based on the database state.
+     * If the database is empty, directs to admin setup; otherwise, shows the regular login page.
+     *
+     * @param primaryStage the primary stage for this application, onto which
+     *                     the application scene can be set
+     * @throws SQLException if database connection or initialization fails
+     */
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -55,6 +75,13 @@ public class Main extends Application {
 		}
 	}
 
+	/**
+     * Performs cleanup operations when the application is shutting down.
+     * Closes all database connections and performs necessary cleanup.
+     * This method is called by the JavaFX platform when the application stops.
+     *
+     * @throws Exception if an error occurs during cleanup
+     */
 	@Override
 	public void stop() throws Exception {
 		super.stop();
@@ -70,6 +97,12 @@ public class Main extends Application {
 		}
 	}
 
+	/**
+     * The main entry point for the application.
+     * Launches the JavaFX application using the Application.launch() method.
+     *
+     * @param args command line arguments passed to the application
+     */
 	public static void main(String[] args) {
 		launch(args);
 	}

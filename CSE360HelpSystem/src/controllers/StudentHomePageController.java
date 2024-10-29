@@ -18,6 +18,9 @@ import javafx.stage.Stage;
  * @author Alyssa DiTroia
  */
 public class StudentHomePageController extends PageController {
+	/**
+     * Database instance
+     */
 	Database db;
 
 	// Default constructor of FXML
