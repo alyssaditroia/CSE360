@@ -10,7 +10,7 @@ import models.UserSession;
 
 /**
  * <p>
- * Title: SelectRolePageController class
+ * The {@code SelectRolePageController} handles the user input for selecting their role for the current session
  * </p>
  *
  * <p>

@@ -28,7 +28,6 @@ public class OTP {
 	/**
 	 * Constructor to initialize the database
 	 * 
-	 * @param db
 	 */
 	public OTP() {
 		db = Database.getInstance();

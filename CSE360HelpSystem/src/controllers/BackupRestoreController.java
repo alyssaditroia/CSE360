@@ -11,7 +11,10 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.UserSession;
-
+/**
+ * The {@code BackupRestoreController} Handles the user input for backup and restore functionality
+ * 
+ */
 public class BackupRestoreController extends PageController {
     
     @FXML private TextField backupLocationField;

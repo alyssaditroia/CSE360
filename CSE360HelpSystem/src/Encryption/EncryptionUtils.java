@@ -4,7 +4,10 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-
+/**
+ * The {@code EncryptionUtils} handles the IV generation, byte array conversions, and char array conversions. 
+ * 
+ */
 public class EncryptionUtils {
 	private static int IV_SIZE = 16;
 	

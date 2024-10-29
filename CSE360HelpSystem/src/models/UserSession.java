@@ -1,10 +1,7 @@
 package models;
 
 /***********
- * 
- * User Session Class
- * Handles the current user's session for the logged in user
- * 
+ * The {@code UserSession} class handles the current sessions User, Roles, and Selected Article
  * 
  **************/
 public class UserSession {

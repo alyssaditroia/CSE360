@@ -10,12 +10,8 @@ import java.util.Map;
 import models.User;
 
 /**
- * <p>
- * Title: Database
- * </p>
+ * The {@code Database} class manages all interactions with the database. Primarily the user database. 
  * 
- * This class manages all interactions with the database, including saving
- * users, managing OTP, and updating user details.
  * 
  * To visualize database run commands in your terminal: cd /h2/bin java -jar
  * h2*.jar
@@ -36,7 +32,7 @@ public class Database {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "org.h2.Driver";
 
-	 static final String DB_URL = "jdbc:h2:C:\\Users\\jjust\\h2\\firstDatabase";
+	 static final String DB_URL = "jdbc:h2:~/CSE360HelpDatabase";
 	 
 	// Database credentials
 	static final String USER = "user";
@@ -477,7 +473,7 @@ public class Database {
 	 * Function added by Alyssa DiTroia 
 	 * getEmail() Method to get the email of the user to check if it is there
 	 * 
-	 * @param username
+	 * @param email type string
 	 * @return
 	 */
 	public String getEmail(String email) {
@@ -669,7 +665,7 @@ public class Database {
 	/**
 	 * Retrieve all users from the cse360users table.
 	 * 
-	 * @return List<User> A list of all users
+	 * @return List of type User A list of all users
 	 * @throws SQLException
 	 */
 	public List<Map<String, Object>> getAllUsers() throws SQLException {

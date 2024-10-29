@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 /***********
  * 
- * User Class Models the User Entity
+ * The {@code User} Class Models the User information in memory before storing to the database
  * 
  * @author Alyssa DiTroia
  **************/

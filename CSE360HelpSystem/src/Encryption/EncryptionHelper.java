@@ -8,7 +8,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
+/**
+ * The {@code EncryptionHelper} handles the encrypt and decrypt functions
+ */
 public class EncryptionHelper {
 
 	private static String BOUNCY_CASTLE_PROVIDER_IDENTIFIER = "BC";	
