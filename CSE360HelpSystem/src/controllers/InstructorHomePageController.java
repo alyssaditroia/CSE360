@@ -74,11 +74,19 @@ public class InstructorHomePageController extends PageController {
 	public InstructorHomePageController() {
 		super();
 	}
-
+	
+	/**
+	 * 
+	 * @param primaryStage
+	 * @param db
+	 */
 	public InstructorHomePageController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
-
+	
+	/**
+	 * 
+	 */
 	@FXML
 	public void logout() {
 		System.out.println("Instructor logged out.");
@@ -223,7 +231,12 @@ public class InstructorHomePageController extends PageController {
             }
         });
     }
-
+    
+    /**
+     * 
+     * @param title
+     * @param message
+     */
     private void showInfoAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -263,6 +276,9 @@ public class InstructorHomePageController extends PageController {
         }
     }
     
+    /**
+     * 
+     */
     @FXML
     public void addGroupToFilter() {
         String selectedGroup = groupFilterComboBox.getValue();
@@ -274,13 +290,18 @@ public class InstructorHomePageController extends PageController {
         }
     }
     
-    
+    /**
+     * 
+     */
     @FXML
     public void clearGroupFilters() {
         groupFilterListView.getItems().clear();
         filterArticles(); // Reapply any keyword filters
     }
     
+    /**
+     * 
+     */
     @FXML
     public void goToBackupRestore() {
         navigateTo("/views/BackupRestoreView.fxml");

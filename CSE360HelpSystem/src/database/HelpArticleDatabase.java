@@ -18,7 +18,10 @@ import org.bouncycastle.util.Arrays;
 import Encryption.EncryptionHelper;
 import Encryption.EncryptionUtils;
 import models.Article;
-
+/**
+ * The {@code HelpArticleDatabase} handles interactions with the database for the HelpArticle table and Grouping Identifiers table
+ * 
+ */
 public class HelpArticleDatabase extends Database{
 
     private Database db; // Use the existing Database class

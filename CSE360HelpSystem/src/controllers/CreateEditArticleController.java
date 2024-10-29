@@ -13,7 +13,9 @@ import database.Database;
 import database.HelpArticleDatabase;
 import models.Article;
 import models.UserSession;
-
+/**
+ * The {@code CreateEditArticleController} handles the user input for creating and editing help articles
+ */
 public class CreateEditArticleController extends PageController {
 
     private HelpArticleDatabase had;
@@ -111,9 +113,10 @@ public class CreateEditArticleController extends PageController {
             } else {
             	clearFields(); 
             }
-        } catch (Exception e) {
-            showErrorAlert("Error", "Failed to initialize the CreateEditArticleController: " + e.getMessage());
-            System.out.println("[ERROR] Failed to initialize the CreateEditArticleController: " + e.getMessage());
+        } 
+        catch (Exception e) {
+            //showErrorAlert("Error", "Failed to initialize the CreateEditArticleController: " + e.getMessage());
+            System.out.println("[ERROR] (not actually error when creating new article): " + e.getMessage());
         }
     }
 
@@ -330,7 +333,6 @@ public class CreateEditArticleController extends PageController {
         alert.showAndWait();
     }
 }
-
 
 
 
