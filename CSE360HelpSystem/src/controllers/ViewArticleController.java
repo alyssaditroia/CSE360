@@ -10,20 +10,42 @@ import javafx.stage.Stage;
 import database.Database;
 import models.Article;
 import models.UserSession;
-
+/**
+ * <p>
+ * Title: InstructorHomePageController
+ * </p>
+ * 
+ * <p>
+ * Description: Manages the page that displays a selected help article's information
+ * </p>
+ */
 public class ViewArticleController extends PageController {
+	
+	/**
+	 * The help article that is currently being viewed on the page
+	 */
     private Article articleToView;
 
-    // Constructors
+    /**
+     * Default constructor required for FXML loader initialization.
+     */
     public ViewArticleController() {
         super();
     }
 
+    /**
+     * Constructs a ViewArticleController with the specified stage and database.
+     *
+     * @param primaryStage The main application window
+     * @param db The database instance to be used
+     */
     public ViewArticleController(Stage primaryStage, Database db) {
         super(primaryStage, db);
     }
 
-    // UI Elements
+    /**
+     * FXML injected UI elements for the view of the page
+     */
     @FXML
     private TextField titleField;  
 
@@ -51,6 +73,10 @@ public class ViewArticleController extends PageController {
     @FXML
     private Button logout;
 
+    /**
+     * Initializes the controller and populates the UI fields with the selected article's data.
+     * Displays an error alert if no article is selected.
+     */
     @FXML
     public void initialize() {
         Article selectedArticle = UserSession.getInstance().getSelectedArticle();
@@ -67,7 +93,11 @@ public class ViewArticleController extends PageController {
         }
     }
 
-    // Navigation method to go back to the search list
+    /**
+     * Handles navigation back to the previous view based on user role.
+     * Admins are directed to the article management view, while instructors and students
+     * return to their respective homepages.
+     */
     @FXML
     public void goBackToList() {
         String currentRole = UserSession.getInstance().getCurrentRole();
@@ -80,7 +110,9 @@ public class ViewArticleController extends PageController {
         }
     }
 
-    // Navigate to the edit article view
+    /**
+     * Navigates to the edit article view for the currently selected article.
+     */
     @FXML
     public void goToEditArticle() {
         navigateTo("/views/CreateEditArticleView.fxml"); // Navigate to the article edit page

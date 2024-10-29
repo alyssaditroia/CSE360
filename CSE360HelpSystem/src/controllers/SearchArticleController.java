@@ -16,20 +16,42 @@ import database.Database;
 import database.HelpArticleDatabase;
 import models.Article;
 import models.UserSession;
-
+/**
+ * <p>
+ * Title: SearchArticleController
+ * </p>
+ * 
+ * <p>
+ * Description: Manages the page that allows the user to search the system for specific help articles
+ * </p>
+ */
 public class SearchArticleController extends PageController {
+	/**
+     * Help article database instance
+     */
     private HelpArticleDatabase had;
 
-    // Constructor with default behavior
+    /**
+     * Default constructor required for FXML loader initialization.
+     */
     public SearchArticleController() {
         super();
     }
 
-    // Constructor with Stage and Database
+
+	/**
+	 * Constructs a SearchArticleController with the specified stage and database.
+	 *
+	 * @param primaryStage The main application window
+	 * @param db The database instance to be used
+	 */
     public SearchArticleController(Stage primaryStage, Database db) {
         super(primaryStage, db);
     }
-
+    
+    /**
+     * FXML injected UI elements for the view of the page
+     */
     // Search field for article queries
     @FXML
     private TextField searchField;
@@ -62,6 +84,11 @@ public class SearchArticleController extends PageController {
     @FXML
     private ListView<String> groupFilterListView;
 
+
+	/**
+	 * Initializes the controller and its UI components.
+	 * Sets up table columns, loads groups into the ComboBox, and loads initial articles.
+	 */
     @FXML
     public void initialize() {
         try {
@@ -201,6 +228,13 @@ public class SearchArticleController extends PageController {
             showErrorAlert("No selection", "Please select an article to edit.");
         }
     }
+    
+    /**
+     * Displays an information alert dialog with the specified title and message.
+     *
+     * @param title The title of the alert dialog
+     * @param message The message to display in the alert dialog
+     */
     private void showInfoAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -208,6 +242,10 @@ public class SearchArticleController extends PageController {
         alert.showAndWait();
     }
     
+    /**
+     * Adds the selected group from the ComboBox to the filter ListView.
+     * Reapplies filters after adding the group.
+     */
     @FXML
     public void addGroupToFilter() {
         String selectedGroup = groupFilterComboBox.getValue();
@@ -219,6 +257,10 @@ public class SearchArticleController extends PageController {
         }
     }
 
+    /**
+     * Clears all group filters from the ListView.
+     * Reapplies any existing keyword filters.
+     */
     @FXML
     public void clearGroupFilters() {
         groupFilterListView.getItems().clear();
@@ -226,4 +268,3 @@ public class SearchArticleController extends PageController {
     }
 
 }
-

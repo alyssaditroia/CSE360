@@ -14,17 +14,41 @@ import database.HelpArticleDatabase;
 import models.Article;
 import models.UserSession;
 
+/*******
+ * <p>
+ * Title: AdminHomePageController class
+ * </p>
+ * 
+ * <p>
+ * Description: a JavaFX controller that manages the functionality of the article 
+ * creation and editing page. This class extends the PageController base
+ * class, allowing it to inherit common page-related behavior.
+ * </p>
+ * 
+ * @author Alyssa DiTroia
+ * 
+ */
 public class CreateEditArticleController extends PageController {
-
+	
+	/**
+	 * Database instance for help article operations
+	 */
     private HelpArticleDatabase had;
-    private Article articleToEdit;  // Holds the article being edited
-
+    
+    /**
+     * Currently selected article for editing, null if creating new article
+     */
+    private Article articleToEdit; 
+    
+    /**
+     * FXML injected UI elements for the article creation/editing form
+     */
     @FXML
     private TextField titleField;
-
+    
     @FXML
     private TextField authorsField;
-
+    
     @FXML
     private TextArea abstractField;
 
@@ -67,15 +91,27 @@ public class CreateEditArticleController extends PageController {
     @FXML
     private Button cancel;  // Cancel editing and return to the list
 
-    // Constructors
+    /**
+     * Default constructor
+     */
     public CreateEditArticleController() {
         super();
     }
-
+    
+    /**
+     * Constructor with stage and database parameters
+     * 
+     * @param primaryStage the main application window
+     * @param db the database instance to be used
+     */
     public CreateEditArticleController(Stage primaryStage, Database db) {
         super(primaryStage, db);
     }
-
+    
+    /**
+     * Initializes the controller, setting up UI components and loading necessary data.
+     * Configures the grouping identifiers dropdown, level options, and loads article data if editing.
+     */
     @FXML
     public void initialize() {
         try {
@@ -118,7 +154,11 @@ public class CreateEditArticleController extends PageController {
         }
     }
 
-    // Load article data for editing
+    /**
+     * Populates form fields with data from an existing article for editing
+     * 
+     * @param article the Article object containing the data to load
+     */
     public void loadArticleData(Article article) {
         titleField.setText(article.getTitle());
         authorsField.setText(article.getAuthors());
@@ -323,7 +363,12 @@ public class CreateEditArticleController extends PageController {
         dateAddedField.setValue(null);  // Clear the date
         versionField.clear();  // Clear the version field
     }
-
+    
+    /**
+     * Displays an information alert dialog
+     * @param title the title of the alert dialog
+     * @param message the message to display in the alert
+     */
     private void showInfoAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -331,7 +376,6 @@ public class CreateEditArticleController extends PageController {
         alert.showAndWait();
     }
 }
-
 
 
 
