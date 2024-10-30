@@ -14,9 +14,9 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 /**
  * <p> Title: OTPTest </p>
- * @author Cooper
- * 
  * Tests the OTP Class
+ * 
+ *  @author Cooper Anderson
  */
 class OTPTest {
     private OTP otp;

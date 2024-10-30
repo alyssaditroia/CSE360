@@ -26,18 +26,31 @@ import models.TextValidation;
  * @author Alyssa DiTroia
  **************/
 public class FinishAccountSetupController extends PageController {
+	/**
+     * Database instance
+     */
 	private Database db;
 
-	// Default constructor, called by FXMLLoader
+	/**
+	 * Default constructor required for FXML loader initialization.
+	 */
 	public FinishAccountSetupController() {
 		super();
 	}
 
-	// Constructor with Stage and Database
+	/**
+	 * Constructs a FinishAccountSetupController with the specified stage and database.
+	 *
+	 * @param primaryStage The main application window
+	 * @param db The database instance to be used
+	 */
 	public FinishAccountSetupController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
-
+	
+	/**
+     * FXML injected UI elements for the Finish Account Setup page
+     */
 	@FXML
 	private TextField emailField; // TextField for email
 	@FXML
@@ -106,11 +119,21 @@ public class FinishAccountSetupController extends PageController {
 			errorLabel.setText("Database update failed: " + e.getMessage());
 		}
 	}
-
+	
+	/**
+	 * Redirects the user to the role selection page view.
+	 */
 	private void redirectToSelectRolePageView() {
 		navigateTo("/views/SelectRolePageView.fxml");
 	}
 
+	/**
+	 * Checks the number of roles assigned to a user.
+	 *
+	 * @param username The username to check roles for
+	 * @return The number of roles the user has
+	 * @throws SQLException if there is an error accessing the database
+	 */
 	private int checkNumRoles(String username) throws SQLException {
 		int numRoles = 0;
 		db = Database.getInstance();
@@ -127,17 +150,38 @@ public class FinishAccountSetupController extends PageController {
 		return numRoles;
 	}
 
+	/**
+	 * Redirects the user to their appropriate home page based on their single role.
+	 * Sets the user's current role in the session and navigates to the corresponding view.
+	 *
+	 * @param username The username to check and redirect
+	 * @throws SQLException if there is an error accessing the database
+	 */
 	private void redirectBasedOnSingleRole(String username) throws SQLException {
+		UserSession userSession = UserSession.getInstance();
 		db = Database.getInstance();
 		if (db.isUserAdmin(username)) {
+			String currentRole = "admin";
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/AdminHomePageView.fxml");
 		} else if (db.isUserInstructor(username)) {
+			String currentRole = "instructor";
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/InstructorHomePageView.fxml");
 		} else if (db.isUserStudent(username)) {
+			String currentRole = "student";
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/StudentHomePageView.fxml");
 		}
 	}
 
+	/**
+	 * Initializes the controller with the specified stage and database.
+	 * Extends the parent class initialization.
+	 *
+	 * @param stage The main application window
+	 * @param db The database instance to be used
+	 */
 	@Override
 	public void initialize(Stage stage, Database db) {
 		super.initialize(stage, db);

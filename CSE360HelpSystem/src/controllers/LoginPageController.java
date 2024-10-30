@@ -26,43 +26,51 @@ import models.UserSession;
  * Description: Implements login page and all of the functionalities associated
  * with it
  * </p>
+ * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class LoginPageController extends PageController {
-	// FXML elements
+	/**
+     * FXML injected UI elements for the Login Page
+     */
 	@FXML
 	private TextField usernameField;
-
 	@FXML
 	private PasswordField passwordField;
 	@FXML
 	private TextField inviteCodeField;
-
 	@FXML
 	private Button loginButton;
-
 	@FXML
 	private Button inviteButton;
-
 	@FXML
 	private Label errorLabel;
-
 	@FXML
 	private Label statusLabel;
 
-	// Default constructor, called by FXMLLoader
+	/**
+	 * Default constructor required for FXML loader initialization.
+	 */
 	public LoginPageController() {
 		super();
 	}
 
-	// Constructor with Stage and Database
+	/**
+	 * Constructs a LoginPageController with the specified stage and database.
+	 *
+	 * @param primaryStage The main application window
+	 * @param db The database instance to be used
+	 */
 	public LoginPageController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
 
 	/**
-	 * ****** BELOW HANDLES WHEN THE USER LOGS IN FOR ALL CASES ******* 1. USER IS
-	 * FIRST EVER USER = ADMIN 2. USER IS LOGGING IN FOR THE FIRST TIME AND HAS NOT
-	 * FINISHED ACCOUNT SETUP 3. USER IS FULLY SET UP AND LOGGING IN
+	 * ****** BELOW HANDLES WHEN THE USER LOGS IN FOR ALL CASES ******* 
+	 * 1. USER IS FIRST EVER USER = ADMIN 
+	 * 2. USER IS LOGGING IN FOR THE FIRST TIME AND HAS NOT FINISHED ACCOUNT SETUP 
+	 * 3. USER IS FULLY SET UP AND LOGGING IN
 	 */
 	@FXML
 	public void handleLogin() {
@@ -132,7 +140,8 @@ public class LoginPageController extends PageController {
 					User loggedInUser = new User(); // Creating a new User
 					loggedInUser.setUsername(username); // Setting the username of the User
 					UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
-					userSession.setCurrentUser(loggedInUser); // Setting the userSession to the current user
+					userSession.setCurrentUser(loggedInUser);
+					userSession.setUsername(username); // Setting the userSession to the current user
 					// ****** FINISH SETTING UP ACCOUNT *******
 					redirectToFinishSetupAccount();
 					return;
@@ -224,6 +233,13 @@ public class LoginPageController extends PageController {
 		}
 	}
 
+	/**
+	 * Determines the number of roles assigned to a user.
+	 *
+	 * @param username The username to check roles for
+	 * @return The number of roles the user has
+	 * @throws SQLException if there is an error accessing the database
+	 */
 	private int checkNumRoles(String username) throws SQLException {
 		int numRoles = 0;
 		db = Database.getInstance();
@@ -240,17 +256,41 @@ public class LoginPageController extends PageController {
 		return numRoles;
 	}
 
+	/**
+	 * Redirects the user to their appropriate home page based on their single role.
+	 * Sets the user's current role in the session and navigates to the corresponding view.
+	 *
+	 * @param username The username to check and redirect
+	 * @throws SQLException if there is an error accessing the database
+	 */
 	private void redirectBasedOnSingleRole(String username) throws SQLException {
+		UserSession userSession = UserSession.getInstance();
 		db = Database.getInstance();
 		if (db.isUserAdmin(username)) {
+			String currentRole = "admin";
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/AdminHomePageView.fxml");
 		} else if (db.isUserInstructor(username)) {
+			String currentRole = "instructor";
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/InstructorHomePageView.fxml");
 		} else if (db.isUserStudent(username)) {
+			String currentRole = "student";
+			userSession.setCurrentRole(currentRole);
 			navigateTo("/views/StudentHomePageView.fxml");
-		}
+		} else {
+	        // Handle case where no role is found
+	        showErrorAlert("Error", "No valid role found for user.");
+	    }
+
+	    // Print current role to ensure it's correctly set
+	    System.out.println("[INFO] User role set to: " + userSession.getCurrentRole());
 	}
 
+	/**
+	 * Redirects to the login page after successful administrator setup.
+	 * Displays a success message and automatically redirects after a delay.
+	 */
 	private void redirectToLoginPageViewAdmin() {
 		statusLabel.setText("Admin account setup successful! Redirecting to login...");
 		statusLabel.setStyle("-fx-text-fill: green;");
@@ -259,7 +299,11 @@ public class LoginPageController extends PageController {
 		pause.setOnFinished(event -> navigateTo("/views/LoginPageView.fxml"));
 		pause.play();
 	}
-
+	
+	/**
+	 * Redirects to the account setup page after successful invite code validation.
+	 * Displays a success message and automatically redirects after a delay.
+	 */
 	@FXML
 	public void redirectToSetupAccount() {
 		statusLabel.setText("Invite code validated! Redirecting to account setup...");
@@ -270,6 +314,10 @@ public class LoginPageController extends PageController {
 		pause.play();
 	}
 
+	/**
+	 * Redirects to the password update page after validating a one-time password.
+	 * Displays a success message and automatically redirects after a delay.
+	 */
 	@FXML
 	public void redirectToUpdatePassword() {
 		statusLabel.setText("One-time password validated! Redirecting to update password...");
@@ -280,6 +328,10 @@ public class LoginPageController extends PageController {
 		pause.play();
 	}
 
+	/**
+	 * Redirects to the finish account setup page for users logging in for the first time.
+	 * Displays a success message and automatically redirects after a delay.
+	 */
 	@FXML
 	public void redirectToFinishSetupAccount() {
 		statusLabel.setText("Login successful, finish setup required! Redirecting to finish account setup...");
@@ -290,6 +342,10 @@ public class LoginPageController extends PageController {
 		pause.play();
 	}
 
+	/**
+	 * Redirects to the role selection page for users with multiple roles.
+	 * Displays a success message and automatically redirects after a delay.
+	 */
 	@FXML
 	public void redirectToSelectRolePageView() {
 		statusLabel.setText("Login successful! Redirecting to select role page...");
@@ -300,11 +356,22 @@ public class LoginPageController extends PageController {
 		pause.play();
 	}
 
+	/**
+	 * Displays an error message in the error label.
+	 *
+	 * @param message The error message to display
+	 */
 	public void showError(String message) {
 		errorLabel.setText(message);
 	}
 
-	// OVERRIDE the initialize method if needed
+	/**
+	 * Initializes the controller with the specified stage and database.
+	 * Extends the parent class initialization.
+	 *
+	 * @param stage The main application window
+	 * @param db The database instance to be used
+	 */
 	@Override
 	public void initialize(Stage stage, Database db) {
 		super.initialize(stage, db);

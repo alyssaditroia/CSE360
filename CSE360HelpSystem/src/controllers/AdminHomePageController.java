@@ -37,68 +37,135 @@ import java.util.Map;
  * </p>
  * 
  * @author Alyssa DiTroia
+ * @author Justin Faris
  * 
  */
 public class AdminHomePageController extends PageController {
-
+	
+	/**
+	 * Constructor for AdminHomePageController with no parameters
+	 */
 	public AdminHomePageController() {
 		super();
 	}
-
+	
+	/**
+	 * Constructor for AdminHomePageController with stage and database parameters
+	 * 
+	 * @param primaryStage the main application window
+	 * @param db the database instance to be used
+	 */
 	public AdminHomePageController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
-
+	
+	/**
+	 * Label displaying the admin home page title
+	 */
 	@FXML
 	private Label adminHomeTitle;
 
+	/**
+	 * Checkbox for admin permission selection
+	 */
 	@FXML
 	private CheckBox admin;
 
+	/**
+	 * Checkbox for student permission selection
+	 */
 	@FXML
 	private CheckBox student;
 
+	/**
+	 * Checkbox for instructor permission selection
+	 */
 	@FXML
 	private CheckBox instructor;
 
+	/**
+	 * Text field for entering email addresses
+	 */
 	@FXML
 	private TextField emailField;
 
+	/**
+	 * Button to trigger sending invites
+	 */
 	@FXML
 	private Button sendInviteButton;
 
+	/**
+	 * TableView displaying user information
+	 */
 	@FXML
 	private TableView<User> userTable;
 
+	/**
+	 * Column for displaying usernames
+	 */
 	@FXML
 	private TableColumn<User, String> usernameColumn;
 
+	/**
+	 * Column for displaying preferred names
+	 */
 	@FXML
 	private TableColumn<User, String> preferrednameColumn;
 
+	/**
+	 * Column for displaying email addresses
+	 */
 	@FXML
 	private TableColumn<User, String> emailColumn;
 
+	/**
+	 * Column for displaying admin status
+	 */
 	@FXML
 	private TableColumn<User, Boolean> adminColumn;
 
+	/**
+	 * Column for displaying student status
+	 */
 	@FXML
 	private TableColumn<User, Boolean> studentColumn;
 
+	/**
+	 * Column for displaying instructor status
+	 */
 	@FXML
 	private TableColumn<User, Boolean> instructorColumn;
 
+	/**
+	 * Column containing update permissions controls
+	 */
 	@FXML
 	private TableColumn<User, Void> updatePermissionsColumn;
 
+	/**
+	 * Column containing password reset controls
+	 */
 	@FXML
 	private TableColumn<User, Void> resetPasswordColumn;
 
+	/**
+	 * Column containing delete user controls
+	 */
 	@FXML
 	private TableColumn<User, Void> deleteColumn;
 
+	/**
+	 * Button for logging out of the application
+	 */
 	@FXML
 	private Button logoutButton;
+	
+	/**
+	 * Button for viewing articles
+	 */
+	@FXML
+	private Button viewArticlesButton;
 
 	/**
 	 * Handles invite button click ensures email field contains proper input and the
@@ -148,19 +215,20 @@ public class AdminHomePageController extends PageController {
 	}
 
 	/**
-	 * Logout functionality
+	 * Go to Article View
 	 */
 	@FXML
-	public void logout() {
-		System.out.println("Admin logged out.");
-		navigateTo("/views/LoginPageView.fxml");
+	public void article() {
+		System.out.println("Going to Article View.");
+		//navigateTo("/views/HelpArticleView.fxml");
+		navigateTo("/views/SearchArticleView.fxml");
 	}
-
+	
 	/**
 	 * Set permissions for a new user
 	 * 
-	 * @param user
-	 * @param inviteToken
+	 * @param user type User
+	 * @param inviteToken type String
 	 */
 	public void setPermissions(User user, String inviteToken) {
 		user.setAdmin(admin.isSelected());
@@ -332,7 +400,9 @@ public class AdminHomePageController extends PageController {
 		return token.toString();
 	}
 
-	// Show alert messages
+	/**
+	 * List to store alert messages
+	 */
 	private List<String> alertMessages = new ArrayList<>();
 
 	/**
@@ -425,5 +495,13 @@ public class AdminHomePageController extends PageController {
 		super.initialize(stage, db);
 		initializeTable(); // Table is set up when the controller is initialized
 		loadUsers(); // Load users into the TableView
+	}
+	
+	/**
+	 * Navigates to the backup and restore view
+	 */
+	@FXML
+	private void navigateToBackupRestore() {
+	    navigateTo("/views/BackupRestoreView.fxml");
 	}
 }

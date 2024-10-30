@@ -8,10 +8,19 @@
     <children>
         <VBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" 
               AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
+              
             <!-- Title Label -->
             <Label fx:id="adminHomeTitle" text="Admin Home Page" 
                    style="-fx-font-size: 24; -fx-font-weight: bold;" />
-
+			
+			
+			<!-- Navigation Buttons -->
+			<HBox alignment="CENTER" spacing="10">
+			    <Button fx:id="viewArticlesButton" text="View Help Articles" onAction="#article" />
+			    <Button fx:id="backupRestoreButton" text="Backup/Restore" onAction="#navigateToBackupRestore" />
+			</HBox>
+			
+			
             <!-- GridPane for Permissions and Email -->
             <GridPane alignment="CENTER_LEFT" hgap="10" vgap="10">
                 <!-- Label for Permissions -->
@@ -30,6 +39,7 @@
                 <Button fx:id="sendInviteButton" text="Send Invite" onAction="#handleInvite" GridPane.rowIndex="5" GridPane.columnIndex="1" />
             </GridPane>
 
+
             <!-- TableView for displaying invited users -->
             <TableView fx:id="userTable" prefHeight="300">
 			    <columns>
@@ -44,6 +54,7 @@
 			        <TableColumn fx:id="deleteColumn" text="Delete User" />
 			    </columns>
 			</TableView>
+
 
             <!-- Buttons for Actions  -->
             <HBox alignment="CENTER_RIGHT" spacing="20">

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package models;
 
 import java.sql.*;
@@ -12,25 +9,60 @@ import database.Database;
 
 import java.util.Random;
 
+import Encryption.EncryptionHelper;
+
 /**
- * OneTimePassword Class
+ * The {@code OTP} class represents the one time password and handles OTP operations
+ * The OTP class also interacts with the database for updating and handling OTPs
  * 
- * @author Alyssa diTroia
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class OTP {
+	/**
+     * The one-time password stored as a character array for security.
+     */
 	private char[] OTP;
+	
+	/**
+     * The expiration timestamp for the current OTP.
+     * After this time, the OTP becomes invalid.
+     */
 	private LocalDateTime expiration;
+	
+	/**
+     * Flag indicating whether the OTP is currently valid.
+     * True indicates the OTP is active and can be used, false indicates it has been used or invalidated.
+     */
 	private boolean flag;
+	
+	/**
+     * Database instance for managing OTP data persistence.
+     */
 	private Database db;
+	
+	/**
+     * Helper instance for encrypting and decrypting OTP data.
+     */
+	private EncryptionHelper encryptionHelper;
+	
+	/**
+     * Random number generator for OTP creation.
+     * Used to generate secure random values for one-time passwords.
+     */
 	private Random random = new Random();
 
 	/**
 	 * Constructor to initialize the database
 	 * 
-	 * @param db
 	 */
 	public OTP() {
 		db = Database.getInstance();
+		try {
+			encryptionHelper = new EncryptionHelper();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -40,6 +72,7 @@ public class OTP {
 	 * @param email The username to associate the OTP with
 	 * @throws SQLException
 	 */
+	// TODO Encrypt OTP
 	public void generateAndSaveOTP(String email) throws SQLException {
 		// Generate a random 6-digit OTP
 		this.OTP = String.valueOf(100000 + random.nextInt(900000)).toCharArray();
@@ -70,6 +103,7 @@ public class OTP {
 	 * @return Error message if validation fails, or an empty string if valid
 	 * @throws SQLException
 	 */
+	// TODO Decrypt OTP 
 	public String validateOTP(String username, char[] password) throws SQLException {
 		// Check if username or inputOTP is null
 		if (username == null || password == null) {
