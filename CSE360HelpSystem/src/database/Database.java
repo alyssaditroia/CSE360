@@ -245,7 +245,7 @@ public class Database {
 	}
 
 	/**
-	 * Function added by Aly	ssa DiTroia 
+	 * Function added by Alyssa DiTroia 
 	 * Updates the user's password in the database
 	 * @param username
 	 * @param password
