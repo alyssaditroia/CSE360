@@ -6,6 +6,9 @@ import java.util.List;
 
 /**
  * The {@code Article} class handles articles in program memory without interacting with the database.
+ * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class Article {
     /** 

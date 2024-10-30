@@ -10,6 +10,9 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 /**
  * The {@code EncryptionHelper} handles the encrypt and decrypt functions
+ * 
+ * 
+ * @author Lynn Robert carter
  */
 public class EncryptionHelper {
 

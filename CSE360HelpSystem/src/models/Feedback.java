@@ -3,6 +3,9 @@ package models;
 import java.time.LocalDateTime;
 /**
  * The {@code Feedback} class handles user feedback in program memory without interacting with the database
+ * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class Feedback {
 	/**

@@ -11,11 +11,17 @@ import models.Article;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
+/**
+ * {@code ArticleTest} class contains Junit tests for the Article class. 
+ * @author Alyssa DiTroia
+ */
 public class ArticleTest {
 
     private Article article;
 
+    /**
+     * Setup for each test includes creating a mock article for testing
+     */
     @BeforeEach
     public void setUp() {
         char[] title = "Sample Title".toCharArray();
@@ -35,7 +41,9 @@ public class ArticleTest {
 
         System.out.println("Setup complete: Article object initialized.");
     }
-
+    /**
+     * A Test that tests the constructor of the article class
+     */
     @Test
     public void testFullConstructor() {
         System.out.println("Testing full constructor...");
@@ -56,6 +64,9 @@ public class ArticleTest {
         System.out.println("Full constructor test passed.");
     }
 
+    /**
+     * A Test for the partial constructor of the article class
+     */
     @Test
     public void testPartialConstructor() {
         System.out.println("Testing partial constructor...");
@@ -90,6 +101,9 @@ public class ArticleTest {
         System.out.println("Partial constructor test passed.");
     }
 
+    /**
+     * A test for all the setters and getters in the article class
+     */
     @Test
     public void testSettersAndGetters() {
         System.out.println("Testing setters and getters...");
@@ -150,6 +164,9 @@ public class ArticleTest {
         System.out.println("Version set and retrieved successfully.");
     }
 
+    /**
+     * A test for the search function in the article class
+     */
     @Test
     public void testSearchArticle() {
         System.out.println("Testing searchArticle method...");

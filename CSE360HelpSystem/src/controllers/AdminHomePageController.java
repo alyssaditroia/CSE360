@@ -37,6 +37,7 @@ import java.util.Map;
  * </p>
  * 
  * @author Alyssa DiTroia
+ * @author Justin Faris
  * 
  */
 public class AdminHomePageController extends PageController {

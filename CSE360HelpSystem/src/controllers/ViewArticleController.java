@@ -18,6 +18,9 @@ import models.UserSession;
  * <p>
  * Description: Manages the page that displays a selected help article's information
  * </p>
+ * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class ViewArticleController extends PageController {
 	
