@@ -22,6 +22,12 @@ public class StudentHomePageController extends PageController {
      * Database instance
      */
 	Database db;
+	
+	@FXML
+	private Button logoutButton;
+	
+	@FXML
+	private Button generalGroupButton;
 
 	// Default constructor of FXML
 	public StudentHomePageController() {
@@ -32,9 +38,14 @@ public class StudentHomePageController extends PageController {
 	public StudentHomePageController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
-
+	
+	/**
+	 * Navigates to the backup and restore view
+	 */
 	@FXML
-	private Button logoutButton;
+	private void navigateToGeneralGroup() {
+	    navigateTo("/views/StudentGeneralView.fxml");
+	}
 
 	// Logout functionality
 	@FXML

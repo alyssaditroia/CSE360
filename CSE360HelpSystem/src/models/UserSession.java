@@ -39,6 +39,14 @@ public class UserSession {
      * The currently selected article for viewing or editing.
      */
 	private Article selectedArticle;
+	
+	// PHASE 3 ADDITIONS
+	// 1 is view - 'student'
+	// 2 is create and delete - 'admin'
+	// 3 is create, delete, edit, and view - 'instructor'
+	private int specialGroupAccessLevel = 0;
+	
+	private SpecialGroup selectedSpecialGroup;
 
 	 /**
      * Private constructor to enforce singleton pattern.
@@ -58,6 +66,7 @@ public class UserSession {
 		}
 		return instance;
 	}
+	
 
 	/**
      * Gets the current user's username.
@@ -194,6 +203,34 @@ public class UserSession {
 	public static void setInstance(UserSession userSession) {
 		System.out.println("[INFO in UserSession] setInstance() called");
 		instance = userSession;
+	}
+	
+	
+	public void setAccessLevel(int level) {
+		this.specialGroupAccessLevel = level;
+	}
+	
+	
+	public int getAccessLevel() {
+		return this.specialGroupAccessLevel;
+	}
+	
+	
+	public void setSelectedSpecialGroup(SpecialGroup group) {
+	    
+	    if (selectedArticle != null) {
+	        System.out.println("[INFO in UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
+	    } else {
+	        System.out.println("[INFO in UserSession] Selected Group is set to null");
+	    }
+	    
+	    this.selectedSpecialGroup = group;
+	}
+
+	
+	public SpecialGroup getSelectedSpecialGroup() {
+		System.out.println("[INFO in UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
+		return this.selectedSpecialGroup;
 	}
 }
 
