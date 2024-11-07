@@ -316,4 +316,16 @@ public class InstructorHomePageController extends PageController {
     public void goToBackupRestore() {
         navigateTo("/views/BackupRestoreView.fxml");
     }
+    
+    
+    // PHASE 3 ADDITIONS
+    @FXML
+    public void goToSpecialGroups() {
+        navigateTo("/views/SelectSpecialGroupView.fxml");
+    }
+    
+    @FXML
+    public void goToCreateSpecialGroup() {
+        navigateTo("/views/CreateSpecialGroupView.fxml");
+    }
 }

@@ -67,6 +67,14 @@ public class Article {
      * Version number of the article (e.g., "1.0", "2.1").
      */
     private String version;
+    
+    // PHASE 3 ADDITIONS
+    /**
+     * Flag variable controlling if the article is generic or part of a special group
+     * 
+     * Articles by default are created as generic, and a function later will be called to set the flag variable for special group articles
+     */
+    private Boolean isSpecialGroupArticle;
 
     /**
      * Constructor for creating a complete article with all fields including ID.
@@ -98,6 +106,7 @@ public class Article {
         this.permissions = permissions;
         this.dateAdded = dateAdded;
         this.version = version;
+        this.isSpecialGroupArticle = false;
     }
 
     /**
@@ -357,6 +366,25 @@ public class Article {
      */
     public void setReferences(char[] references) {
         this.references = references;
+    }
+    
+    // PHASE 3 ADDITIONS
+    /**
+     * Sets the article to be created as part of a special group
+     * 
+     * Called when creating articles as part of a special group
+     */
+    public void setAsPartOfSpecialGroup() {
+    	this.isSpecialGroupArticle = true;
+    }
+    
+    /**
+     * Checks if articles are generic or not
+     * 
+     * @return
+     */
+    public Boolean checkSpecialGroupArticle() {
+    	return this.isSpecialGroupArticle;
     }
 }
 
