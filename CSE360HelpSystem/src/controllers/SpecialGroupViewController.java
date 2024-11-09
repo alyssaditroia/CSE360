@@ -31,6 +31,7 @@ public class SpecialGroupViewController extends PageController {
     @FXML private Button editButton;
     @FXML private Button deleteButton;
     @FXML private Label groupNameLabel;
+    @FXML private Button manageUsersButton;
 
     private SpecialGroupsDatabase specialGroupsDB;
     private HelpArticleDatabase helpArticleDB;
@@ -175,5 +176,10 @@ public class SpecialGroupViewController extends PageController {
     @FXML
     public void goToCreateArticle() {
         navigateTo("/views/SpecialGroupAddEditArticleView.fxml");
+    }
+    
+    @FXML
+    private void goToUserManagement() {
+        navigateTo("/views/SpecialGroupManagementView.fxml");
     }
 }

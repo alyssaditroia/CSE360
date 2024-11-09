@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.SpecialGroupManagementController"
+            prefWidth="800" prefHeight="800" 
+            style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
+    
+    <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="0.0" 
+          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" 
+          AnchorPane.bottomAnchor="0.0">
+        
+        <!-- Title -->
+        <Label text="Special Group User Management" 
+               style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+        
+        <!-- Admin Users Table -->
+        <VBox spacing="10">
+            <Label text="Users with Admin Access" 
+                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+            <TableView fx:id="adminUsersTable" prefHeight="150">
+                <columns>
+                    <TableColumn fx:id="adminIdCol" text="ID" prefWidth="75"/>
+                    <TableColumn fx:id="adminNameCol" text="Username" prefWidth="150"/>
+                    <TableColumn fx:id="adminEmailCol" text="Email" prefWidth="200"/>
+                    <TableColumn fx:id="adminActionsCol" text="Actions" prefWidth="250"/>
+                </columns>
+            </TableView>
+        </VBox>
+
+        <!-- Manage Users Table -->
+        <VBox spacing="10">
+            <Label text="Users with Manage Access" 
+                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+            <TableView fx:id="manageUsersTable" prefHeight="150">
+                <columns>
+                    <TableColumn fx:id="manageIdCol" text="ID" prefWidth="75"/>
+                    <TableColumn fx:id="manageNameCol" text="Username" prefWidth="150"/>
+                    <TableColumn fx:id="manageEmailCol" text="Email" prefWidth="200"/>
+                    <TableColumn fx:id="manageActionsCol" text="Actions" prefWidth="250"/>
+                </columns>
+            </TableView>
+        </VBox>
+
+        <!-- View Users Table -->
+        <VBox spacing="10">
+            <Label text="Users with View Access" 
+                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+            <TableView fx:id="viewUsersTable" prefHeight="150">
+                <columns>
+                    <TableColumn fx:id="viewIdCol" text="ID" prefWidth="75"/>
+                    <TableColumn fx:id="viewNameCol" text="Username" prefWidth="150"/>
+                    <TableColumn fx:id="viewEmailCol" text="Email" prefWidth="200"/>
+                    <TableColumn fx:id="viewActionsCol" text="Actions" prefWidth="250"/>
+                </columns>
+            </TableView>
+        </VBox>
+
+        <!-- Available Users Table -->
+        <VBox spacing="10">
+            <Label text="Available Users" 
+                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+            <TableView fx:id="availableUsersTable" prefHeight="150">
+                <columns>
+                    <TableColumn fx:id="availableIdCol" text="ID" prefWidth="75"/>
+                    <TableColumn fx:id="availableNameCol" text="Username" prefWidth="150"/>
+                    <TableColumn fx:id="availableEmailCol" text="Email" prefWidth="200"/>
+                    <TableColumn fx:id="availableActionsCol" text="Actions" prefWidth="250"/>
+                </columns>
+            </TableView>
+        </VBox>
+        
+        <!-- Back Button -->
+        <Button text="Back" onAction="#goBack" />
+    </VBox>
+</AnchorPane>

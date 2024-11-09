@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import models.SpecialGroup;
+import models.User;
 
 public class SpecialGroupsDatabase extends Database {
     private Database db;
@@ -236,5 +237,102 @@ public class SpecialGroupsDatabase extends Database {
             }
         }
         return articles;
+    }
+
+    public List<User> getGroupUsersByAccessLevel(int groupId, int accessLevel) throws SQLException {
+        List<User> users = new ArrayList<>();
+        // Debug print
+        System.out.println("Fetching users for group " + groupId + " with access level " + accessLevel);
+        
+        String sql = "SELECT u.* FROM cse360users u " +
+                     "INNER JOIN special_group_members sgm ON u.id = sgm.user_id " +
+                     "WHERE sgm.group_id = ? AND sgm.access_level = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, groupId);
+            pstmt.setInt(2, accessLevel);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User(
+                        rs.getString("firstName"),
+                        rs.getString("lastName"),
+                        rs.getString("preferredName"),
+                        rs.getString("email"),
+                        rs.getString("username"),
+                        null,  // password not needed
+                        rs.getBoolean("isAdmin"),
+                        rs.getBoolean("isStudent"),
+                        rs.getBoolean("isInstructor")
+                    );
+                    user.setId(rs.getInt("id"));
+                    users.add(user);
+                    // Debug print
+                    System.out.println("Found user: " + user.getUsername() + " (ID: " + user.getId() + ")");
+                }
+            }
+        }
+        // Debug print
+        System.out.println("Total users found: " + users.size());
+        return users;
+    }
+
+    public List<User> getAvailableUsers(int groupId) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM cse360users u WHERE u.id NOT IN " +
+                     "(SELECT user_id FROM special_group_members WHERE group_id = ?)";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, groupId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User(
+                        rs.getString("firstName"),
+                        rs.getString("lastName"),
+                        rs.getString("preferredName"),
+                        rs.getString("email"),
+                        rs.getString("username"),
+                        null,  // password not needed
+                        rs.getBoolean("isAdmin"),
+                        rs.getBoolean("isStudent"),
+                        rs.getBoolean("isInstructor")
+                    );
+                    user.setId(rs.getInt("id"));
+                    users.add(user);
+                }
+            }
+        }
+        return users;
+    }
+
+    public void updateUserAccess(int groupId, int userId, int newAccessLevel) throws SQLException {
+        String sql = "UPDATE special_group_members SET access_level = ? " +
+                     "WHERE group_id = ? AND user_id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, newAccessLevel);
+            pstmt.setInt(2, groupId);
+            pstmt.setInt(3, userId);
+            pstmt.executeUpdate();
+        }
+    }
+    
+    
+    public void printGroupMembers(int groupId) throws SQLException {
+        String sql = "SELECT user_id, access_level FROM special_group_members WHERE group_id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, groupId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            System.out.println("\n=== Current Group Members ===");
+            System.out.println("Group ID: " + groupId);
+            while (rs.next()) {
+                System.out.println("User ID: " + rs.getInt("user_id") + 
+                                 ", Access Level: " + rs.getInt("access_level"));
+            }
+            System.out.println("=========================\n");
+        }
     }
 }
