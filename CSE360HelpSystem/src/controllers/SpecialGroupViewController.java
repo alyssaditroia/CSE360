@@ -55,9 +55,16 @@ public class SpecialGroupViewController extends PageController {
                 helpArticleDB = new HelpArticleDatabase();
             }
             
-            // Get the selected group's articles
+            // Get the selected group
             SpecialGroup currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
             if (currentGroup != null) {
+                // Clear and refresh group's articles from database
+                List<String> freshArticles = specialGroupsDB.getGroupArticles(currentGroup.getGroupId());
+                currentGroup.getGroupArticles().clear();  // Clear existing articles
+                for (String articleId : freshArticles) {  // Add fresh articles
+                    currentGroup.addArticle(articleId);
+                }
+                
                 // Set group name in title
                 if (groupNameLabel != null) {
                     groupNameLabel.setText(currentGroup.getName());
@@ -80,12 +87,14 @@ public class SpecialGroupViewController extends PageController {
                 setupAccessControls();
                 loadGroupFilters();
             }
+            
         } catch (Exception e) {
             e.printStackTrace();
             showErrorAlert("Initialization Error", "Failed to initialize special group view");
             goHome();
         }
     }
+    
     private void setupTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -112,7 +121,10 @@ public class SpecialGroupViewController extends PageController {
             String searchQuery = searchField.getText().toLowerCase();
             List<String> selectedGroups = new ArrayList<>(groupFilterListView.getItems());
             
+            SpecialGroup currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
+            
             List<Article> articles = helpArticleDB.getAllDecryptedArticles().stream()
+                .filter(article -> currentGroup.getGroupArticles().contains(String.valueOf(article.getId())))  // Add this line
                 .filter(article -> matchesSearch(article, searchQuery))
                 .filter(article -> matchesGroupFilters(article, selectedGroups))
                 .collect(Collectors.toList());
@@ -160,5 +172,8 @@ public class SpecialGroupViewController extends PageController {
         }
     }
     
-    
+    @FXML
+    public void goToCreateArticle() {
+        navigateTo("/views/SpecialGroupAddEditArticleView.fxml");
+    }
 }

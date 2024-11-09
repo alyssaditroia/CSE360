@@ -165,6 +165,9 @@ public class AdminHomePageController extends PageController {
 	 */
 	@FXML
 	private Button viewArticlesButton;
+	
+	@FXML
+	private TableColumn<User, Integer> idColumn;
 
 	/**
 	 * Handles invite button click ensures email field contains proper input and the
@@ -240,6 +243,8 @@ public class AdminHomePageController extends PageController {
 	 * Initialize table columns and their associated action buttons
 	 */
 	private void initializeTable() {
+		idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+		
 		usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
 		preferrednameColumn.setCellValueFactory(new PropertyValueFactory<>("preferredName"));
 		emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -365,6 +370,7 @@ public class AdminHomePageController extends PageController {
 			for (Map<String, Object> row : rawUsers) {
 				User user = new User();
 				// Use the keys to retrieve values from the map
+				user.setId((Integer) row.get("id"));
 				user.setUsername((String) row.get("username"));
 				user.setPreferredName((String) row.get("preferredName"));
 				user.setEmail((String) row.get("email"));

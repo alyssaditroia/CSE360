@@ -43,6 +43,7 @@
             <!-- TableView for displaying invited users -->
             <TableView fx:id="userTable" prefHeight="300">
 			    <columns>
+			    	<TableColumn fx:id="idColumn" text="User ID" prefWidth="75.0"/>
 			        <TableColumn fx:id="usernameColumn" text="Username" />
 			        <TableColumn fx:id="preferrednameColumn" text="Preferred Name" />
 			        <TableColumn fx:id="emailColumn" text="Email" />

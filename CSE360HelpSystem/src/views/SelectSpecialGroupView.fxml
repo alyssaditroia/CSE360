@@ -4,8 +4,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml" 
-      fx:controller="controllers.SelectSpecialGroupController">
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SelectSpecialGroupController" spacing="20" alignment="CENTER"
+      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>

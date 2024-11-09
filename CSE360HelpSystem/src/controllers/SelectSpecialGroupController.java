@@ -68,17 +68,28 @@ public class SelectSpecialGroupController extends PageController {
      */
     private void loadUserGroups() {
         try {
-            // Get current user's groups from database
+            System.out.println("\n=== Loading Special Groups ===");
             String userId = String.valueOf(UserSession.getInstance().getCurrentUser().getId());
-            List<String[]> userGroups = specialGroupsDB.getUserGroups(userId);
+            System.out.println("Current User ID: " + userId);
             
-            // Store mapping of names to IDs and populate dropdown
+            List<String[]> userGroups = specialGroupsDB.getUserGroups(userId);
+            System.out.println("Number of groups found: " + userGroups.size());
+            
+            // Clear existing mappings
+            groupNameToId.clear();
+            
+            // Print each group found
+            System.out.println("\nGroups accessible to user:");
             for (String[] group : userGroups) {
+                System.out.println("Group ID: " + group[0] + ", Name: " + group[1] + ", Access Level: " + group[2]);
                 groupNameToId.put(group[1], Integer.parseInt(group[0]));
             }
             
             groupDropdown.setItems(FXCollections.observableArrayList(groupNameToId.keySet()));
+            System.out.println("================================\n");
         } catch (Exception e) {
+            System.out.println("Error in loadUserGroups: " + e.getMessage());
+            e.printStackTrace();
             showError("Error loading groups");
             goHome();
         }

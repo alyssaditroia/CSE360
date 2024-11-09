@@ -4,8 +4,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SpecialGroupViewController" 
-      spacing="10" alignment="TOP_CENTER">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SpecialGroupViewController" spacing="20" alignment="CENTER"
+      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
 
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
@@ -45,6 +45,7 @@
 
     <!-- Action Buttons Section -->
     <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="createButton" text="Create New Article" onAction="#goToCreateArticle"/>
         <Button text="Return To Homepage" onAction="#goHome"/>
     </HBox>
 

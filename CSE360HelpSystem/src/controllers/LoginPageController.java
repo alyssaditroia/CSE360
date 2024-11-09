@@ -129,6 +129,7 @@ public class LoginPageController extends PageController {
 						// NEED TO IMPLEMENT THE CASE WHERE THE VALIDATION MESSAGE IS FALSE
 					}
 				}
+				
 				// ****** BELOW CHECKS IF THE USER IS FULLY SET UP OR NOT *******
 				// If the user in the database associated with the username entered does not
 				// have a first name
@@ -151,8 +152,17 @@ public class LoginPageController extends PageController {
 				User loggedInUser = new User();
 				loggedInUser.setUsername(username);
 				loggedInUser.setInviteToken("");
+				
+				int userId = db.getUserId(username);
+				loggedInUser.setId(userId);
+				System.out.println("\n=== User Login ID Check ===");
+				System.out.println("Username: " + username);
+				System.out.println("Retrieved User ID: " + userId);
+				System.out.println("=========================\n");
+				
 				UserSession.getInstance().setCurrentUser(loggedInUser);
 				System.out.println("User logged in: " + UserSession.getInstance().getUsername());
+				
 
 				// CHANGED: Justin Faris 10-3-24
 				// Check number of roles and redirect accordingly

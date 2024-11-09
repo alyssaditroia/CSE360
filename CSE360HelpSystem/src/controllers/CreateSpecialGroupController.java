@@ -41,12 +41,21 @@ public class CreateSpecialGroupController extends PageController {
             showErrorAlert("Invalid Input", "Group name cannot be empty");
             return;
         }
-
+        
         try {
+            // Print before creation
+            System.out.println("\n=== Creating New Special Group ===");
+            System.out.println("Group Name: " + groupName);
+            System.out.println("Current User ID: " + UserSession.getInstance().getCurrentUser().getId());
+            
             int groupId = specialGroupsDB.createSpecialGroup(groupName);
+            System.out.println("Created Group ID: " + groupId);
+            
             String userId = String.valueOf(UserSession.getInstance().getCurrentUser().getId());
             specialGroupsDB.addUserToGroup(groupId, userId, 3);
-
+            System.out.println("Added user " + userId + " to group with access level 3");
+            System.out.println("=====================================\n");
+            
             goHome();
         } catch (SQLException e) {
             if (e.getMessage().contains("CONSTRAINT_INDEX")) {

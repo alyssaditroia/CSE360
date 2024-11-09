@@ -484,6 +484,9 @@ public class HelpArticleDatabase extends Database{
 	 * @throws Exception if decryption or database operation fails
 	 */
 	public Article decryptArticleFromResultSet(ResultSet rs) throws Exception {
+	    // Get the ID first
+	    int id = rs.getInt("id");
+
 	    // Retrieve the IV (Initialization Vector)
 	    String ivBase64 = rs.getString("iv");
 	    byte[] iv = Base64.getDecoder().decode(ivBase64);
@@ -504,19 +507,16 @@ public class HelpArticleDatabase extends Database{
 	    char[] body = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedBody, iv));
 	    char[] references = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedReferences, iv));
 
-	    // Get non-encrypted fields (e.g., level, grouping identifiers, permissions)
+	    // Get non-encrypted fields
 	    String level = rs.getString("level");
 	    String groupingIdentifiers = rs.getString("grouping_identifiers");
 	    String permissions = rs.getString("permissions");
 	    java.sql.Date dateAdded = rs.getDate("date_added");
 	    String version = rs.getString("version");
 	    
-	    // DEBUG CHECK
-	    System.out.println("Retrieved grouping identifiers for article: " + groupingIdentifiers);
-	    
-	    // Create and return the Article object
+	    // Use the constructor that includes ID
 	    return new Article(
-	        title, authors, abstractText, keywords, body, references, level,
+	        id, title, authors, abstractText, keywords, body, references, level,
 	        List.of(groupingIdentifiers.split(",")), permissions, dateAdded, version
 	    );
 	}
@@ -836,6 +836,33 @@ public class HelpArticleDatabase extends Database{
                 }
             }
         }
+    }
+    
+    
+    /**
+     * Gets all articles that are not part of any special group
+     * 
+     * @return List<Article> list of general articles not tied to any special group
+     * @throws Exception if database access or decryption fails
+     */
+    public List<Article> getAllGeneralArticles() throws Exception {
+        List<Article> articles = new ArrayList<>();
+        // Query to get only articles that aren't in special groups
+        String sql = "SELECT id, iv, title, authors, abstract, keywords, body, references, level, " +
+                     "grouping_identifiers, permissions, date_added, version FROM articles " +
+                     "WHERE id NOT IN (SELECT article_id FROM special_group_articles)";
+        
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                // Use existing decryption logic
+                Article article = decryptArticleFromResultSet(rs);
+                articles.add(article);
+            }
+        }
+        System.out.println("[INFO in HelpArticleDB] All general articles retrieved from database");
+        return articles;
     }
 }
 	

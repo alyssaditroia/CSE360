@@ -45,10 +45,14 @@ public class SpecialGroupsDatabase extends Database {
     public List<String[]> getUserGroups(String userId) throws SQLException {
         List<String[]> accessibleGroups = new ArrayList<>();
         
-        String sql = "SELECT sg.group_id, sg.group_name, sgm.access_level "
-                  + "FROM special_groups sg "
-                  + "JOIN special_group_members sgm ON sg.group_id = sgm.group_id "
-                  + "WHERE sgm.user_id = ?";
+        String sql = "SELECT sg.group_id, sg.group_name, sgm.access_level " +
+                    "FROM special_groups sg " +
+                    "JOIN special_group_members sgm ON sg.group_id = sgm.group_id " +
+                    "WHERE sgm.user_id = ?";
+        
+        System.out.println("\n=== Executing getUserGroups Query ===");
+        System.out.println("SQL Query: " + sql);
+        System.out.println("Searching for User ID: " + userId);
                   
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, userId);
@@ -60,9 +64,15 @@ public class SpecialGroupsDatabase extends Database {
                     groupInfo[1] = rs.getString("group_name");
                     groupInfo[2] = rs.getString("access_level");
                     accessibleGroups.add(groupInfo);
+                    
+                    System.out.println("Found group: ID=" + groupInfo[0] + 
+                                     ", Name=" + groupInfo[1] + 
+                                     ", Access=" + groupInfo[2]);
                 }
             }
         }
+        System.out.println("Total groups found: " + accessibleGroups.size());
+        System.out.println("=================================\n");
         return accessibleGroups;
     }
 

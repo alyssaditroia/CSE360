@@ -50,6 +50,7 @@
             <!-- TableView for displaying articles -->
             <TableView fx:id="articleTable" prefHeight="500" VBox.vgrow="ALWAYS">
                 <columns>
+                	<TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
                     <TableColumn fx:id="titleColumn" text="Title" prefWidth="200"/>
                     <TableColumn fx:id="levelColumn" text="Level" prefWidth="100"/>
                     <TableColumn fx:id="groupsColumn" text="Groups" prefWidth="200"/>

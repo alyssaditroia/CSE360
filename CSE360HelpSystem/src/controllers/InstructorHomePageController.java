@@ -75,6 +75,9 @@ public class InstructorHomePageController extends PageController {
     
     @FXML
     private ListView<String> groupFilterListView;
+    
+    @FXML
+    private TableColumn<Article, Integer> idColumn;
 
     /**
      * Default constructor required for FXML loader
@@ -124,6 +127,7 @@ public class InstructorHomePageController extends PageController {
      */
     private void initializeTable() {
         // Set up the basic columns
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         levelColumn.setCellValueFactory(new PropertyValueFactory<>("level"));
         
@@ -196,7 +200,7 @@ public class InstructorHomePageController extends PageController {
      */
     private void loadArticles() {
         try {
-            List<Article> articles = db.getAllDecryptedArticles();
+            List<Article> articles = db.getAllGeneralArticles();
             articleTable.getItems().setAll(articles);
         } catch (Exception e) {
             showErrorAlert("Error", "Failed to load articles: " + e.getMessage());

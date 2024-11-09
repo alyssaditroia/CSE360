@@ -1,5 +1,7 @@
 package models;
 
+import java.util.ArrayList;
+
 /***********
  * The {@code UserSession} class handles the current sessions User, Roles, and Selected Article
  * 
@@ -46,13 +48,25 @@ public class UserSession {
 	// 3 is create, delete, edit, and view - 'instructor'
 	private int specialGroupAccessLevel = 0;
 	
+	/**
+	 * The currently selected special group that the user wants to view
+	 */
 	private SpecialGroup selectedSpecialGroup;
+	
+	/**
+	 * Flag variable controls if the user is adding an article to a special group
+	 */
+	private boolean createAsSpecialGroupArticle = false;
+	
+	/**
+	 * ArrayList for holding the users's searches they have made looking for help information, used to pass their searches into messages to the help system
+	 */
+	private ArrayList<String> systemSearches;
 
 	 /**
      * Private constructor to enforce singleton pattern.
      */
-	private UserSession() {
-	}
+	private UserSession() {}
 
 	 /**
      * Gets the singleton instance of UserSession.
@@ -231,6 +245,26 @@ public class UserSession {
 	public SpecialGroup getSelectedSpecialGroup() {
 		System.out.println("[INFO in UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
 		return this.selectedSpecialGroup;
+	}
+	
+	
+	public void setSpecialGroupArticleFlag(boolean flag) {
+	    this.createAsSpecialGroupArticle = flag;
+	}
+	
+	
+	public boolean isSpecialGroupArticle() {
+	    return this.createAsSpecialGroupArticle;
+	}
+	
+	
+	public void addUserSearch(String searchRequest) {
+		this.systemSearches.add(searchRequest);
+	}
+	
+	
+	public ArrayList<String> getUserSearches() {
+		return this.systemSearches;
 	}
 }
 
