@@ -195,15 +195,7 @@ public class SpecialGroupManagementController extends PageController {
 
     private void updateUserAccess(User user, int newAccessLevel) {
         try {
-            String sql = "UPDATE special_group_members SET access_level = ? " +
-                        "WHERE group_id = ? AND user_id = ?";
-            
-            try (PreparedStatement pstmt = specialGroupsDb.getConnection().prepareStatement(sql)) {
-                pstmt.setInt(1, newAccessLevel);
-                pstmt.setInt(2, groupId);
-                pstmt.setString(3, String.valueOf(user.getId()));
-                pstmt.executeUpdate();
-            }
+            specialGroupsDb.updateUserAccess(groupId, user.getId(), newAccessLevel);
             loadUsers(); // Refresh all tables
         } catch (Exception e) {
             e.printStackTrace();
