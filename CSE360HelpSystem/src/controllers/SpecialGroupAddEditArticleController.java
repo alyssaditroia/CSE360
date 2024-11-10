@@ -201,12 +201,6 @@ public class SpecialGroupAddEditArticleController extends PageController {
                 
                 had.updateArticle(articleToEdit);
                 
-                // Make sure the article is still associated with the special group
-                specialGroupsDB.addArticleToGroup(
-                    currentGroup.getGroupId(),
-                    String.valueOf(articleToEdit.getId())
-                );
-                
                 showInfoAlert("Success", "Article updated successfully!");
             }
             

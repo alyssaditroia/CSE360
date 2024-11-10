@@ -878,5 +878,119 @@ public class HelpArticleDatabase extends Database{
         System.out.println("[INFO in HelpArticleDB] All general articles retrieved from database");
         return articles;
     }
+    
+    
+    public void backupSpecialGroupArticles(String filename, int groupId) throws SQLException, IOException {
+        // Debug print
+        System.out.println("Backing up articles for group ID: " + groupId);
+        
+        String sql = "SELECT a.* FROM articles a " +
+                     "INNER JOIN special_group_articles sga ON a.id = sga.article_id " +
+                     "WHERE sga.group_id = ?";
+                     
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, groupId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            // Debug print
+            System.out.println("Found articles in group: " + rs.getFetchSize());
+            
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    // Debug print
+                    System.out.println("Writing article ID: " + id);
+                    
+                    String ivBase64 = rs.getString("iv");
+                    String title = rs.getString("title");
+                    String authors = rs.getString("authors");
+                    String abstractText = rs.getString("abstract");
+                    String keywords = rs.getString("keywords");
+                    String body = rs.getString("body");
+                    String references = rs.getString("references");
+                    String level = rs.getString("level");
+                    String groupingIdentifiers = rs.getString("grouping_identifiers");
+                    String permissions = rs.getString("permissions");
+                    String dateAdded = rs.getString("date_added");
+                    String version = rs.getString("version");
+
+                    // Write each field to the backup file
+                    writer.write(id + "\n");
+                    writer.write(ivBase64 + "\n");
+                    writer.write(title + "\n");
+                    writer.write(authors + "\n");
+                    writer.write(abstractText + "\n");
+                    writer.write(keywords + "\n");
+                    writer.write(body + "\n");
+                    writer.write(references + "\n");
+                    writer.write(level + "\n");
+                    writer.write(groupingIdentifiers + "\n");
+                    writer.write(permissions + "\n");
+                    writer.write(dateAdded + "\n");
+                    writer.write(version + "\n");
+                    writer.write("END_OF_ARTICLE\n");
+                }
+            }
+        }
+    }
+    
+    
+    public void restoreSpecialGroupArticles(String filename, int groupId) throws SQLException, IOException {
+        // First clear existing articles for this group
+        String deleteSql = "DELETE FROM special_group_articles WHERE group_id = ?";
+        try (PreparedStatement deleteStmt = connection.prepareStatement(deleteSql)) {
+            deleteStmt.setInt(1, groupId);
+            deleteStmt.executeUpdate();
+        }
+
+        // Now restore from backup and associate with group
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                int id = Integer.parseInt(line);
+                String iv = reader.readLine();
+                String title = reader.readLine();
+                String authors = reader.readLine();
+                String abstractText = reader.readLine();
+                String keywords = reader.readLine();
+                String body = reader.readLine();
+                String references = reader.readLine();
+                String level = reader.readLine();
+                String groupingIdentifiers = reader.readLine();
+                String permissions = reader.readLine();
+                Date dateAdded = Date.valueOf(reader.readLine());
+                String version = reader.readLine();
+                reader.readLine(); // Skip "END_OF_ARTICLE"
+
+                // Insert/Update the article
+                String insertSql = "MERGE INTO articles (id, iv, title, authors, abstract, keywords, body, references, level, grouping_identifiers, permissions, date_added, version) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement pstmt = connection.prepareStatement(insertSql)) {
+                    pstmt.setInt(1, id);
+                    pstmt.setString(2, iv);
+                    pstmt.setString(3, title);
+                    pstmt.setString(4, authors);
+                    pstmt.setString(5, abstractText);
+                    pstmt.setString(6, keywords);
+                    pstmt.setString(7, body);
+                    pstmt.setString(8, references);
+                    pstmt.setString(9, level);
+                    pstmt.setString(10, groupingIdentifiers);
+                    pstmt.setString(11, permissions);
+                    pstmt.setDate(12, dateAdded);
+                    pstmt.setString(13, version);
+                    pstmt.executeUpdate();
+                    
+                    // Associate with special group
+                    String groupSql = "INSERT INTO special_group_articles (group_id, article_id) VALUES (?, ?)";
+                    try (PreparedStatement groupStmt = connection.prepareStatement(groupSql)) {
+                        groupStmt.setInt(1, groupId);
+                        groupStmt.setInt(2, id);
+                        groupStmt.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
 }
 	

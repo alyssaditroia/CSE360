@@ -246,7 +246,7 @@ public class SpecialGroupViewController extends PageController {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
         confirm.setHeaderText("Delete Article");
-        confirm.setContentText("Are you sure you want to delete this article from the special group?");
+        confirm.setContentText("Are you sure you want to delete this article completely? This cannot be undone.");
 
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
@@ -261,10 +261,13 @@ public class SpecialGroupViewController extends PageController {
                     // Remove from current group's article list
                     currentGroup.removeArticle(String.valueOf(article.getId()));
                     
+                    // Delete the article completely - Add this line
+                    helpArticleDB.deleteArticle(article.getId());
+                    
                     // Refresh the table
                     loadArticles();
                     
-                    showInfoAlert("Success", "Article removed from special group successfully");
+                    showInfoAlert("Success", "Article deleted successfully");
                 } catch (SQLException e) {
                     showErrorAlert("Error", "Failed to delete article: " + e.getMessage());
                 }

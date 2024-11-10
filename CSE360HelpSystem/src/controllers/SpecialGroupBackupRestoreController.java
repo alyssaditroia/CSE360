@@ -10,6 +10,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import models.Article;
+import models.SpecialGroup;
+import models.UserSession;
 
 public class SpecialGroupBackupRestoreController extends PageController {
     @FXML private TextField backupLocationField;
@@ -77,11 +80,14 @@ public class SpecialGroupBackupRestoreController extends PageController {
         }
 
         try {
-            // Get list of article IDs for this special group
-            List<String> groupArticleIds = sgd.getGroupArticles(currentGroupId);
+            // Get current group from UserSession
+            SpecialGroup currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
+            if (currentGroup == null) {
+                showErrorAlert("Error", "No special group selected.");
+                return;
+            }
             
-            // Backup only the articles in this group
-            had.backupGroupArticles(backupFile.getAbsolutePath(), groupArticleIds);
+            had.backupSpecialGroupArticles(backupFile.getAbsolutePath(), currentGroup.getGroupId());
             
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Success");
@@ -100,15 +106,16 @@ public class SpecialGroupBackupRestoreController extends PageController {
         }
 
         try {
-            // First, remove all existing articles from the group
-            List<String> currentArticles = sgd.getGroupArticles(currentGroupId);
-            for (String articleId : currentArticles) {
-                sgd.removeArticleFromGroup(currentGroupId, articleId);
+            // Get current group from UserSession
+            SpecialGroup currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
+            if (currentGroup == null) {
+                showErrorAlert("Error", "No special group selected.");
+                return;
             }
             
-            // Restore articles from backup
-            had.restoreArticlesWithMerge(restoreFile.getAbsolutePath(), true);
-            
+            // Use the special group restore method
+            had.restoreSpecialGroupArticles(restoreFile.getAbsolutePath(), currentGroup.getGroupId());
+                
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Success");
             alert.setContentText("Special group articles restored successfully!");
