@@ -219,6 +219,7 @@ public class SpecialGroupAddEditArticleController extends PageController {
 
     @FXML
     public void goBackToList() {
+    	UserSession.getInstance().setSelectedArticle(null);
         navigateTo("/views/SpecialGroupView.fxml");
     }
 

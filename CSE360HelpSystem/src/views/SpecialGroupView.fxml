@@ -47,6 +47,7 @@
     <HBox spacing="10" alignment="CENTER">
     	<Button fx:id="manageUsersButton" text="Manage Users" onAction="#goToUserManagement"/>
         <Button fx:id="createButton" text="Create New Article" onAction="#goToCreateArticle"/>
+        <Button text="Backup/Restore" onAction="#goToBackupRestore"/>
         <Button text="Return To Homepage" onAction="#goHome"/>
     </HBox>
 

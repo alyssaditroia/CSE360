@@ -309,6 +309,8 @@ public class CreateEditArticleController extends PageController {
      */
     @FXML
     public void goBackToList() {
+    	UserSession.getInstance().setSelectedArticle(null);
+    	
         String currentRole = UserSession.getInstance().getCurrentRole();
         if ("admin".equals(currentRole)) {
             navigateTo("/views/SearchArticleView.fxml");

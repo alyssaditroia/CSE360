@@ -4,9 +4,11 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.collections.ObservableList;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -97,10 +99,51 @@ public class SpecialGroupViewController extends PageController {
     }
     
     private void setupTableColumns() {
+        // Existing column setup
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         abstractColumn.setCellValueFactory(new PropertyValueFactory<>("abstractText"));
         authorsColumn.setCellValueFactory(new PropertyValueFactory<>("authors"));
+        
+        // Add action buttons column
+        TableColumn<Article, Void> actionsColumn = new TableColumn<>("Actions");
+        actionsColumn.setCellFactory(column -> new TableCell<>() {
+            private final Button viewBtn = new Button("View");
+            private final Button editBtn = new Button("Edit");
+            private final Button deleteBtn = new Button("Delete");
+
+            {
+                // Set up button actions
+                viewBtn.setOnAction(event -> {
+                    Article article = getTableView().getItems().get(getIndex());
+                    viewArticle(article);
+                });
+
+                editBtn.setOnAction(event -> {
+                    Article article = getTableView().getItems().get(getIndex());
+                    editArticle(article);
+                });
+
+                deleteBtn.setOnAction(event -> {
+                    Article article = getTableView().getItems().get(getIndex());
+                    deleteArticle(article);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    HBox buttons = new HBox(5);
+                    buttons.getChildren().addAll(viewBtn, editBtn, deleteBtn);
+                    setGraphic(buttons);
+                }
+            }
+        });
+        
+        articleTable.getColumns().add(actionsColumn);
     }
 
     private void setupAccessControls() {
@@ -181,5 +224,58 @@ public class SpecialGroupViewController extends PageController {
     @FXML
     private void goToUserManagement() {
         navigateTo("/views/SpecialGroupManagementView.fxml");
+    }
+    
+    @FXML
+    private void goToBackupRestore() {
+        navigateTo("/views/SpecialGroupBackupRestoreView.fxml");
+    }
+    
+    
+    private void viewArticle(Article article) {
+        UserSession.getInstance().setSelectedArticle(article);
+        navigateTo("/views/ViewArticle.fxml");  // Use your view article page
+    }
+
+    private void editArticle(Article article) {
+        UserSession.getInstance().setSelectedArticle(article);
+        navigateTo("/views/SpecialGroupAddEditArticleView.fxml");
+    }
+
+    private void deleteArticle(Article article) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText("Delete Article");
+        confirm.setContentText("Are you sure you want to delete this article from the special group?");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // Get current group
+                    SpecialGroup currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
+                    
+                    // Remove article from special group
+                    specialGroupsDB.removeArticleFromGroup(currentGroup.getGroupId(), 
+                                                         String.valueOf(article.getId()));
+                    
+                    // Remove from current group's article list
+                    currentGroup.removeArticle(String.valueOf(article.getId()));
+                    
+                    // Refresh the table
+                    loadArticles();
+                    
+                    showInfoAlert("Success", "Article removed from special group successfully");
+                } catch (SQLException e) {
+                    showErrorAlert("Error", "Failed to delete article: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void showInfoAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

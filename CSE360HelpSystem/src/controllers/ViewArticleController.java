@@ -100,12 +100,15 @@ public class ViewArticleController extends PageController {
      */
     @FXML
     public void goBackToList() {
+        // Clear the selected article when leaving the view page
+        UserSession.getInstance().setSelectedArticle(null);
+        
         String currentRole = UserSession.getInstance().getCurrentRole();
         if ("admin".equals(currentRole)) {
             // Admins go to the article management view
             navigateTo("/views/SearchArticleView.fxml");
         } else {
-        	// Instructors and students go back to their homepage
+            // Instructors and students go back to their homepage
             goHome();
         }
     }
