@@ -23,8 +23,8 @@
 
             <!-- Action Buttons -->
             <HBox alignment="CENTER" spacing="10">
-                <Button fx:id="createArticleButton" text="Create New Article" onAction="#createNewArticle" 
-                        style="-fx-font-size: 14;"/>
+            	<Button text="Message Center" onAction="#goToMessagingSystem" style="-fx-font-size: 14;"/>
+                <Button fx:id="createArticleButton" text="Create New Article" onAction="#createNewArticle" style="-fx-font-size: 14;"/>
              	<Button fx:id="backupRestoreButton" text="Backup and Restore" onAction="#goToBackupRestore" style="-fx-font-size: 14;"/>
              	<Button text="Special Groups" onAction="#goToSpecialGroups" style="-fx-font-size: 14;"/>	
              	<Button text="Create Group" onAction="#goToCreateSpecialGroup" style="-fx-font-size: 14;"/>

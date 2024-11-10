@@ -160,7 +160,7 @@ public class PageController {
      */
     @FXML
     public void goToStudentHomepage() {
-        navigateTo("/views/InstructorHomePageView.fxml");
+        navigateTo("/views/StudentHomePageView.fxml");
     }
     
     /**
@@ -170,23 +170,27 @@ public class PageController {
     @FXML
     public void goHome() {
         String currentRole = UserSession.getInstance().getCurrentRole();
-        
+        System.out.println("Current role in goHome(): " + currentRole);
+
         if (currentRole == null) {
             System.out.println("Error: User session not set or current role is null.");
             showErrorAlert("Session Error", "The user session is not set. Please log in again.");
             navigateTo("/views/LoginPageView.fxml"); // Navigate to login page
             return; // Stop further execution
         }
-        
+
         // Check the role and navigate accordingly
-        if ("admin".equals(currentRole)) { 
+        if ("admin".equals(currentRole)) {
+            System.out.println("Navigating to Admin Homepage");
             goToAdminHomepage();
         } else if ("instructor".equals(currentRole)) {
+            System.out.println("Navigating to Instructor Homepage");
             goToInstructorHomepage();
         } else {
+            System.out.println("Navigating to Student Homepage");
             goToStudentHomepage();
         }
-    }
+	}
     
 
     /**

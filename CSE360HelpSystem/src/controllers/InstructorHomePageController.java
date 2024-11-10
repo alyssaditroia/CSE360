@@ -78,6 +78,9 @@ public class InstructorHomePageController extends PageController {
     
     @FXML
     private TableColumn<Article, Integer> idColumn;
+    
+    @FXML
+    private Button backupRestoreButton;
 
     /**
      * Default constructor required for FXML loader
@@ -331,5 +334,10 @@ public class InstructorHomePageController extends PageController {
     @FXML
     public void goToCreateSpecialGroup() {
         navigateTo("/views/CreateSpecialGroupView.fxml");
+    }
+    
+    @FXML
+    public void goToMessagingSystem() {
+        navigateTo("/views/MessagingSystemView.fxml");
     }
 }

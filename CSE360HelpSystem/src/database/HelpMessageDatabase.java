@@ -3,14 +3,11 @@ package database;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 import models.Conversation;
 import models.HelpMessage;
 
-/**
- * The {@code HelpMessageDatabase} handles interactions with the database for help messages and conversations
- */
 public class HelpMessageDatabase extends Database {
+
     /**
      * Database instance for interacting with core database functionality
      */
@@ -29,8 +26,9 @@ public class HelpMessageDatabase extends Database {
      */
     public HelpMessageDatabase() throws Exception {
         System.out.println("[INFO] Help Message Database Initializing");
-        db = Database.getInstance();
-        connection = db.getConnection();
+        // Initialize the Database instance and connection
+        db = Database.getInstance(); 
+        connection = db.getConnection(); // Get the shared connection
         if (connection != null) {
             System.out.println("[INFO] Connection established successfully in HelpMessageDatabase.");
         } else {
@@ -44,7 +42,7 @@ public class HelpMessageDatabase extends Database {
      * 
      * @throws SQLException if table creation fails
      */
-    public void createHelpTables() throws SQLException {
+    private void createHelpTables() throws SQLException {
         // Create help_messages table with all fields from HelpMessage class
         String messageTable = "CREATE TABLE IF NOT EXISTS help_messages ("
             + "message_id INT AUTO_INCREMENT PRIMARY KEY, "
@@ -58,6 +56,7 @@ public class HelpMessageDatabase extends Database {
         String conversationMessagesTable = "CREATE TABLE IF NOT EXISTS conversation_messages ("
             + "conversation_id INT NOT NULL, "
             + "message_id INT NOT NULL, "
+            + "creator_id INT, "
             + "PRIMARY KEY (conversation_id, message_id), "
             + "FOREIGN KEY (message_id) REFERENCES help_messages(message_id))";
 
@@ -268,5 +267,19 @@ public class HelpMessageDatabase extends Database {
                 stmt.executeUpdate(deleteMessages);
             }
         }
+    }
+    
+    @Override
+    public Connection getConnection() throws SQLException {
+        try {
+            if (connection == null || connection.isClosed()) {
+                // Get a new connection from the parent database
+                connection = db.getConnection();
+            }
+        } catch (SQLException e) {
+            System.out.println("[ERROR] Error checking database connection: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return connection;
     }
 }

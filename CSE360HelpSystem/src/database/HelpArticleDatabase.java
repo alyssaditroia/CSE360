@@ -847,10 +847,24 @@ public class HelpArticleDatabase extends Database{
      */
     public List<Article> getAllGeneralArticles() throws Exception {
         List<Article> articles = new ArrayList<>();
-        // Query to get only articles that aren't in special groups
-        String sql = "SELECT id, iv, title, authors, abstract, keywords, body, references, level, " +
-                     "grouping_identifiers, permissions, date_added, version FROM articles " +
-                     "WHERE id NOT IN (SELECT article_id FROM special_group_articles)";
+        
+        // First check if special_group_articles table exists
+        boolean specialTableExists = false;
+        try (ResultSet rs = connection.getMetaData().getTables(null, null, "SPECIAL_GROUP_ARTICLES", null)) {
+            specialTableExists = rs.next();
+        }
+        
+        // Build appropriate SQL query based on table existence
+        String sql;
+        if (specialTableExists) {
+            sql = "SELECT id, iv, title, authors, abstract, keywords, body, references, level, " +
+                  "grouping_identifiers, permissions, date_added, version FROM articles " +
+                  "WHERE id NOT IN (SELECT article_id FROM special_group_articles)";
+        } else {
+            // If table doesn't exist, just get all articles
+            sql = "SELECT id, iv, title, authors, abstract, keywords, body, references, level, " +
+                  "grouping_identifiers, permissions, date_added, version FROM articles";
+        }
         
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {

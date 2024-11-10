@@ -53,5 +53,10 @@ public class StudentHomePageController extends PageController {
 		System.out.println("Student logged out.");
 		navigateTo("/views/LoginPageView.fxml");
 	}
+	
+	@FXML
+	public void goToMessagingSystem() {
+		navigateTo("/views/MessagingSystemView.fxml"); 
+	}
 
 }
