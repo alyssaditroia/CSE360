@@ -291,63 +291,55 @@ public class MessagingSystemController extends PageController {
     
     private VBox createMessageBubble(HelpMessage message) {
         VBox bubble = new VBox(5);
-        
-        // Add ALL style classes explicitly
         bubble.getStyleClass().addAll("message-bubble");
         
         boolean isOwnMessage = message.getUserId() == userSession.getCurrentUser().getId();
-        System.out.println("Creating bubble for message from user: " + message.getUserId());
-        System.out.println("Current user: " + userSession.getCurrentUser().getId());
-        System.out.println("Is own message: " + isOwnMessage);
         
-        // Set alignment and add style class based on ownership
+        // Set alignment based on message ownership
         if (isOwnMessage) {
             bubble.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
             bubble.getStyleClass().add("own-message");
-            System.out.println("Added own-message style class");
         } else {
             bubble.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-            
-            // Determine sender role and add appropriate style
-            try {
-                if (db != null) {
+            if (db != null) {
+                try {
                     String userId = String.valueOf(message.getUserId());
                     if (db.isUserInstructor(userId)) {
                         bubble.getStyleClass().add("instructor-message");
-                        System.out.println("Added instructor-message style class");
                     } else if (db.isUserStudent(userId)) {
                         bubble.getStyleClass().add("student-message");
-                        System.out.println("Added student-message style class");
                     }
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
         }
         
-        // Add sender label
-        String senderRole;
+        // Create username label
         try {
-            if (db != null) {
-                String userId = String.valueOf(message.getUserId());
-                if (db.isUserInstructor(userId)) {
-                    senderRole = "Instructor";
-                } else if (db.isUserStudent(userId)) {
-                    senderRole = "Student";
-                } else {
-                    senderRole = "Unknown Role";
+            // Query the database to get the username for this message's user ID
+            String query = "SELECT username FROM cse360users WHERE id = ?";
+            String username = "Unknown User";
+            
+            try (PreparedStatement pstmt = db.getConnection().prepareStatement(query)) {
+                pstmt.setInt(1, message.getUserId());
+                ResultSet rs = pstmt.executeQuery();
+                
+                if (rs.next()) {
+                    username = rs.getString("username");
                 }
-            } else {
-                senderRole = "Unknown Role";
             }
+            
+            Label senderLabel = new Label(username);
+            senderLabel.getStyleClass().add("sender-label");
+            bubble.getChildren().add(senderLabel);
+            
         } catch (SQLException e) {
-            senderRole = "Error Getting Role";
             e.printStackTrace();
+            Label errorLabel = new Label("Error retrieving user info");
+            errorLabel.getStyleClass().add("sender-label");
+            bubble.getChildren().add(errorLabel);
         }
-        
-        Label senderLabel = new Label(senderRole);
-        senderLabel.getStyleClass().add("sender-label");
-        bubble.getChildren().add(senderLabel);
         
         // Add message content
         Label contentLabel = new Label(message.getMessageBody());
@@ -368,9 +360,6 @@ public class MessagingSystemController extends PageController {
                 bubble.getChildren().add(searchLabel);
             }
         }
-
-        // Print all style classes for debugging
-        System.out.println("Final style classes for bubble: " + bubble.getStyleClass());
         
         return bubble;
     }
