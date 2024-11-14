@@ -9,6 +9,7 @@ import models.User;
 import models.UserSession;
 
 import java.sql.PreparedStatement;
+import java.util.List;
 
 import database.Database;
 import database.SpecialGroupsDatabase;
@@ -186,8 +187,17 @@ public class SpecialGroupManagementController extends PageController {
 
     private void removeUserFromGroup(User user) {
         try {
+            // Check if this is the last admin
+            if (isLastAdmin(user)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Cannot Remove User");
+                alert.setContentText("Cannot remove the last user with full permissions. At least one user must have full permissions at all times.");
+                alert.showAndWait();
+                return;
+            }
+            
             specialGroupsDb.removeUserFromGroup(groupId, String.valueOf(user.getId()));
-            loadUsers(); // Refresh all tables
+            loadUsers();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -195,8 +205,17 @@ public class SpecialGroupManagementController extends PageController {
 
     private void updateUserAccess(User user, int newAccessLevel) {
         try {
+            // If user is being downgraded from admin (level 3)
+            if (newAccessLevel != 3 && isLastAdmin(user)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Cannot Update Permissions");
+                alert.setContentText("Cannot remove full permissions from the last user with full permissions. At least one user must have full permissions at all times.");
+                alert.showAndWait();
+                return;
+            }
+            
             specialGroupsDb.updateUserAccess(groupId, user.getId(), newAccessLevel);
-            loadUsers(); // Refresh all tables
+            loadUsers();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -211,5 +230,18 @@ public class SpecialGroupManagementController extends PageController {
     @FXML
     public void goBack() {
     	navigateTo("/views/SpecialGroupView.fxml");
+    }
+    
+    
+    private boolean isLastAdmin(User user) {
+        try {
+            // Get all users with admin access (level 3)
+            List<User> adminUsers = specialGroupsDb.getGroupUsersByAccessLevel(groupId, 3);
+            // If there's only one admin and it's this user, they're the last admin
+            return adminUsers.size() == 1 && adminUsers.get(0).getId() == user.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -19,7 +19,7 @@
         
         <!-- Admin Users Table -->
         <VBox spacing="10">
-            <Label text="Users with Admin Access" 
+            <Label text="Instructor Group Access Users - Management and View Permissions" 
                    style="-fx-font-size: 16; -fx-font-weight: bold;"/>
             <TableView fx:id="adminUsersTable" prefHeight="150">
                 <columns>
@@ -33,7 +33,7 @@
 
         <!-- Manage Users Table -->
         <VBox spacing="10">
-            <Label text="Users with Manage Access" 
+            <Label text="Admin Group Access Users - Management Permissions" 
                    style="-fx-font-size: 16; -fx-font-weight: bold;"/>
             <TableView fx:id="manageUsersTable" prefHeight="150">
                 <columns>
@@ -47,7 +47,7 @@
 
         <!-- View Users Table -->
         <VBox spacing="10">
-            <Label text="Users with View Access" 
+            <Label text="Student Group Access Users - View Permissions" 
                    style="-fx-font-size: 16; -fx-font-weight: bold;"/>
             <TableView fx:id="viewUsersTable" prefHeight="150">
                 <columns>

@@ -529,45 +529,41 @@ public class HelpArticleDatabase extends Database{
 	 * @param groups list of groups to include in backup
 	 * @throws Exception if backup operation fails
 	 */
-	public void backupArticles(String filename) throws SQLException, IOException {
-	    String sql = "SELECT * FROM articles";
-	    try (Statement stmt = connection.createStatement();
-	         ResultSet rs = stmt.executeQuery(sql);
-	         BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+	public void backupArticles(String filename) throws Exception {
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+	        // Get all general articles using the existing method
+	        List<Article> articles = getAllGeneralArticles();
 	        
-	        while (rs.next()) {
-	            int id = rs.getInt("id");
-	            String iv = rs.getString("iv");
-	            String title = rs.getString("title");
-	            String authors = rs.getString("authors");
-	            String abstractText = rs.getString("abstract");
-	            String keywords = rs.getString("keywords");
-	            String body = rs.getString("body");
-	            String references = rs.getString("references");
-	            String level = rs.getString("level");
-	            String groupingIdentifiers = rs.getString("grouping_identifiers");
-	            String permissions = rs.getString("permissions");
-	            Date dateAdded = rs.getDate("date_added");
-	            String version = rs.getString("version");
-
+	        for (Article article : articles) {
+	            // Generate IV for encryption
+	            byte[] iv = EncryptionUtils.getInitializationVector(article.getTitle().toCharArray());
+	            
+	            // Encrypt the article fields
+	            byte[] encryptedTitle = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getTitle().toCharArray()), iv);
+	            byte[] encryptedAuthors = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAuthors().toCharArray()), iv);
+	            byte[] encryptedAbstract = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAbstractText().toCharArray()), iv);
+	            byte[] encryptedKeywords = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getKeywords().toCharArray()), iv);
+	            byte[] encryptedBody = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getBody().toCharArray()), iv);
+	            byte[] encryptedReferences = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getReferences().toCharArray()), iv);
+	            
 	            // Write each field to the backup file
-	            writer.write(id + "\n");
-	            writer.write(iv + "\n");
-	            writer.write(title + "\n");
-	            writer.write(authors + "\n");
-	            writer.write(abstractText + "\n");
-	            writer.write(keywords + "\n");
-	            writer.write(body + "\n");
-	            writer.write(references + "\n");
-	            writer.write(level + "\n");
-	            writer.write(groupingIdentifiers + "\n");
-	            writer.write(permissions + "\n");
-	            writer.write(dateAdded + "\n");
-	            writer.write(version + "\n");
+	            writer.write(article.getId() + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(iv) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedTitle) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedAuthors) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedAbstract) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedKeywords) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedBody) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedReferences) + "\n");
+	            writer.write(article.getLevel() + "\n");
+	            writer.write(String.join(",", article.getGroupingIdentifiers()) + "\n");
+	            writer.write(article.getPermissions() + "\n");
+	            writer.write(article.getDateAdded().toString() + "\n");
+	            writer.write(article.getVersion() + "\n");
 	            writer.write("END_OF_ARTICLE\n");
 	        }
 	    }
-	    System.out.println("[INFO in HelpArticleDB] Articles backed up to " + filename);
+	    System.out.println("[INFO in HelpArticleDB] General articles backed up to " + filename);
 	}
 
 	/**
@@ -578,7 +574,8 @@ public class HelpArticleDatabase extends Database{
 	 * @throws IOException if file reading fails
 	 */
 	public void restoreArticles(String filename) throws SQLException, IOException {
-	    String deleteSql = "DELETE FROM articles"; // Clears current data before restore
+		// Delete all general articles from the database to replace them with backup
+		String deleteSql = "DELETE FROM articles WHERE id NOT IN (SELECT article_id FROM special_group_articles)";
 	    try (Statement stmt = connection.createStatement()) {
 	        stmt.executeUpdate(deleteSql);
 	    }
@@ -727,7 +724,7 @@ public class HelpArticleDatabase extends Database{
      * @throws Exception if encryption fails or other errors occur
      */
     public void backupGroupArticles(String filename, List<String> groups) throws Exception {
-        List<Article> articlesToBackup = getAllDecryptedArticles().stream()
+        List<Article> articlesToBackup = getAllGeneralArticles().stream()
             .filter(article -> article.getGroupingIdentifiers().stream()
                 .anyMatch(groups::contains))
             .collect(Collectors.toList());

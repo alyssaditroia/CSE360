@@ -9,7 +9,9 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import database.Database;
@@ -83,6 +85,24 @@ public class StudentGeneralViewController extends PageController {
         
     @FXML
     private ListView<String> groupFilterListView;
+    
+    @FXML 
+    private ComboBox<String> levelFilterComboBox;
+    
+    @FXML 
+    private ListView<String> levelFilterListView;
+    
+    @FXML
+    private Label activeGroupsLabel;
+    
+    @FXML
+    private Label levelStatsLabel;
+    
+    @FXML
+    private ListView<String> articleSummaryList;
+    
+    @FXML
+    private TextField idSearchField;
 
 
 	/**
@@ -95,7 +115,11 @@ public class StudentGeneralViewController extends PageController {
             had = new HelpArticleDatabase();
 
             // Set up the table columns with corresponding properties from the Article model
-            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+            idColumn.setCellValueFactory(column -> 
+	            new javafx.beans.property.ReadOnlyObjectWrapper<>(
+	                articleTable.getItems().indexOf(column.getValue()) + 1
+	            )
+	        );
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
             abstractColumn.setCellValueFactory(new PropertyValueFactory<>("abstractText"));  // Use correct property
             authorsColumn.setCellValueFactory(new PropertyValueFactory<>("authors"));
@@ -103,6 +127,10 @@ public class StudentGeneralViewController extends PageController {
             // Load groups into the ComboBox
             List<String> groups = had.fetchGroupingIdentifiers();
             groupFilterComboBox.setItems(FXCollections.observableArrayList(groups));
+            
+            // Initialize level filter with predefined levels
+            List<String> levels = Arrays.asList("beginner", "intermediate", "advanced", "expert");
+            levelFilterComboBox.setItems(FXCollections.observableArrayList(levels));
 
             // Initially load all articles into the table
             loadAllArticles();  // Load all articles at first
@@ -116,9 +144,9 @@ public class StudentGeneralViewController extends PageController {
      */
     public void loadAllArticles() {
         try {
-            List<Article> articles = had.getAllDecryptedArticles();  // Fetch all articles from the database
+            List<Article> articles = had.getAllGeneralArticles();  // Changed from getAllDecryptedArticles() to getAllGeneralArticles()
             ObservableList<Article> articleList = FXCollections.observableArrayList(articles);
-            articleTable.setItems(articleList);  // Set data in TableView
+            articleTable.setItems(articleList);
         } catch (SQLException e) {
             showErrorAlert("Error", "Failed to load articles: " + e.getMessage());
         } catch (Exception e) {
@@ -131,25 +159,49 @@ public class StudentGeneralViewController extends PageController {
      */
     @FXML
     public void loadArticles() {
-        try {
+        try { 	
+        	// Get the student's search field and if isn't empty add their search to the user session 
+        	String originalSearchText = searchField.getText().trim();
+        	if (!originalSearchText.isEmpty()) {
+        	    UserSession.getInstance().addUserSearch(originalSearchText);
+        	    System.out.println("[INFO in UserSession] Added search: " + originalSearchText);
+        	}
+        	
+        	// Get search and filters selected
             String searchQuery = searchField.getText().toLowerCase();
             List<String> selectedGroups = new ArrayList<>(groupFilterListView.getItems());
+            List<String> selectedLevels = new ArrayList<>(levelFilterListView.getItems());
             
-            System.out.println("Filtering with search query: '" + searchQuery + "'");
-            System.out.println("Selected groups for filtering: " + selectedGroups);
+            // Get general articles and filter them
+            List<Article> articles = had.getAllGeneralArticles().stream()
+                .filter(article -> 
+                    searchQuery.isEmpty() || // If no search query, include all
+                    article.getTitle().toLowerCase().contains(searchQuery) ||
+                    article.getAbstractText().toLowerCase().contains(searchQuery) ||
+                    article.getAuthors().toLowerCase().contains(searchQuery))
+                .filter(article -> 
+                    selectedGroups.isEmpty() || // If no groups selected, include all
+                    article.getGroupingIdentifiers().stream().anyMatch(selectedGroups::contains))
+                .filter(article -> 
+                    selectedLevels.isEmpty() || // If no levels selected, include all
+                    (article.getLevel() != null && selectedLevels.contains(article.getLevel())))
+                .collect(Collectors.toList());
             
-            List<Article> articles = had.searchArticles(searchQuery);  
+            // Count articles per level, handling null levels
+            Map<String, Long> levelCounts = articles.stream()
+                .collect(Collectors.groupingBy(
+                    article -> article.getLevel() != null ? article.getLevel() : "unspecified",
+                    Collectors.counting()
+                ));
             
-            // Additional group filtering if groups are selected
-            if (!selectedGroups.isEmpty()) {
-                articles = articles.stream()
-                    .filter(article -> {
-                        List<String> articleGroups = article.getGroupingIdentifiers();
-                        return articleGroups.stream()
-                            .anyMatch(selectedGroups::contains);
-                    })
-                    .collect(Collectors.toList());
-            }
+            // Update the label with safe default values of 0
+            levelStatsLabel.setText(
+                "Beginner(" + levelCounts.getOrDefault("beginner", 0L) + 
+                ") Intermediate(" + levelCounts.getOrDefault("intermediate", 0L) + 
+                ") Advanced(" + levelCounts.getOrDefault("advanced", 0L) + 
+                ") Expert(" + levelCounts.getOrDefault("expert", 0L) + 
+                ") Unspecified(" + levelCounts.getOrDefault("unspecified", 0L) + ")"
+            );
 
             articleTable.setItems(FXCollections.observableArrayList(articles));
         } catch (Exception e) {
@@ -267,6 +319,23 @@ public class StudentGeneralViewController extends PageController {
         loadArticles(); // Reapply any keyword filters
     }
     
+    @FXML
+    public void addLevelToFilter() {
+        String selectedLevel = levelFilterComboBox.getValue();
+        if (selectedLevel != null && !selectedLevel.isEmpty() 
+                && !levelFilterListView.getItems().contains(selectedLevel)) {
+            levelFilterListView.getItems().add(selectedLevel);
+            levelFilterComboBox.setValue(null);
+            loadArticles();
+        }
+    }
+
+    @FXML
+    public void clearLevelFilters() {
+        levelFilterListView.getItems().clear();
+        loadArticles();
+    }
+    
     /**
      * 
      */
@@ -274,6 +343,28 @@ public class StudentGeneralViewController extends PageController {
     private void returnHome() {
 		navigateTo("/views/StudentHomePageView.fxml");
 	}
+    
+    @FXML
+    public void searchById() {
+        try {
+            String idText = idSearchField.getText().trim();
+            if (idText.isEmpty()) {
+                loadAllArticles();
+                return;
+            }
+            
+            long searchId = Long.parseLong(idText);
+            List<Article> articles = had.getAllGeneralArticles().stream()
+                .filter(article -> article.getId() == searchId)
+                .collect(Collectors.toList());
+                
+            articleTable.setItems(FXCollections.observableArrayList(articles));
+        } catch (NumberFormatException e) {
+            showErrorAlert("Invalid Input", "Please enter a valid numeric ID");
+        } catch (Exception e) {
+            showErrorAlert("Error", "Failed to search by ID: " + e.getMessage());
+        }
+    }
 
 }
 

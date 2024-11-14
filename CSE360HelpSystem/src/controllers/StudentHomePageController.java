@@ -58,5 +58,10 @@ public class StudentHomePageController extends PageController {
 	public void goToMessagingSystem() {
 		navigateTo("/views/MessagingSystemView.fxml"); 
 	}
+	
+	@FXML
+	public void goToSelectSpecialGroup() {
+		navigateTo("/views/SelectSpecialGroupView.fxml"); 
+	}
 
 }

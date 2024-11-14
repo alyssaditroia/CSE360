@@ -226,4 +226,14 @@
         </VBox>
     </center>
     
+    <right>
+    <VBox spacing="10" styleClass="sidebar">
+        <padding>
+            <Insets top="10" right="10" bottom="10" left="10"/>
+        </padding>
+        <Label text="Search History" styleClass="user-label"/>
+        <ListView fx:id="searchHistoryList" VBox.vgrow="ALWAYS"/>
+    </VBox>
+</right>
+    
 </BorderPane>

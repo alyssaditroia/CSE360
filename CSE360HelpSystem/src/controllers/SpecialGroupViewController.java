@@ -10,7 +10,9 @@ import javafx.collections.ObservableList;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import database.Database;
@@ -27,13 +29,18 @@ public class SpecialGroupViewController extends PageController {
     @FXML private TableColumn<Article, String> abstractColumn;
     @FXML private TableColumn<Article, String> authorsColumn;
     @FXML private TextField searchField;
-    @FXML private ComboBox<String> groupFilterComboBox;
-    @FXML private ListView<String> groupFilterListView;
     @FXML private Button createButton;
     @FXML private Button editButton;
     @FXML private Button deleteButton;
     @FXML private Label groupNameLabel;
     @FXML private Button manageUsersButton;
+    @FXML private Button deleteGroupButton;
+    @FXML private TextField idSearchField; 
+    @FXML private ComboBox<String> levelFilterComboBox; 
+    @FXML private ListView<String> levelFilterListView; 
+    @FXML private Label levelStatsLabel; 
+    @FXML private Button backupRestoreButton;
+
 
     private SpecialGroupsDatabase specialGroupsDB;
     private HelpArticleDatabase helpArticleDB;
@@ -63,32 +70,26 @@ public class SpecialGroupViewController extends PageController {
             if (currentGroup != null) {
                 // Clear and refresh group's articles from database
                 List<String> freshArticles = specialGroupsDB.getGroupArticles(currentGroup.getGroupId());
-                currentGroup.getGroupArticles().clear();  // Clear existing articles
-                for (String articleId : freshArticles) {  // Add fresh articles
+                currentGroup.getGroupArticles().clear();
+                for (String articleId : freshArticles) {
                     currentGroup.addArticle(articleId);
                 }
                 
-                // Set group name in title
                 if (groupNameLabel != null) {
                     groupNameLabel.setText(currentGroup.getName());
                 }
                 
-                // Load articles
-                List<Article> allArticles = helpArticleDB.getAllDecryptedArticles();
-                List<Article> groupArticles = allArticles.stream()
-                    .filter(article -> currentGroup.getGroupArticles().contains(String.valueOf(article.getId())))
-                    .collect(Collectors.toList());
-                    
-                if (articleTable != null) {
-                    articleTable.setItems(FXCollections.observableArrayList(groupArticles));
-                }
+                // Initialize level filter
+                List<String> levels = Arrays.asList("beginner", "intermediate", "advanced", "expert");
+                levelFilterComboBox.setItems(FXCollections.observableArrayList(levels));
+                
+                // Load initial articles
+                loadArticles();
             }
             
-            // Only setup if components are injected
             if (articleTable != null) {
                 setupTableColumns();
                 setupAccessControls();
-                loadGroupFilters();
             }
             
         } catch (Exception e) {
@@ -137,7 +138,23 @@ public class SpecialGroupViewController extends PageController {
                     setGraphic(null);
                 } else {
                     HBox buttons = new HBox(5);
-                    buttons.getChildren().addAll(viewBtn, editBtn, deleteBtn);
+                    int accessLevel = UserSession.getInstance().getAccessLevel();
+
+                    // Level 1: View button only
+                    if (accessLevel == 1) {
+                        buttons.getChildren().add(viewBtn);
+                    }
+                    
+                    // Level 2: Delete button only
+                    else if (accessLevel == 2) {
+                        buttons.getChildren().add(deleteBtn);
+                    }
+                    
+                    // Level 3: All buttons
+                    else if (accessLevel == 3) {
+                        buttons.getChildren().addAll(viewBtn, editBtn, deleteBtn);
+                    }
+
                     setGraphic(buttons);
                 }
             }
@@ -148,30 +165,43 @@ public class SpecialGroupViewController extends PageController {
 
     private void setupAccessControls() {
         int accessLevel = UserSession.getInstance().getAccessLevel();
-        if (createButton != null) {
-            createButton.setVisible(accessLevel >= 2);
-        }
-        if (editButton != null) {
-            editButton.setVisible(accessLevel >= 3);
-        }
-        if (deleteButton != null) {
-            deleteButton.setVisible(accessLevel >= 2);
-        }
+        
+        // Control button visibility based on access level
+        if (manageUsersButton != null) manageUsersButton.setVisible(accessLevel >= 2);
+        if (createButton != null) createButton.setVisible(accessLevel >= 2);
+        if (deleteGroupButton != null) deleteGroupButton.setVisible(accessLevel == 3);
+        if (backupRestoreButton != null) backupRestoreButton.setVisible(accessLevel >= 2);
     }
 
     @FXML
     public void loadArticles() {
         try {
             String searchQuery = searchField.getText().toLowerCase();
-            List<String> selectedGroups = new ArrayList<>(groupFilterListView.getItems());
+            List<String> selectedLevels = new ArrayList<>(levelFilterListView.getItems());
             
             SpecialGroup currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
             
             List<Article> articles = helpArticleDB.getAllDecryptedArticles().stream()
-                .filter(article -> currentGroup.getGroupArticles().contains(String.valueOf(article.getId())))  // Add this line
+                .filter(article -> currentGroup.getGroupArticles().contains(String.valueOf(article.getId())))
                 .filter(article -> matchesSearch(article, searchQuery))
-                .filter(article -> matchesGroupFilters(article, selectedGroups))
+                .filter(article -> selectedLevels.isEmpty() || 
+                                 (article.getLevel() != null && selectedLevels.contains(article.getLevel())))
                 .collect(Collectors.toList());
+                
+            // Update level statistics
+            Map<String, Long> levelCounts = articles.stream()
+                .collect(Collectors.groupingBy(
+                    article -> article.getLevel() != null ? article.getLevel() : "unspecified",
+                    Collectors.counting()
+                ));
+            
+            levelStatsLabel.setText(
+                "Beginner(" + levelCounts.getOrDefault("beginner", 0L) + 
+                ") Intermediate(" + levelCounts.getOrDefault("intermediate", 0L) + 
+                ") Advanced(" + levelCounts.getOrDefault("advanced", 0L) + 
+                ") Expert(" + levelCounts.getOrDefault("expert", 0L) + 
+                ") Unspecified(" + levelCounts.getOrDefault("unspecified", 0L) + ")"
+            );
                 
             articleTable.setItems(FXCollections.observableArrayList(articles));
         } catch (Exception e) {
@@ -189,31 +219,6 @@ public class SpecialGroupViewController extends PageController {
     private boolean matchesGroupFilters(Article article, List<String> filters) {
         return filters.isEmpty() || article.getGroupingIdentifiers().stream()
             .anyMatch(filters::contains);
-    }
-
-    @FXML
-    public void addGroupToFilter() {
-        String selectedGroup = groupFilterComboBox.getValue();
-        if (selectedGroup != null && !groupFilterListView.getItems().contains(selectedGroup)) {
-            groupFilterListView.getItems().add(selectedGroup);
-            groupFilterComboBox.setValue(null);
-            loadArticles();
-        }
-    }
-
-    @FXML
-    public void clearGroupFilters() {
-        groupFilterListView.getItems().clear();
-        loadArticles();
-    }
-
-    private void loadGroupFilters() {
-        try {
-            List<String> groups = helpArticleDB.fetchGroupingIdentifiers();
-            groupFilterComboBox.setItems(FXCollections.observableArrayList(groups));
-        } catch (Exception e) {
-            showErrorAlert("Filter Error", "Failed to load group filters");
-        }
     }
     
     @FXML
@@ -280,5 +285,74 @@ public class SpecialGroupViewController extends PageController {
         alert.setTitle(title);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    
+    @FXML
+    private void deleteGroup() {
+        SpecialGroup currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
+        if (currentGroup == null) {
+            showErrorAlert("Error", "No group selected");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText("Delete Special Group");
+        confirm.setContentText("Are you sure you want to delete the group '" + 
+                              currentGroup.getName() + "' and all associated articles? This cannot be undone.");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    specialGroupsDB.deleteSpecialGroup(currentGroup.getGroupId());
+                    showInfoAlert("Success", "Group deleted successfully");
+                    goHome();  // Return to homepage after deletion
+                } catch (SQLException e) {
+                    showErrorAlert("Error", "Failed to delete group: " + e.getMessage());
+                }
+            }
+        });
+    }
+    
+    @FXML
+    public void searchById() {
+        try {
+            String idText = idSearchField.getText().trim();
+            if (idText.isEmpty()) {
+                loadArticles(); // Reset to show all articles
+                return;
+            }
+            
+            long searchId = Long.parseLong(idText);
+            SpecialGroup currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
+            
+            List<Article> articles = helpArticleDB.getAllDecryptedArticles().stream()
+                .filter(article -> article.getId() == searchId)
+                .filter(article -> currentGroup.getGroupArticles().contains(String.valueOf(article.getId())))
+                .collect(Collectors.toList());
+                
+            articleTable.setItems(FXCollections.observableArrayList(articles));
+        } catch (NumberFormatException e) {
+            showErrorAlert("Invalid Input", "Please enter a valid numeric ID");
+        } catch (Exception e) {
+            showErrorAlert("Error", "Failed to search by ID: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void addLevelToFilter() {
+        String selectedLevel = levelFilterComboBox.getValue();
+        if (selectedLevel != null && !selectedLevel.isEmpty() 
+                && !levelFilterListView.getItems().contains(selectedLevel)) {
+            levelFilterListView.getItems().add(selectedLevel);
+            levelFilterComboBox.setValue(null);
+            loadArticles();
+        }
+    }
+
+    @FXML
+    public void clearLevelFilters() {
+        levelFilterListView.getItems().clear();
+        loadArticles();
     }
 }

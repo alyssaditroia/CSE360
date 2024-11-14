@@ -24,14 +24,22 @@
         <Button text="Search" onAction="#loadArticles"/>
     </HBox>
 
-    <!-- Group Filter Section -->
+    <!-- ID Search Section -->
     <HBox spacing="10" alignment="CENTER">
-        <Label text="Filter by Groups:"/>
-        <ComboBox fx:id="groupFilterComboBox" promptText="Select Groups"/>
-        <Button text="Add Group" onAction="#addGroupToFilter"/>
-        <Button text="Clear Groups" onAction="#clearGroupFilters"/>
+        <Label text="Search by ID:"/>
+        <TextField fx:id="idSearchField" promptText="Enter article ID..." />
+        <Button text="Search ID" onAction="#searchById"/>
     </HBox>
-    <ListView fx:id="groupFilterListView" prefHeight="100"/>
+
+    <!-- Level Filter Section -->
+    <HBox spacing="10" alignment="CENTER">
+        <Label text="Filter by Level:"/>
+        <ComboBox fx:id="levelFilterComboBox" promptText="Select Level"/>
+        <Button text="Add Level" onAction="#addLevelToFilter"/>
+        <Button text="Clear Levels" onAction="#clearLevelFilters"/>
+    </HBox>
+    <ListView fx:id="levelFilterListView" prefHeight="100"/>
+    <Label fx:id="levelStatsLabel" />
 
     <!-- TableView for displaying Articles -->
     <TableView fx:id="articleTable" prefHeight="400" prefWidth="600">
@@ -47,7 +55,8 @@
     <HBox spacing="10" alignment="CENTER">
     	<Button fx:id="manageUsersButton" text="Manage Users" onAction="#goToUserManagement"/>
         <Button fx:id="createButton" text="Create New Article" onAction="#goToCreateArticle"/>
-        <Button text="Backup/Restore" onAction="#goToBackupRestore"/>
+        <Button fx:id="backupRestoreButton" text="Backup/Restore" onAction="#goToBackupRestore"/>
+        <Button fx:id="deleteGroupButton" text="Delete Group" onAction="#deleteGroup" style="-fx-background-color: #ff4444; -fx-text-fill: white;"/>
         <Button text="Return To Homepage" onAction="#goHome"/>
     </HBox>
 

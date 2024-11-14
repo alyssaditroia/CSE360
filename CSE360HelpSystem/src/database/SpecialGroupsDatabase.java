@@ -125,26 +125,23 @@ public class SpecialGroupsDatabase extends Database {
      * @throws SQLException if database operation fails
      */
     public void deleteSpecialGroup(int groupId) throws SQLException {
-        // Delete members first (due to foreign key)
-        String deleteMembers = "DELETE FROM special_group_members WHERE group_id = ?";
-        // Delete articles associations
-        String deleteArticles = "DELETE FROM special_group_articles WHERE group_id = ?";
-        // Delete the group itself
-        String deleteGroup = "DELETE FROM special_groups WHERE group_id = ?";
+        // First query deletes all articles that are in this special group
+        // Changed articleId parsing to ensure proper integer comparison
+        String deleteArticlesSql = "DELETE FROM articles WHERE id IN " + "(SELECT CAST(article_id AS INT) FROM special_group_articles WHERE group_id = ?)";
         
-        try (PreparedStatement pstmtMembers = connection.prepareStatement(deleteMembers);
-             PreparedStatement pstmtArticles = connection.prepareStatement(deleteArticles);
-             PreparedStatement pstmtGroup = connection.prepareStatement(deleteGroup)) {
-            
-            // Execute deletions in correct order
-            pstmtMembers.setInt(1, groupId);
-            pstmtMembers.executeUpdate();
-            
-            pstmtArticles.setInt(1, groupId);
-            pstmtArticles.executeUpdate();
-            
-            pstmtGroup.setInt(1, groupId);
-            pstmtGroup.executeUpdate();
+        // These queries clean up all group associations and the group itself                         
+        String[] deleteQueries = {
+            deleteArticlesSql,                                            // Deletes the actual articles
+            "DELETE FROM special_group_members WHERE group_id = ?",       // Removes all user associations
+            "DELETE FROM special_group_articles WHERE group_id = ?",      // Removes article associations
+            "DELETE FROM special_groups WHERE group_id = ?"               // Deletes the group itself
+        };
+        
+        for (String sql : deleteQueries) {
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setInt(1, groupId);	
+                pstmt.executeUpdate();
+            }
         }
     }
     

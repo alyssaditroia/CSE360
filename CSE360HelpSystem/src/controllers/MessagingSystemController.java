@@ -25,6 +25,7 @@ public class MessagingSystemController extends PageController {
     @FXML private VBox messageContainer;
     @FXML private Label currentUserLabel;
     @FXML private ComboBox<String> messageTypeComboBox;
+    @FXML private ListView<String> searchHistoryList;
     
     private HelpMessageDatabase messageDB;
     private UserSession userSession;
@@ -166,20 +167,17 @@ public class MessagingSystemController extends PageController {
     
     private void setupInstructorView() {
         messageTypeComboBox.setVisible(false);
-        Button resolveBtn = new Button("Mark as Resolved");
-        resolveBtn.setOnAction(e -> resolveCurrentConversation());
-        resolveBtn.getStyleClass().add("action-button");
-        VBox.setMargin(resolveBtn, new javafx.geometry.Insets(10));
-        chatArea.getChildren().add(0, resolveBtn);
     }
     
     private void setupAdminView() {
         messageTypeComboBox.setVisible(false);
+        /*
         Button deleteBtn = new Button("Delete Conversation");
         deleteBtn.setOnAction(e -> deleteCurrentConversation());
         deleteBtn.getStyleClass().add("action-button");
         VBox.setMargin(deleteBtn, new javafx.geometry.Insets(10));
         chatArea.getChildren().add(0, deleteBtn);
+        */
     }
     
  // In MessagingSystemController.java, modify the sendMessage() method:
@@ -274,9 +272,26 @@ public class MessagingSystemController extends PageController {
     
     private void displayConversation(Conversation conversation) {
         messageContainer.getChildren().clear();
+        searchHistoryList.getItems().clear();
         
         try {
             List<HelpMessage> messages = messageDB.getConversationMessages(conversation.getConversationId());
+            
+            // Add conversation type label at top if there are messages
+            if (!messages.isEmpty()) {
+                HelpMessage firstMessage = messages.get(0);
+                Label typeLabel = new Label(firstMessage.getIsSpecificMessage() ? 
+                    "Specific Help Request Conversation" : "General Help Request Conversation");
+                typeLabel.getStyleClass().add("user-label");
+                messageContainer.getChildren().add(typeLabel);
+                
+                // Add searches only from first message if specific
+                if (firstMessage.getIsSpecificMessage() && !firstMessage.getSearchRequests().isEmpty()) {
+                    searchHistoryList.getItems().addAll(firstMessage.getSearchRequests());
+                }
+            }
+
+            // Add all messages
             for (HelpMessage message : messages) {
                 VBox messageBubble = createMessageBubble(message);
                 messageContainer.getChildren().add(messageBubble);
@@ -346,20 +361,6 @@ public class MessagingSystemController extends PageController {
         contentLabel.getStyleClass().add("content-label");
         contentLabel.setWrapText(true);
         bubble.getChildren().add(contentLabel);
-        
-        // Add specific help request information if applicable
-        if (message.getIsSpecificMessage()) {
-            Label typeLabel = new Label("Specific Help Request");
-            typeLabel.getStyleClass().add("message-type");
-            bubble.getChildren().add(typeLabel);
-            
-            if (!message.getSearchRequests().isEmpty()) {
-                Label searchLabel = new Label("Search History: " + 
-                    String.join(", ", message.getSearchRequests()));
-                searchLabel.getStyleClass().add("search-history");
-                bubble.getChildren().add(searchLabel);
-            }
-        }
         
         return bubble;
     }

@@ -168,6 +168,15 @@ public class AdminHomePageController extends PageController {
 	
 	@FXML
 	private TableColumn<User, Integer> idColumn;
+	
+	@FXML
+	private Button SpecialGroupButton;
+	
+	@FXML
+	private Button backupRestoreButton;
+	
+	@FXML 
+	private Button MessagesButton;
 
 	/**
 	 * Handles invite button click ensures email field contains proper input and the
@@ -436,7 +445,14 @@ public class AdminHomePageController extends PageController {
 	 * @param isInstructor
 	 */
 	private void updatePermissions(User user, Boolean isAdmin, Boolean isStudent, Boolean isInstructor) {
-
+		// Check if we're removing admin from the last admin
+	    if (!isAdmin && user.isAdmin() && isLastAdminUser(user.getEmail())) {
+	        showAlert("Error", 
+	                 "Cannot remove admin role", 
+	                 "There must be at least one user with admin privileges in the system.");
+	        return;
+	    }
+	    
 		// Show a confirmation dialog before applying changes
 		Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
 		confirmationAlert.setTitle("Update Permissions");
@@ -476,6 +492,14 @@ public class AdminHomePageController extends PageController {
 	 * @param user
 	 */
 	private void deleteUser(User user) {
+		// Check if we're deleting the last admin
+	    if (user.isAdmin() && isLastAdminUser(user.getEmail())) {
+	        showAlert("Error", 
+	                 "Cannot delete user", 
+	                 "Cannot delete the last user with admin privileges from the system.");
+	        return;
+	    }
+		
 		Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
 		confirmationAlert.setTitle("Delete User");
 		confirmationAlert.setHeaderText("Delete User: " + user.getUsername());
@@ -508,5 +532,47 @@ public class AdminHomePageController extends PageController {
 	@FXML
 	private void navigateToBackupRestore() {
 	    navigateTo("/views/BackupRestoreView.fxml");
+	}
+	
+	
+	@FXML
+	private void navigateToSpecialGroupSelection() {
+	    navigateTo("/views/SelectSpecialGroupView.fxml");
+	}
+	
+	
+	@FXML
+	private void navigateToMessageSystem() {
+	    navigateTo("/views/MessagingSystemView.fxml");
+	}
+	
+	
+	private boolean isLastAdminUser(String email) {
+	    try {
+	        // Get all users
+	        List<Map<String, Object>> allUsers = db.getAllUsers();
+	        
+	        // Count how many admin users we have
+	        int adminCount = 0;
+	        boolean isUserAdmin = false;
+	        
+	        // Count total admins and check if this user is an admin
+	        for (Map<String, Object> user : allUsers) {
+	            if ((Boolean) user.get("isAdmin")) {
+	                adminCount++;
+	                if (user.get("email").equals(email)) {
+	                    isUserAdmin = true;
+	                }
+	            }
+	        }
+	        
+	        // Return true only if this user is an admin AND there is exactly one admin total
+	        // This means they are the last/only admin
+	        return isUserAdmin && adminCount == 1;
+	        
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
 	}
 }

@@ -66,7 +66,9 @@ public class UserSession {
 	 /**
      * Private constructor to enforce singleton pattern.
      */
-	private UserSession() {}
+	private UserSession() {
+		systemSearches = new ArrayList<>();
+	}
 
 	 /**
      * Gets the singleton instance of UserSession.

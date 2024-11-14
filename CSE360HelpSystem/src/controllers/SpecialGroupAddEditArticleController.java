@@ -28,9 +28,6 @@ public class SpecialGroupAddEditArticleController extends PageController {
     @FXML private TextArea bodyField;
     @FXML private TextArea referencesField;
     @FXML private ComboBox<String> levelField;
-    @FXML private ComboBox<String> groupingSearchComboBox;
-    @FXML private ListView<String> articleGroupingListView;
-    @FXML private Button addGroupingButton;
     @FXML private CheckBox adminCheckbox, instructorCheckbox, studentCheckbox;
     @FXML private DatePicker dateAddedField;
     @FXML private TextField versionField;
@@ -54,17 +51,6 @@ public class SpecialGroupAddEditArticleController extends PageController {
             specialGroupsDB = new SpecialGroupsDatabase();
             currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
 
-            List<String> existingIdentifiers = had.fetchGroupingIdentifiers();
-            groupingSearchComboBox.setItems(FXCollections.observableArrayList(existingIdentifiers));
-            groupingSearchComboBox.setEditable(true);
-            groupingSearchComboBox.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue.isEmpty()) {
-                    filterGroupingSuggestions(newValue);
-                }
-            });
-
-            addGroupingButton.setOnAction(event -> addGroupingIdentifier());
-            addContextMenuToArticleGroupingList();
             levelField.setItems(FXCollections.observableArrayList("beginner", "intermediate", "advanced", "expert"));
 
             articleToEdit = UserSession.getInstance().getSelectedArticle();
@@ -91,63 +77,9 @@ public class SpecialGroupAddEditArticleController extends PageController {
         adminCheckbox.setSelected(permissions.contains("Admin"));
         instructorCheckbox.setSelected(permissions.contains("Instructor"));
         studentCheckbox.setSelected(permissions.contains("Student"));
-
-        List<String> identifiers = article.getGroupingIdentifiers();
-        articleGroupingListView.getItems().clear();
-        articleGroupingListView.getItems().addAll(identifiers);
     }
 
-    @FXML
-    public void addGroupingIdentifier() {
-        String newIdentifier = groupingSearchComboBox.getEditor().getText();
-
-        if (!newIdentifier.isEmpty()) {
-            if (!groupingSearchComboBox.getItems().contains(newIdentifier)) {
-                try {
-                    had.insertGroupingIdentifier(newIdentifier);
-                    groupingSearchComboBox.getItems().add(newIdentifier);
-                    showInfoAlert("Success", "New identifier added: " + newIdentifier);
-                } catch (SQLException e) {
-                    showErrorAlert("Error", "Failed to insert grouping identifier: " + e.getMessage());
-                    return;
-                }
-            }
-
-            if (!articleGroupingListView.getItems().contains(newIdentifier)) {
-                articleGroupingListView.getItems().add(newIdentifier);
-            }
-
-            groupingSearchComboBox.getEditor().clear();
-        }
-    }
-
-    private void filterGroupingSuggestions(String input) {
-        List<String> filteredIdentifiers = FXCollections.observableArrayList();
-        
-        try {
-            filteredIdentifiers = had.fetchGroupingIdentifiers().stream()
-                .filter(identifier -> identifier.toLowerCase().contains(input.toLowerCase()))
-                .collect(Collectors.toList());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showErrorAlert("Error", "Failed to fetch grouping identifiers.");
-        }
-
-        groupingSearchComboBox.setItems(FXCollections.observableArrayList(filteredIdentifiers));
-    }
-
-    private void addContextMenuToArticleGroupingList() {
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem removeItem = new MenuItem("Remove");
-        removeItem.setOnAction(event -> {
-            String selectedItem = articleGroupingListView.getSelectionModel().getSelectedItem();
-            if (selectedItem != null) {
-                articleGroupingListView.getItems().remove(selectedItem);
-            }
-        });
-        contextMenu.getItems().add(removeItem);
-        articleGroupingListView.setContextMenu(contextMenu);
-    }
+    
 
     @FXML
     public void saveArticle() {
@@ -159,17 +91,20 @@ public class SpecialGroupAddEditArticleController extends PageController {
             char[] body = bodyField.getText().toCharArray();
             char[] references = referencesField.getText().toCharArray();
             String level = levelField.getValue();
-            List<String> selectedIdentifiers = articleGroupingListView.getItems();
+
             String permissions = getSelectedPermissions();
             java.sql.Date dateAdded = java.sql.Date.valueOf(dateAddedField.getValue());
             String version = versionField.getText();
 
             if (articleToEdit == null) {
                 Article newArticle = new Article(title, authors, abstractText, keywords, body, references, level,
-                        selectedIdentifiers, permissions, dateAdded, version);
+                		List.of(), permissions, dateAdded, version);
                 
                 // Set special group flag
                 newArticle.setAsPartOfSpecialGroup();
+                
+                // Set article in user session
+                UserSession.getInstance().setSelectedArticle(newArticle);
                 
                 // Save to help article database
                 had.createArticle(newArticle);
@@ -193,7 +128,7 @@ public class SpecialGroupAddEditArticleController extends PageController {
                 articleToEdit.setBody(body);
                 articleToEdit.setReferences(references);
                 articleToEdit.setLevel(level);
-                articleToEdit.setGroupingIdentifiers(selectedIdentifiers);
+                articleToEdit.setGroupingIdentifiers(List.of());
                 articleToEdit.setPermissions(permissions);
                 articleToEdit.setDateAdded(dateAdded);
                 articleToEdit.setVersion(version);
@@ -241,7 +176,6 @@ public class SpecialGroupAddEditArticleController extends PageController {
         bodyField.clear();
         referencesField.clear();
         levelField.setValue(null);
-        articleGroupingListView.getItems().clear();
         adminCheckbox.setSelected(false);
         instructorCheckbox.setSelected(false);
         studentCheckbox.setSelected(false);

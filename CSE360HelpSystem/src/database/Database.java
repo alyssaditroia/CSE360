@@ -424,16 +424,43 @@ public class Database {
 
 	/**
 	 * Function added by Alyssa DiTroia 
-	 * Delets a user from the database
+	 * Delets a user and any help messages they had alongside any conversations they started from the database
 	 * @param email
 	 * @throws SQLException
 	 */
 	public void deleteUser(String email) throws SQLException {
-		String sql = "DELETE FROM cse360users WHERE email = ?";
-		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-			pstmt.setString(1, email);
-			pstmt.executeUpdate();
-		}
+	    // Get user ID first
+	    int userId;
+	    String getIdSql = "SELECT id FROM cse360users WHERE email = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(getIdSql)) {
+	        pstmt.setString(1, email);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (!rs.next()) {
+	            return; // User not found
+	        }
+	        userId = rs.getInt("id");
+	    }
+
+	    // Delete from conversation_messages where user is creator
+	    String deleteConvMessages = "DELETE FROM conversation_messages WHERE creator_id = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteConvMessages)) {
+	        pstmt.setInt(1, userId);
+	        pstmt.executeUpdate();
+	    }
+
+	    // Delete all help messages from this user
+	    String deleteMessages = "DELETE FROM help_messages WHERE user_id = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteMessages)) {
+	        pstmt.setInt(1, userId);
+	        pstmt.executeUpdate();
+	    }
+	    
+	    // Finally delete the user
+	    String deleteUser = "DELETE FROM cse360users WHERE email = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteUser)) {
+	        pstmt.setString(1, email);
+	        pstmt.executeUpdate();
+	    }
 	}
 
 	/**

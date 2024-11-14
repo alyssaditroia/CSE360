@@ -9,13 +9,30 @@
     <padding>
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
-
+	
     <!-- Search Section -->
     <HBox spacing="10" alignment="CENTER">
         <Label text="Search Articles:"/>
         <TextField fx:id="searchField" promptText="Enter keywords..." />
         <Button text="Search" onAction="#loadArticles"/>
     </HBox>
+    
+    <!-- ID Search Section -->
+    <HBox spacing="10" alignment="CENTER">
+	    <Label text="Search by ID:"/>
+	    <TextField fx:id="idSearchField" promptText="Enter article ID..." />
+	    <Button text="Search ID" onAction="#searchById"/>
+	</HBox>
+    
+    <!-- Level Filter Section -->
+	<HBox spacing="10" alignment="CENTER">
+	    <Label text="Filter by Level:"/>
+	    <ComboBox fx:id="levelFilterComboBox" promptText="Select Level"/>
+	    <Button text="Add Level" onAction="#addLevelToFilter"/>
+	    <Button text="Clear Levels" onAction="#clearLevelFilters"/>
+	</HBox>
+	<ListView fx:id="levelFilterListView" prefHeight="100"/>
+	<Label fx:id="levelStatsLabel" />
     
     <!-- Group Filter Section -->
 	<HBox spacing="10" alignment="CENTER">
@@ -29,7 +46,7 @@
     <!-- TableView for displaying Articles -->
     <TableView fx:id="articleTable" prefHeight="400" prefWidth="600">
         <columns>
-            <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+            <TableColumn fx:id="idColumn" text="#" prefWidth="50"/>	
             <TableColumn fx:id="titleColumn" text="Title" prefWidth="200"/>
             <TableColumn fx:id="abstractColumn" text="Abstract" prefWidth="250"/>
             <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="100"/>
