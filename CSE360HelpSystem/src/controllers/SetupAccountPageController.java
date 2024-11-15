@@ -27,18 +27,31 @@ import models.TextValidation;
  * @author Alyssa DiTroia
  */
 public class SetupAccountPageController extends PageController {
+	/**
+	 * Database instance for user account operations
+	 */
 	private Database db;
 
-	// Constructor with for FXMLLoader
+	/**
+	 * Default constructor required for FXML loader
+	 */
 	public SetupAccountPageController() {
 		super();
 	}
 
-	// Constructor with dependency injection for Stage and Database
+	/**
+	 * Constructor with stage and database parameters
+	 * 
+	 * @param primaryStage the main application window
+	 * @param db the database instance
+	 */
 	public SetupAccountPageController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
 
+	/**
+     * FXML injected UI elements for the view of the page
+     */
 	@FXML
 	private TextField usernameField;
 
@@ -109,6 +122,9 @@ public class SetupAccountPageController extends PageController {
 		}
 	}
 
+	/**
+	 * Redirects the user to the login page after successful account setup
+	 */
 	private void redirectToLogin() {
 		navigateTo("/views/LoginPageView.fxml");
 	}

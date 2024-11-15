@@ -11,22 +11,41 @@ import database.Database;
 import models.Article;
 import models.UserSession;
 /**
- * The {@code ViewArticleController} handles the user input for viewing the selected help article
+ * <p>
+ * Title: InstructorHomePageController
+ * </p>
  * 
+ * <p>
+ * Description: Manages the page that displays a selected help article's information
+ * </p>
  */
 public class ViewArticleController extends PageController {
+	
+	/**
+	 * The help article that is currently being viewed on the page
+	 */
     private Article articleToView;
 
-    // Constructors
+    /**
+     * Default constructor required for FXML loader initialization.
+     */
     public ViewArticleController() {
         super();
     }
 
+    /**
+     * Constructs a ViewArticleController with the specified stage and database.
+     *
+     * @param primaryStage The main application window
+     * @param db The database instance to be used
+     */
     public ViewArticleController(Stage primaryStage, Database db) {
         super(primaryStage, db);
     }
 
-    // UI Elements
+    /**
+     * FXML injected UI elements for the view of the page
+     */
     @FXML
     private TextField titleField;  
 
@@ -54,6 +73,10 @@ public class ViewArticleController extends PageController {
     @FXML
     private Button logout;
 
+    /**
+     * Initializes the controller and populates the UI fields with the selected article's data.
+     * Displays an error alert if no article is selected.
+     */
     @FXML
     public void initialize() {
         Article selectedArticle = UserSession.getInstance().getSelectedArticle();
@@ -65,27 +88,47 @@ public class ViewArticleController extends PageController {
             keywordsField.setText(selectedArticle.getKeywords());
             bodyField.setText(selectedArticle.getBody());  // Ensure body content is loaded here
             referencesField.setText(selectedArticle.getReferences());
+            
+         // Hide edit button if user is a student
+            String currentRole = UserSession.getInstance().getCurrentRole();
+            editArticle.setVisible(!"student".equals(currentRole));
         } else {
             showErrorAlert("Error", "No article selected.");
         }
     }
 
-    // Navigation method to go back to the search list
+    /**
+     * Handles navigation back to the previous view based on user role.
+     * Admins are directed to the article management view, while instructors and students
+     * return to their respective homepages.
+     */
     @FXML
     public void goBackToList() {
+        // Clear the selected article when leaving the view page
+        UserSession.getInstance().setSelectedArticle(null);
+        
         String currentRole = UserSession.getInstance().getCurrentRole();
         if ("admin".equals(currentRole)) {
             // Admins go to the article management view
             navigateTo("/views/SearchArticleView.fxml");
+        } else if("student".equals(currentRole))  {
+        	// Students go to their general article view
+        	navigateTo("/views/StudentHomepageView.fxml");
         } else {
-        	// Instructors and students go back to their homepage
+            // Instructors go back to their homepage
             goHome();
         }
     }
 
-    // Navigate to the edit article view
+    /**
+     * Navigates to the edit article view for the currently selected article.
+     */
     @FXML
     public void goToEditArticle() {
-        navigateTo("/views/CreateEditArticleView.fxml"); // Navigate to the article edit page
+    	if(UserSession.getInstance().getSelectedArticle().checkSpecialGroupArticle() == true) {
+    		navigateTo("/views/SpecialGroupAddEditArticleView.fxml");
+    	} else {
+    		navigateTo("/views/CreateEditArticleView.fxml"); 
+    	}    
     }
 }

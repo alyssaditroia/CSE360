@@ -40,18 +40,31 @@ import models.Article;
  */
 public class HelpArticleController extends PageController {
     
-    // Database handler instance
+	/**
+     * Help article database instance
+     */
     private HelpArticleDatabase had;
     
+    /**
+     * Default Constructor
+     */
 	public HelpArticleController() {
 		super();
 	}
-
+	
+	/**
+	 * Constructs a HelpArticleController with the specified stage and database.
+	 *
+	 * @param primaryStage The main application window
+	 * @param db The database instance to be used
+	 */
 	public HelpArticleController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
 
-    // FXML fields corresponding to HelpArticleView.fxml file
+    /**
+     * FXML fields corresponding to the Help Article View
+     */
     @FXML
     private TextField titleField;
     @FXML

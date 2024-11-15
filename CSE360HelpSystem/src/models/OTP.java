@@ -18,11 +18,37 @@ import Encryption.EncryptionHelper;
  * @author Alyssa DiTroia
  */
 public class OTP {
+	/**
+     * The one-time password stored as a character array for security.
+     */
 	private char[] OTP;
+	
+	/**
+     * The expiration timestamp for the current OTP.
+     * After this time, the OTP becomes invalid.
+     */
 	private LocalDateTime expiration;
+	
+	/**
+     * Flag indicating whether the OTP is currently valid.
+     * True indicates the OTP is active and can be used, false indicates it has been used or invalidated.
+     */
 	private boolean flag;
+	
+	/**
+     * Database instance for managing OTP data persistence.
+     */
 	private Database db;
+	
+	/**
+     * Helper instance for encrypting and decrypting OTP data.
+     */
 	private EncryptionHelper encryptionHelper;
+	
+	/**
+     * Random number generator for OTP creation.
+     * Used to generate secure random values for one-time passwords.
+     */
 	private Random random = new Random();
 
 	/**

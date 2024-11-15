@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.CreateSpecialGroupController" spacing="20" alignment="CENTER"
+      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+    
+    <Label text="Create Special Group"/>
+    <TextField fx:id="groupNameField" promptText="Enter group name"/>
+    <Button text="Create Group" onAction="#handleCreateGroup" minWidth="200"/>
+    <Button text="Return Home" onAction="#goHome" minWidth="200"/>
+</VBox>

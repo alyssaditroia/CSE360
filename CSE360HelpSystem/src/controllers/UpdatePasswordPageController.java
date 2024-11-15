@@ -32,6 +32,9 @@ import models.TextValidation;
  * @author Alyssa DiTroia
  */
 public class UpdatePasswordPageController extends PageController {
+	/**
+     * Database instance for managing user passwords
+     */
 	private Database db;
 
 	// Constructor for FXMLLoader
@@ -44,6 +47,9 @@ public class UpdatePasswordPageController extends PageController {
 		super(primaryStage, db);
 	}
 
+	/**
+     * FXML injected UI elements for the view of the page
+     */
 	@FXML
 	private TextField usernameField;
 
@@ -109,6 +115,9 @@ public class UpdatePasswordPageController extends PageController {
 		}
 	}
 
+	/**
+	 * Navigates to the system login page
+	 */
 	private void redirectToLogin() {
 		navigateTo("/views/LoginPageView.fxml");
 	}

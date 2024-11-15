@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SelectSpecialGroupController" spacing="20" alignment="CENTER"
+      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="Select Special Group" style="-fx-font-size: 18px;"/>
+    
+    <VBox alignment="CENTER" spacing="10">
+        <ComboBox fx:id="groupDropdown" 
+                  promptText="Choose a group"
+                  minWidth="200"/>
+        
+        <Button text="Select Group" 
+                onAction="#handleGroupSelection"
+                minWidth="200"/>
+                
+        <Button text="Return Home" 
+                onAction="#goHome"
+                minWidth="200"/>
+    </VBox>
+</VBox>

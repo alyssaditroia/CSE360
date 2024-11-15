@@ -40,68 +40,143 @@ import java.util.Map;
  * 
  */
 public class AdminHomePageController extends PageController {
-
+	
+	/**
+	 * Constructor for AdminHomePageController with no parameters
+	 */
 	public AdminHomePageController() {
 		super();
 	}
-
+	
+	/**
+	 * Constructor for AdminHomePageController with stage and database parameters
+	 * 
+	 * @param primaryStage the main application window
+	 * @param db the database instance to be used
+	 */
 	public AdminHomePageController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
-
+	
+	/**
+	 * Label displaying the admin home page title
+	 */
 	@FXML
 	private Label adminHomeTitle;
 
+	/**
+	 * Checkbox for admin permission selection
+	 */
 	@FXML
 	private CheckBox admin;
 
+	/**
+	 * Checkbox for student permission selection
+	 */
 	@FXML
 	private CheckBox student;
 
+	/**
+	 * Checkbox for instructor permission selection
+	 */
 	@FXML
 	private CheckBox instructor;
 
+	/**
+	 * Text field for entering email addresses
+	 */
 	@FXML
 	private TextField emailField;
 
+	/**
+	 * Button to trigger sending invites
+	 */
 	@FXML
 	private Button sendInviteButton;
 
+	/**
+	 * TableView displaying user information
+	 */
 	@FXML
 	private TableView<User> userTable;
 
+	/**
+	 * Column for displaying usernames
+	 */
 	@FXML
 	private TableColumn<User, String> usernameColumn;
 
+	/**
+	 * Column for displaying preferred names
+	 */
 	@FXML
 	private TableColumn<User, String> preferrednameColumn;
 
+	/**
+	 * Column for displaying email addresses
+	 */
 	@FXML
 	private TableColumn<User, String> emailColumn;
 
+	/**
+	 * Column for displaying admin status
+	 */
 	@FXML
 	private TableColumn<User, Boolean> adminColumn;
 
+	/**
+	 * Column for displaying student status
+	 */
 	@FXML
 	private TableColumn<User, Boolean> studentColumn;
 
+	/**
+	 * Column for displaying instructor status
+	 */
 	@FXML
 	private TableColumn<User, Boolean> instructorColumn;
 
+	/**
+	 * Column containing update permissions controls
+	 */
 	@FXML
 	private TableColumn<User, Void> updatePermissionsColumn;
 
+	/**
+	 * Column containing password reset controls
+	 */
 	@FXML
 	private TableColumn<User, Void> resetPasswordColumn;
 
+	/**
+	 * Column containing delete user controls
+	 */
 	@FXML
 	private TableColumn<User, Void> deleteColumn;
 
+	/**
+	 * Button for logging out of the application
+	 */
 	@FXML
 	private Button logoutButton;
 	
+	/**
+	 * Button for viewing articles
+	 */
 	@FXML
 	private Button viewArticlesButton;
+	
+	@FXML
+	private TableColumn<User, Integer> idColumn;
+	
+	@FXML
+	private Button SpecialGroupButton;
+	
+	@FXML
+	private Button backupRestoreButton;
+	
+	@FXML 
+	private Button MessagesButton;
 
 	/**
 	 * Handles invite button click ensures email field contains proper input and the
@@ -159,6 +234,7 @@ public class AdminHomePageController extends PageController {
 		//navigateTo("/views/HelpArticleView.fxml");
 		navigateTo("/views/SearchArticleView.fxml");
 	}
+	
 	/**
 	 * Set permissions for a new user
 	 * 
@@ -176,6 +252,8 @@ public class AdminHomePageController extends PageController {
 	 * Initialize table columns and their associated action buttons
 	 */
 	private void initializeTable() {
+		idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+		
 		usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
 		preferrednameColumn.setCellValueFactory(new PropertyValueFactory<>("preferredName"));
 		emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -301,6 +379,7 @@ public class AdminHomePageController extends PageController {
 			for (Map<String, Object> row : rawUsers) {
 				User user = new User();
 				// Use the keys to retrieve values from the map
+				user.setId((Integer) row.get("id"));
 				user.setUsername((String) row.get("username"));
 				user.setPreferredName((String) row.get("preferredName"));
 				user.setEmail((String) row.get("email"));
@@ -335,7 +414,9 @@ public class AdminHomePageController extends PageController {
 		return token.toString();
 	}
 
-	// Show alert messages
+	/**
+	 * List to store alert messages
+	 */
 	private List<String> alertMessages = new ArrayList<>();
 
 	/**
@@ -364,7 +445,14 @@ public class AdminHomePageController extends PageController {
 	 * @param isInstructor
 	 */
 	private void updatePermissions(User user, Boolean isAdmin, Boolean isStudent, Boolean isInstructor) {
-
+		// Check if we're removing admin from the last admin
+	    if (!isAdmin && user.isAdmin() && isLastAdminUser(user.getEmail())) {
+	        showAlert("Error", 
+	                 "Cannot remove admin role", 
+	                 "There must be at least one user with admin privileges in the system.");
+	        return;
+	    }
+	    
 		// Show a confirmation dialog before applying changes
 		Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
 		confirmationAlert.setTitle("Update Permissions");
@@ -404,6 +492,14 @@ public class AdminHomePageController extends PageController {
 	 * @param user
 	 */
 	private void deleteUser(User user) {
+		// Check if we're deleting the last admin
+	    if (user.isAdmin() && isLastAdminUser(user.getEmail())) {
+	        showAlert("Error", 
+	                 "Cannot delete user", 
+	                 "Cannot delete the last user with admin privileges from the system.");
+	        return;
+	    }
+		
 		Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
 		confirmationAlert.setTitle("Delete User");
 		confirmationAlert.setHeaderText("Delete User: " + user.getUsername());
@@ -430,8 +526,53 @@ public class AdminHomePageController extends PageController {
 		loadUsers(); // Load users into the TableView
 	}
 	
+	/**
+	 * Navigates to the backup and restore view
+	 */
 	@FXML
 	private void navigateToBackupRestore() {
 	    navigateTo("/views/BackupRestoreView.fxml");
+	}
+	
+	
+	@FXML
+	private void navigateToSpecialGroupSelection() {
+	    navigateTo("/views/SelectSpecialGroupView.fxml");
+	}
+	
+	
+	@FXML
+	private void navigateToMessageSystem() {
+	    navigateTo("/views/MessagingSystemView.fxml");
+	}
+	
+	
+	private boolean isLastAdminUser(String email) {
+	    try {
+	        // Get all users
+	        List<Map<String, Object>> allUsers = db.getAllUsers();
+	        
+	        // Count how many admin users we have
+	        int adminCount = 0;
+	        boolean isUserAdmin = false;
+	        
+	        // Count total admins and check if this user is an admin
+	        for (Map<String, Object> user : allUsers) {
+	            if ((Boolean) user.get("isAdmin")) {
+	                adminCount++;
+	                if (user.get("email").equals(email)) {
+	                    isUserAdmin = true;
+	                }
+	            }
+	        }
+	        
+	        // Return true only if this user is an admin AND there is exactly one admin total
+	        // This means they are the last/only admin
+	        return isUserAdmin && adminCount == 1;
+	        
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
 	}
 }

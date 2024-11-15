@@ -27,7 +27,7 @@ import models.UserSession;
  * Description: Manages the page that allows the user to search the system for specific help articles
  * </p>
  */
-public class SearchArticleController extends PageController {
+public class StudentGeneralViewController extends PageController {
 	/**
      * Help article database instance
      */
@@ -36,7 +36,7 @@ public class SearchArticleController extends PageController {
     /**
      * Default constructor required for FXML loader initialization.
      */
-    public SearchArticleController() {
+    public StudentGeneralViewController() {
         super();
     }
 
@@ -47,7 +47,7 @@ public class SearchArticleController extends PageController {
 	 * @param primaryStage The main application window
 	 * @param db The database instance to be used
 	 */
-    public SearchArticleController(Stage primaryStage, Database db) {
+    public StudentGeneralViewController(Stage primaryStage, Database db) {
         super(primaryStage, db);
     }
     
@@ -86,17 +86,23 @@ public class SearchArticleController extends PageController {
     @FXML
     private ListView<String> groupFilterListView;
     
-    @FXML
-    private TextField idSearchField;
-    
-    @FXML
+    @FXML 
     private ComboBox<String> levelFilterComboBox;
     
-    @FXML
+    @FXML 
     private ListView<String> levelFilterListView;
     
     @FXML
+    private Label activeGroupsLabel;
+    
+    @FXML
     private Label levelStatsLabel;
+    
+    @FXML
+    private ListView<String> articleSummaryList;
+    
+    @FXML
+    private TextField idSearchField;
 
 
 	/**
@@ -109,7 +115,11 @@ public class SearchArticleController extends PageController {
             had = new HelpArticleDatabase();
 
             // Set up the table columns with corresponding properties from the Article model
-            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+            idColumn.setCellValueFactory(column -> 
+	            new javafx.beans.property.ReadOnlyObjectWrapper<>(
+	                articleTable.getItems().indexOf(column.getValue()) + 1
+	            )
+	        );
             titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
             abstractColumn.setCellValueFactory(new PropertyValueFactory<>("abstractText"));  // Use correct property
             authorsColumn.setCellValueFactory(new PropertyValueFactory<>("authors"));
@@ -122,8 +132,8 @@ public class SearchArticleController extends PageController {
             List<String> levels = Arrays.asList("beginner", "intermediate", "advanced", "expert");
             levelFilterComboBox.setItems(FXCollections.observableArrayList(levels));
 
-            // Initially load all general articles into the table
-            loadAllArticles();
+            // Initially load all articles into the table
+            loadAllArticles();  // Load all articles at first
         } catch (Exception e) {
             showErrorAlert("Error", "Failed to initialize the SearchArticleController: " + e.getMessage());
         }
@@ -134,9 +144,9 @@ public class SearchArticleController extends PageController {
      */
     public void loadAllArticles() {
         try {
-            List<Article> articles = had.getAllGeneralArticles();  // Fetch all general articles from the database
+            List<Article> articles = had.getAllGeneralArticles();  // Changed from getAllDecryptedArticles() to getAllGeneralArticles()
             ObservableList<Article> articleList = FXCollections.observableArrayList(articles);
-            articleTable.setItems(articleList);  // Set data in TableView
+            articleTable.setItems(articleList);
         } catch (SQLException e) {
             showErrorAlert("Error", "Failed to load articles: " + e.getMessage());
         } catch (Exception e) {
@@ -149,8 +159,15 @@ public class SearchArticleController extends PageController {
      */
     @FXML
     public void loadArticles() {
-        try {
-            // Get search and filters selected
+        try { 	
+        	// Get the student's search field and if isn't empty add their search to the user session 
+        	String originalSearchText = searchField.getText().trim();
+        	if (!originalSearchText.isEmpty()) {
+        	    UserSession.getInstance().addUserSearch(originalSearchText);
+        	    System.out.println("[INFO in UserSession] Added search: " + originalSearchText);
+        	}
+        	
+        	// Get search and filters selected
             String searchQuery = searchField.getText().toLowerCase();
             List<String> selectedGroups = new ArrayList<>(groupFilterListView.getItems());
             List<String> selectedLevels = new ArrayList<>(levelFilterListView.getItems());
@@ -170,13 +187,14 @@ public class SearchArticleController extends PageController {
                     (article.getLevel() != null && selectedLevels.contains(article.getLevel())))
                 .collect(Collectors.toList());
             
-            // Update level statistics
+            // Count articles per level, handling null levels
             Map<String, Long> levelCounts = articles.stream()
                 .collect(Collectors.groupingBy(
                     article -> article.getLevel() != null ? article.getLevel() : "unspecified",
                     Collectors.counting()
                 ));
             
+            // Update the label with safe default values of 0
             levelStatsLabel.setText(
                 "Beginner(" + levelCounts.getOrDefault("beginner", 0L) + 
                 ") Intermediate(" + levelCounts.getOrDefault("intermediate", 0L) + 
@@ -300,7 +318,32 @@ public class SearchArticleController extends PageController {
         groupFilterListView.getItems().clear();
         loadArticles(); // Reapply any keyword filters
     }
+    
+    @FXML
+    public void addLevelToFilter() {
+        String selectedLevel = levelFilterComboBox.getValue();
+        if (selectedLevel != null && !selectedLevel.isEmpty() 
+                && !levelFilterListView.getItems().contains(selectedLevel)) {
+            levelFilterListView.getItems().add(selectedLevel);
+            levelFilterComboBox.setValue(null);
+            loadArticles();
+        }
+    }
 
+    @FXML
+    public void clearLevelFilters() {
+        levelFilterListView.getItems().clear();
+        loadArticles();
+    }
+    
+    /**
+     * 
+     */
+    @FXML
+    private void returnHome() {
+		navigateTo("/views/StudentHomePageView.fxml");
+	}
+    
     @FXML
     public void searchById() {
         try {
@@ -323,20 +366,5 @@ public class SearchArticleController extends PageController {
         }
     }
 
-    @FXML
-    public void addLevelToFilter() {
-        String selectedLevel = levelFilterComboBox.getValue();
-        if (selectedLevel != null && !selectedLevel.isEmpty() 
-                && !levelFilterListView.getItems().contains(selectedLevel)) {
-            levelFilterListView.getItems().add(selectedLevel);
-            levelFilterComboBox.setValue(null);
-            loadArticles();
-        }
-    }
-
-    @FXML
-    public void clearLevelFilters() {
-        levelFilterListView.getItems().clear();
-        loadArticles();
-    }
 }
+

@@ -24,10 +24,27 @@ import models.Article;
  */
 public class HelpArticleDatabase extends Database{
 
-    private Database db; // Use the existing Database class
+	/**
+	 * Database instance for interacting with core database functionality
+	 */
+    private Database db; // NOTE: Use the existing Database class
+    
+    /**
+     * Database connection instance
+     */
     private Connection connection;
+    
+    /**
+     * Encryption helper instance for encrypting/decrypting article data
+     */
     private EncryptionHelper encryptionHelper;
 
+    /**
+     * Constructor for HelpArticleDatabase
+     * Initializes database connection and creates necessary tables
+     * 
+     * @throws Exception if database connection or table creation fails
+     */
     public HelpArticleDatabase() throws Exception {
     	System.out.println("[INFO in HelpArticleDB] Help Article Table Initializing");
         // Initialize the Database instance and connection
@@ -126,15 +143,23 @@ public class HelpArticleDatabase extends Database{
 		}
 		return false;
 	}
+	
 	/**
-	 * Creates new article in the database
-	 * @param title
-	 * @param authors
-	 * @param abstractText
-	 * @param keywords
-	 * @param body
-	 * @param references
-	 * @throws Exception
+	 * Creates a new Article either from individual parameters or an Article object
+	 * 
+	 * @param title article title
+	 * @param authors article authors
+	 * @param abstractText article abstract
+	 * @param keywords article keywords
+	 * @param body article body content
+	 * @param references article references
+	 * @param level article difficulty level
+	 * @param groupingIdentifiers list of groups/tags for the article
+	 * @param permissions access permissions for the article
+	 * @param dateAdded date the article was created
+	 * @param version article version number
+	 * 
+	 * @throws Exception if encryption or database operation fails
 	 */
 	public void createArticle(char[] title, char[] authors, char[] abstractText, char[] keywords, char[] body,
 			char[] references, String level, List<String> groupingIdentifiers, String permissions, Date dateAdded,
@@ -171,12 +196,14 @@ public class HelpArticleDatabase extends Database{
 			pstmt.executeUpdate();
 		}
 	}
-	/**
-	 * 
-	 * createsArticle from Article Object instead of individual parameters
-	 * @param article
-	 * @throws Exception
-	 */
+	
+	 /**
+     * Creates a new article from an Article object.
+     * Encrypts all sensitive data before storing in the database.
+     * 
+     * @param article Article object containing all article information
+     * @throws Exception if encryption or database operation fails
+     */
 	public void createArticle(Article article) throws Exception {
 	    // Generate IV based on article title
 	    byte[] iv = EncryptionUtils.getInitializationVector(article.getTitle().toCharArray());
@@ -215,12 +242,14 @@ public class HelpArticleDatabase extends Database{
 	}
 
 
-    /**
-     * Gets article from the database and decrypts it
-     * @param id
-     * @return
-     * @throws Exception
-     */
+	/**
+	 * Gets an article from the database and decrypts it
+	 * 
+	 * @param id the unique identifier of the article to retrieve
+	 * @return String[] array containing decrypted article fields in order: title, authors, abstract, keywords, body, references, level, grouping_identifiers, permissions, date_added, version
+	 * @throws SQLException if database retrieval fails
+	 * @throws Exception if decryption fails or article not found
+	 */
 	public String[] getDecryptedArticle(int id) throws Exception {
 	    String sql = "SELECT * FROM articles WHERE id = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -337,16 +366,18 @@ public class HelpArticleDatabase extends Database{
 
 
 	/**
-	 * Helper function to clear character arrays from memory
-	 * @param array
+	 * Clears sensitive data from character arrays
+	 * @param array the character array to clear
 	 */
 	private void clearCharArray(char[] array) {
 	    Arrays.fill(array, ' ');
 	}
 		
 	/**
-	 * Lists all articles
-	 * @throws Exception
+	 * Lists all articles in the database with basic information
+	 * 
+	 * @throws SQLException if database access fails
+	 * @throws Exception if decryption fails or other errors occur
 	 */
 	public void listArticles() throws Exception {
         String sql = "SELECT id, iv, title, authors FROM articles";
@@ -371,11 +402,14 @@ public class HelpArticleDatabase extends Database{
         }
     }
 		
+
 	/**
-	 * filterArticlesByLevel will only select articles from the specified level
-	 * @param level
-	 * @return
-	 * @throws Exception
+	 * Filters articles based on their difficulty level
+	 * 
+	 * @param level the difficulty level to filter by
+	 * @return List<Article> list of articles matching the specified level
+	 * @throws SQLException if database access fails
+	 * @throws Exception if decryption fails or other errors occur
 	 */
 	public List<Article> filterArticlesByLevel(String level) throws Exception {
 	    List<Article> articles = new ArrayList<>();
@@ -394,11 +428,13 @@ public class HelpArticleDatabase extends Database{
 	}
 		
 	/**
-	 * 
-	 * @param searchQuery
-	 * @return
-	 * @throws Exception
-	 */
+     * Searches for articles based on a search query.
+     * Searches through decrypted titles, authors, and keywords.
+     * 
+     * @param searchQuery the text to search for in articles
+     * @return List<Article> list of articles matching the search query
+     * @throws Exception if database access or decryption fails
+     */
 	public List<Article> searchArticles(String searchQuery) throws Exception {
 	    List<Article> articles = new ArrayList<>();
 	    String sql = "SELECT * FROM articles";  // Fetch all articles
@@ -425,10 +461,11 @@ public class HelpArticleDatabase extends Database{
 		
 		
 	/**
+	 * Checks if an article matches the given search query in its title, authors, or keywords
 	 * 
-	 * @param article
-	 * @param searchQuery
-	 * @return
+	 * @param article the Article to check
+	 * @param searchQuery the search term to look for
+	 * @return true if the article matches the search query, false otherwise
 	 */
 	private boolean matchesSearchQuery(Article article, String searchQuery) {
 	    // Check if title, authors, or keywords contain the search query
@@ -438,13 +475,18 @@ public class HelpArticleDatabase extends Database{
 	}
 
 		
+
 	/**
+	 * Retrieves a single article from the database and decrypts it
 	 * 
-	 * @param rs
-	 * @return
-	 * @throws Exception
+	 * @param rs ResultSet containing the encrypted article data
+	 * @return decrypted Article object
+	 * @throws Exception if decryption or database operation fails
 	 */
 	public Article decryptArticleFromResultSet(ResultSet rs) throws Exception {
+	    // Get the ID first
+	    int id = rs.getInt("id");
+
 	    // Retrieve the IV (Initialization Vector)
 	    String ivBase64 = rs.getString("iv");
 	    byte[] iv = Base64.getDecoder().decode(ivBase64);
@@ -465,79 +507,75 @@ public class HelpArticleDatabase extends Database{
 	    char[] body = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedBody, iv));
 	    char[] references = EncryptionUtils.toCharArray(encryptionHelper.decrypt(encryptedReferences, iv));
 
-	    // Get non-encrypted fields (e.g., level, grouping identifiers, permissions)
+	    // Get non-encrypted fields
 	    String level = rs.getString("level");
 	    String groupingIdentifiers = rs.getString("grouping_identifiers");
 	    String permissions = rs.getString("permissions");
 	    java.sql.Date dateAdded = rs.getDate("date_added");
 	    String version = rs.getString("version");
 	    
-	    // DEBUG CHECK
-	    System.out.println("Retrieved grouping identifiers for article: " + groupingIdentifiers);
-	    
-	    // Create and return the Article object
+	    // Use the constructor that includes ID
 	    return new Article(
-	        title, authors, abstractText, keywords, body, references, level,
+	        id, title, authors, abstractText, keywords, body, references, level,
 	        List.of(groupingIdentifiers.split(",")), permissions, dateAdded, version
 	    );
 	}
 
 
 	/**
-	 * Backups articles from database
-	 * @param filename
-	 * @throws SQLException
-	 * @throws IOException
+	 * Adds specified groups to the backup operation
+	 * 
+	 * @param filename path to backup file
+	 * @param groups list of groups to include in backup
+	 * @throws Exception if backup operation fails
 	 */
-	public void backupArticles(String filename) throws SQLException, IOException {
-	    String sql = "SELECT * FROM articles";
-	    try (Statement stmt = connection.createStatement();
-	         ResultSet rs = stmt.executeQuery(sql);
-	         BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+	public void backupArticles(String filename) throws Exception {
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+	        // Get all general articles using the existing method
+	        List<Article> articles = getAllGeneralArticles();
 	        
-	        while (rs.next()) {
-	            int id = rs.getInt("id");
-	            String iv = rs.getString("iv");
-	            String title = rs.getString("title");
-	            String authors = rs.getString("authors");
-	            String abstractText = rs.getString("abstract");
-	            String keywords = rs.getString("keywords");
-	            String body = rs.getString("body");
-	            String references = rs.getString("references");
-	            String level = rs.getString("level");
-	            String groupingIdentifiers = rs.getString("grouping_identifiers");
-	            String permissions = rs.getString("permissions");
-	            Date dateAdded = rs.getDate("date_added");
-	            String version = rs.getString("version");
-
+	        for (Article article : articles) {
+	            // Generate IV for encryption
+	            byte[] iv = EncryptionUtils.getInitializationVector(article.getTitle().toCharArray());
+	            
+	            // Encrypt the article fields
+	            byte[] encryptedTitle = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getTitle().toCharArray()), iv);
+	            byte[] encryptedAuthors = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAuthors().toCharArray()), iv);
+	            byte[] encryptedAbstract = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getAbstractText().toCharArray()), iv);
+	            byte[] encryptedKeywords = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getKeywords().toCharArray()), iv);
+	            byte[] encryptedBody = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getBody().toCharArray()), iv);
+	            byte[] encryptedReferences = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getReferences().toCharArray()), iv);
+	            
 	            // Write each field to the backup file
-	            writer.write(id + "\n");
-	            writer.write(iv + "\n");
-	            writer.write(title + "\n");
-	            writer.write(authors + "\n");
-	            writer.write(abstractText + "\n");
-	            writer.write(keywords + "\n");
-	            writer.write(body + "\n");
-	            writer.write(references + "\n");
-	            writer.write(level + "\n");
-	            writer.write(groupingIdentifiers + "\n");
-	            writer.write(permissions + "\n");
-	            writer.write(dateAdded + "\n");
-	            writer.write(version + "\n");
+	            writer.write(article.getId() + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(iv) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedTitle) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedAuthors) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedAbstract) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedKeywords) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedBody) + "\n");
+	            writer.write(Base64.getEncoder().encodeToString(encryptedReferences) + "\n");
+	            writer.write(article.getLevel() + "\n");
+	            writer.write(String.join(",", article.getGroupingIdentifiers()) + "\n");
+	            writer.write(article.getPermissions() + "\n");
+	            writer.write(article.getDateAdded().toString() + "\n");
+	            writer.write(article.getVersion() + "\n");
 	            writer.write("END_OF_ARTICLE\n");
 	        }
 	    }
-	    System.out.println("[INFO in HelpArticleDB] Articles backed up to " + filename);
+	    System.out.println("[INFO in HelpArticleDB] General articles backed up to " + filename);
 	}
 
-    /**
-     * restores articles
-     * @param filename
-     * @throws SQLException
-     * @throws IOException
-     */
+	/**
+	 * Restores articles from a backup file
+	 * 
+	 * @param filename path to the backup file to restore from
+	 * @throws SQLException if database operations fail
+	 * @throws IOException if file reading fails
+	 */
 	public void restoreArticles(String filename) throws SQLException, IOException {
-	    String deleteSql = "DELETE FROM articles"; // Clears current data before restore
+		// Delete all general articles from the database to replace them with backup
+		String deleteSql = "DELETE FROM articles WHERE id NOT IN (SELECT article_id FROM special_group_articles)";
 	    try (Statement stmt = connection.createStatement()) {
 	        stmt.executeUpdate(deleteSql);
 	    }
@@ -583,11 +621,14 @@ public class HelpArticleDatabase extends Database{
 	    System.out.println("[INFO in HelpArticleDB] Articles restored from " + filename);
 	}
 		
-	/**
-	 * 
-	 * @param article
-	 * @throws Exception
-	 */
+
+    /**
+     * Updates an existing article in the database.
+     * Encrypts all sensitive data before updating the database record.
+     * 
+     * @param article Article object containing updated information
+     * @throws Exception if encryption or database update operation fails
+     */
 	public void updateArticle(Article article) throws Exception {
 		char[] title = article.getTitle().toCharArray();
 	    // Generate the IV (Initialization Vector) from the article title, just like in createArticle()
@@ -628,10 +669,11 @@ public class HelpArticleDatabase extends Database{
 	}
 
 
-    /**
-     * Deletes an article
-     * @param id
-     * @throws SQLException
+	/**
+     * Deletes an article from the database.
+     * 
+     * @param id unique identifier of the article to delete
+     * @throws SQLException if database deletion operation fails
      */
     public void deleteArticle(int id) throws SQLException {
         String sql = "DELETE FROM articles WHERE id = ?";
@@ -673,13 +715,16 @@ public class HelpArticleDatabase extends Database{
     }
 	
     /**
+     * Backs up articles from specific groups to a file
      * 
-     * @param filename
-     * @param groups
-     * @throws Exception
+     * @param filename path where backup file should be created
+     * @param groups list of group identifiers to include in backup
+     * @throws SQLException if database access fails
+     * @throws IOException if file writing fails
+     * @throws Exception if encryption fails or other errors occur
      */
     public void backupGroupArticles(String filename, List<String> groups) throws Exception {
-        List<Article> articlesToBackup = getAllDecryptedArticles().stream()
+        List<Article> articlesToBackup = getAllGeneralArticles().stream()
             .filter(article -> article.getGroupingIdentifiers().stream()
                 .anyMatch(groups::contains))
             .collect(Collectors.toList());
@@ -718,7 +763,12 @@ public class HelpArticleDatabase extends Database{
     }
 
     /**
-     * Restores articles with merge option
+     * Restores articles with option to merge with existing content
+     * 
+     * @param filename path to the backup file to restore from
+     * @param merge if true, preserves existing articles and only adds new ones; if false, replaces all content
+     * @throws SQLException if database operations fail
+     * @throws IOException if file reading fails
      */
     public void restoreArticlesWithMerge(String filename, boolean merge) throws SQLException, IOException {
         if (!merge) {
@@ -780,6 +830,161 @@ public class HelpArticleDatabase extends Database{
                     pstmt.setDate(12, new java.sql.Date(dateAdded.getTime()));
                     pstmt.setString(13, version);
                     pstmt.executeUpdate();
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * Gets all articles that are not part of any special group
+     * 
+     * @return List<Article> list of general articles not tied to any special group
+     * @throws Exception if database access or decryption fails
+     */
+    public List<Article> getAllGeneralArticles() throws Exception {
+        List<Article> articles = new ArrayList<>();
+        
+        // First check if special_group_articles table exists
+        boolean specialTableExists = false;
+        try (ResultSet rs = connection.getMetaData().getTables(null, null, "SPECIAL_GROUP_ARTICLES", null)) {
+            specialTableExists = rs.next();
+        }
+        
+        // Build appropriate SQL query based on table existence
+        String sql;
+        if (specialTableExists) {
+            sql = "SELECT id, iv, title, authors, abstract, keywords, body, references, level, " +
+                  "grouping_identifiers, permissions, date_added, version FROM articles " +
+                  "WHERE id NOT IN (SELECT article_id FROM special_group_articles)";
+        } else {
+            // If table doesn't exist, just get all articles
+            sql = "SELECT id, iv, title, authors, abstract, keywords, body, references, level, " +
+                  "grouping_identifiers, permissions, date_added, version FROM articles";
+        }
+        
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                // Use existing decryption logic
+                Article article = decryptArticleFromResultSet(rs);
+                articles.add(article);
+            }
+        }
+        System.out.println("[INFO in HelpArticleDB] All general articles retrieved from database");
+        return articles;
+    }
+    
+    
+    public void backupSpecialGroupArticles(String filename, int groupId) throws SQLException, IOException {
+        // Debug print
+        System.out.println("Backing up articles for group ID: " + groupId);
+        
+        String sql = "SELECT a.* FROM articles a " +
+                     "INNER JOIN special_group_articles sga ON a.id = sga.article_id " +
+                     "WHERE sga.group_id = ?";
+                     
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, groupId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            // Debug print
+            System.out.println("Found articles in group: " + rs.getFetchSize());
+            
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    // Debug print
+                    System.out.println("Writing article ID: " + id);
+                    
+                    String ivBase64 = rs.getString("iv");
+                    String title = rs.getString("title");
+                    String authors = rs.getString("authors");
+                    String abstractText = rs.getString("abstract");
+                    String keywords = rs.getString("keywords");
+                    String body = rs.getString("body");
+                    String references = rs.getString("references");
+                    String level = rs.getString("level");
+                    String groupingIdentifiers = rs.getString("grouping_identifiers");
+                    String permissions = rs.getString("permissions");
+                    String dateAdded = rs.getString("date_added");
+                    String version = rs.getString("version");
+
+                    // Write each field to the backup file
+                    writer.write(id + "\n");
+                    writer.write(ivBase64 + "\n");
+                    writer.write(title + "\n");
+                    writer.write(authors + "\n");
+                    writer.write(abstractText + "\n");
+                    writer.write(keywords + "\n");
+                    writer.write(body + "\n");
+                    writer.write(references + "\n");
+                    writer.write(level + "\n");
+                    writer.write(groupingIdentifiers + "\n");
+                    writer.write(permissions + "\n");
+                    writer.write(dateAdded + "\n");
+                    writer.write(version + "\n");
+                    writer.write("END_OF_ARTICLE\n");
+                }
+            }
+        }
+    }
+    
+    
+    public void restoreSpecialGroupArticles(String filename, int groupId) throws SQLException, IOException {
+        // First clear existing articles for this group
+        String deleteSql = "DELETE FROM special_group_articles WHERE group_id = ?";
+        try (PreparedStatement deleteStmt = connection.prepareStatement(deleteSql)) {
+            deleteStmt.setInt(1, groupId);
+            deleteStmt.executeUpdate();
+        }
+
+        // Now restore from backup and associate with group
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                int id = Integer.parseInt(line);
+                String iv = reader.readLine();
+                String title = reader.readLine();
+                String authors = reader.readLine();
+                String abstractText = reader.readLine();
+                String keywords = reader.readLine();
+                String body = reader.readLine();
+                String references = reader.readLine();
+                String level = reader.readLine();
+                String groupingIdentifiers = reader.readLine();
+                String permissions = reader.readLine();
+                Date dateAdded = Date.valueOf(reader.readLine());
+                String version = reader.readLine();
+                reader.readLine(); // Skip "END_OF_ARTICLE"
+
+                // Insert/Update the article
+                String insertSql = "MERGE INTO articles (id, iv, title, authors, abstract, keywords, body, references, level, grouping_identifiers, permissions, date_added, version) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement pstmt = connection.prepareStatement(insertSql)) {
+                    pstmt.setInt(1, id);
+                    pstmt.setString(2, iv);
+                    pstmt.setString(3, title);
+                    pstmt.setString(4, authors);
+                    pstmt.setString(5, abstractText);
+                    pstmt.setString(6, keywords);
+                    pstmt.setString(7, body);
+                    pstmt.setString(8, references);
+                    pstmt.setString(9, level);
+                    pstmt.setString(10, groupingIdentifiers);
+                    pstmt.setString(11, permissions);
+                    pstmt.setDate(12, dateAdded);
+                    pstmt.setString(13, version);
+                    pstmt.executeUpdate();
+                    
+                    // Associate with special group
+                    String groupSql = "INSERT INTO special_group_articles (group_id, article_id) VALUES (?, ?)";
+                    try (PreparedStatement groupStmt = connection.prepareStatement(groupSql)) {
+                        groupStmt.setInt(1, groupId);
+                        groupStmt.setInt(2, id);
+                        groupStmt.executeUpdate();
+                    }
                 }
             }
         }
