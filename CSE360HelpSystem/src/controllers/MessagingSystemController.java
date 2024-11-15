@@ -3,9 +3,12 @@ package controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import models.Conversation;
+import models.ConversationListCell;
+import models.HelpMessage;
+import models.UserSession;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import models.*;
 import database.HelpMessageDatabase;
 
 import java.sql.Connection;
@@ -15,8 +18,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+/**
+ * The {@code MessagingSystemController} class manages a messaging interface
+ * allowing users to view, create, and participate in help conversations.
+ * It extends PageController, so it inherits basic UI and database setup.
+ */
 
 public class MessagingSystemController extends PageController {
+	// FXML COMPONENTS
     @FXML private ListView<Conversation> conversationListView;
     @FXML private VBox chatArea;
     @FXML private TextArea messageInput;
@@ -31,6 +40,11 @@ public class MessagingSystemController extends PageController {
     private UserSession userSession;
     private ObservableList<Conversation> conversations;
 
+    /**
+     * Initializes the messaging system by
+     * setting up the UI, loading user conversations, and setting event handlers
+     * It checks the user’s role to configure the interface accordingly
+     */
     @Override
     public void initialize(javafx.stage.Stage stage, database.Database db) {
         super.initialize(stage, db);
@@ -51,7 +65,10 @@ public class MessagingSystemController extends PageController {
             showError("Error initializing messaging system");
         }
     }
-    
+    /**
+     * Configures the UI components based on the user's role. 
+     * It sets up the conversation list view and manages the visibility and items
+     */
     private void setupUI() {
         conversationListView.setItems(conversations);
         conversationListView.setCellFactory(lv -> new ConversationListCell());
@@ -69,7 +86,9 @@ public class MessagingSystemController extends PageController {
         currentUserLabel.setText("Logged in as: " + userSession.getUsername() + 
                                " (" + userSession.getCurrentRole() + ")");
     }
-    
+    /**
+     * Loads conversations based on the user’s role
+     */
     private void loadConversations() {
         if (messageDB == null) return;
         
@@ -121,7 +140,9 @@ public class MessagingSystemController extends PageController {
             showError("Error loading conversations");
         }
     }
-    
+    /**
+     * Sets up event listeners for the page
+     */
     private void setupEventHandlers() {
         conversationListView.getSelectionModel().selectedItemProperty().addListener(
             (obs, oldVal, newVal) -> {
@@ -140,7 +161,9 @@ public class MessagingSystemController extends PageController {
             }
         });
     }
-    
+    /**
+     * Configures the UI based on the user’s role
+     */
     private void configureForUserRole() {
         String role = userSession.getCurrentRole();
         switch (role) {
@@ -155,7 +178,9 @@ public class MessagingSystemController extends PageController {
                 break;
         }
     }
-    
+    /**
+     * Sets up the view for students with student permission access
+     */
     private void setupStudentView() {
         Button newConversationBtn = new Button("New Help Request");
         newConversationBtn.setOnAction(e -> startNewConversation());
@@ -164,11 +189,15 @@ public class MessagingSystemController extends PageController {
         chatArea.getChildren().add(0, newConversationBtn);
         messageTypeComboBox.setVisible(true);
     }
-    
+    /**
+     * Sets up the view for instructors with instructor permission access
+     */
     private void setupInstructorView() {
         messageTypeComboBox.setVisible(false);
     }
-    
+    /**
+     * Sets up the view for admin with admin permission access
+     */
     private void setupAdminView() {
         messageTypeComboBox.setVisible(false);
         /*
@@ -181,6 +210,9 @@ public class MessagingSystemController extends PageController {
     }
     
  // In MessagingSystemController.java, modify the sendMessage() method:
+    /**
+     * Handles sending messages
+     */
     private void sendMessage() {
         if (messageInput.getText().trim().isEmpty()) return;
         
@@ -242,7 +274,11 @@ public class MessagingSystemController extends PageController {
             showError("Error sending message");
         }
     }
-    
+    /**
+     * Creates a new conversation
+     * Finds the next available conversation ID in the database
+     * adds it to conversations, and focus on messageInput
+     */
     private void startNewConversation() {
         try {
             // Get max conversation ID from conversation_messages or start at 1
@@ -269,7 +305,11 @@ public class MessagingSystemController extends PageController {
         }
     }
 
-    
+    /**
+     * Clears and populates messageContainer with messages from the selected conversation.
+     * If the conversation is specific, it shows a type label and loads search history.
+     * @param conversation
+     */
     private void displayConversation(Conversation conversation) {
         messageContainer.getChildren().clear();
         searchHistoryList.getItems().clear();
@@ -303,7 +343,11 @@ public class MessagingSystemController extends PageController {
             showError("Error loading messages");
         }
     }
-    
+    /**
+     * Creates a formatted VBox (message bubble) to display each message. 
+     * @param message
+     * @return
+     */
     private VBox createMessageBubble(HelpMessage message) {
         VBox bubble = new VBox(5);
         bubble.getStyleClass().addAll("message-bubble");

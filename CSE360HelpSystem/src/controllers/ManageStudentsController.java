@@ -18,9 +18,13 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * The {@code ManageStudentsController} manages the page for displaying students
+ * handles inviting, displaying, and deleting students from a specific group
+ * specifically for users who only have student access to the system
+ */
 public class ManageStudentsController extends PageController {
-    
+    // FXML FIELD DEFINITIONS
     @FXML
     private TextField emailField;
     
@@ -45,20 +49,29 @@ public class ManageStudentsController extends PageController {
     @FXML
     private Button homeButton;
 
+    // CONSTRUCTOR
     public ManageStudentsController() {
         super();
     }
 
+    // CONSTRUCTOR
     public ManageStudentsController(Stage primaryStage, Database db) {
         super(primaryStage, db);
     }
 
+    /**
+     * Initializer initializes the student table and loads student data into the table
+     * Called automatically by FXML when view is created
+     */
     @FXML
     private void initialize() {
         initializeTable();
         loadStudents();
     }
 
+    /**
+     * Configures the columns in the student table to display students and management properties
+     */
     private void initializeTable() {
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         preferredNameColumn.setCellValueFactory(new PropertyValueFactory<>("preferredName"));
@@ -87,6 +100,10 @@ public class ManageStudentsController extends PageController {
         });
     }
 
+    /**
+     * Validates the email entered in the email field
+     * if the email is valid it generates an invite token and saves the invite into database
+     */
     @FXML
     public void handleInvite() {
         String email = emailField.getText();
@@ -117,7 +134,10 @@ public class ManageStudentsController extends PageController {
             showAlert("User Already Exists!", "User already exists with the email", email);
         }
     }
-
+    /**
+     * Retrieves all students from the database and displays them in the table
+     * Filters so only students who are not also admin or instructor or both are displayed
+     */
     private void loadStudents() {
         db = Database.getInstance();
         List<User> students = new ArrayList<>();
@@ -144,6 +164,10 @@ public class ManageStudentsController extends PageController {
         studentTable.getItems().setAll(students);
     }
 
+    /**
+     * Function for deleting a student from the system
+     * @param student
+     */
     private void deleteStudent(User student) {
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationAlert.setTitle("Delete Student");
@@ -164,6 +188,10 @@ public class ManageStudentsController extends PageController {
         });
     }
 
+    /**
+     * Generates a random invite token for inviting students to the system
+     * @return
+     */
     private String generateInviteToken() {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         SecureRandom random = new SecureRandom();

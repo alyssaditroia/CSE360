@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import models.Conversation;
 import models.HelpMessage;
-
+/**
+ * The {@code HelpMessageDatabase} stores student help messages for sending and receiving messages between students and instructors.
+ * Extends the original database class
+ */
 public class HelpMessageDatabase extends Database {
 
     /**

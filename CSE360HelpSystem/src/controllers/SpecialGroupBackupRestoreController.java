@@ -13,17 +13,24 @@ import javafx.stage.Stage;
 import models.Article;
 import models.SpecialGroup;
 import models.UserSession;
-
+/**
+ * The {@code SpecialGroupBackupRestoreController} handles handling the backup and restoration of articles in a special group. 
+ * 
+ */
 public class SpecialGroupBackupRestoreController extends PageController {
-    @FXML private TextField backupLocationField;
+    
+	// FXML COMPONENTS
+	@FXML private TextField backupLocationField;
     @FXML private TextField restoreLocationField;
     
+    // Instances
     private HelpArticleDatabase had;
     private SpecialGroupsDatabase sgd;
     private int currentGroupId;
     private File backupFile;
     private File restoreFile;
     
+    // Constructors
     public SpecialGroupBackupRestoreController() {
         super();
     }
@@ -33,6 +40,7 @@ public class SpecialGroupBackupRestoreController extends PageController {
         this.currentGroupId = groupId;
     }
     
+    // Initialization
     @FXML
     public void initialize() {
         try {
@@ -44,6 +52,9 @@ public class SpecialGroupBackupRestoreController extends PageController {
         }
     }
     
+    /**
+     * Opens a file chooser dialog to select a location for saving the backup file
+     */
     @FXML
     void chooseBackupLocation() {
         FileChooser fileChooser = new FileChooser();
@@ -57,7 +68,9 @@ public class SpecialGroupBackupRestoreController extends PageController {
             backupLocationField.setText(backupFile.getAbsolutePath());
         }
     }
-    
+    /**
+     * Opens a file chooser dialog to select a backup file for restoration
+     */
     @FXML
     void chooseRestoreFile() {
         FileChooser fileChooser = new FileChooser();
@@ -72,6 +85,9 @@ public class SpecialGroupBackupRestoreController extends PageController {
         }
     }
     
+    /**
+     * Creates a backup of articles for the selected special group
+     */
     @FXML
     void createBackup() {
         if (backupFile == null) {
@@ -97,7 +113,9 @@ public class SpecialGroupBackupRestoreController extends PageController {
             showErrorAlert("Backup Error", "Failed to create backup: " + e.getMessage());
         }
     }
-    
+    /**
+     * Restores articles from a selected backup file into the current special group
+     */
     @FXML
     void restoreArticles() {
         if (restoreFile == null) {

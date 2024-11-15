@@ -21,9 +21,14 @@ import database.HelpArticleDatabase;
 import models.Article;
 import models.SpecialGroup;
 import models.UserSession;
-
+/**
+ * The {@code SpecialGroupViewController} is for managing articles and settings within a specific special group.
+ * It allows users to view, create, edit, delete, filter, and search articles, as well as manage group settings such as users and backups.
+ */
 public class SpecialGroupViewController extends PageController {
-    @FXML private TableView<Article> articleTable;
+    
+	// FXML COMPONENTS
+	@FXML private TableView<Article> articleTable;
     @FXML private TableColumn<Article, Integer> idColumn;
     @FXML private TableColumn<Article, String> titleColumn;
     @FXML private TableColumn<Article, String> abstractColumn;
@@ -41,10 +46,11 @@ public class SpecialGroupViewController extends PageController {
     @FXML private Label levelStatsLabel; 
     @FXML private Button backupRestoreButton;
 
-
+    // Instances
     private SpecialGroupsDatabase specialGroupsDB;
     private HelpArticleDatabase helpArticleDB;
 
+    // Constructors 
     public SpecialGroupViewController() {
         super();
     }
@@ -54,6 +60,7 @@ public class SpecialGroupViewController extends PageController {
         super(stage, db);
     }
 
+    // Initialization 
     @FXML
     public void initialize() {
         try {
@@ -98,7 +105,7 @@ public class SpecialGroupViewController extends PageController {
             goHome();
         }
     }
-    
+    // Sets up the columns for the table
     private void setupTableColumns() {
         // Existing column setup
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -162,7 +169,9 @@ public class SpecialGroupViewController extends PageController {
         
         articleTable.getColumns().add(actionsColumn);
     }
-
+    /**
+     * Adjusts the visibility of UI components based on access level
+     */
     private void setupAccessControls() {
         int accessLevel = UserSession.getInstance().getAccessLevel();
         
@@ -173,6 +182,12 @@ public class SpecialGroupViewController extends PageController {
         if (backupRestoreButton != null) backupRestoreButton.setVisible(accessLevel >= 2);
     }
 
+    /**
+     * Loads articles by
+     * Filters articles by search query, selected levels, and group membership
+     * Updates levelStatsLabel with counts of articles at each difficulty level.
+     * Populates article table
+     */
     @FXML
     public void loadArticles() {
         try {
@@ -208,19 +223,31 @@ public class SpecialGroupViewController extends PageController {
             showErrorAlert("Loading Error", "Failed to load articles: " + e.getMessage());
         }
     }
-
+    /**
+     * Checks if an article matches a search query based on its title, authors, or abstract.
+     * @param article
+     * @param query
+     * @return
+     */
     private boolean matchesSearch(Article article, String query) {
         if (query.isEmpty()) return true;
         return article.getTitle().toLowerCase().contains(query) ||
                article.getAuthors().toLowerCase().contains(query) ||
                article.getAbstractText().toLowerCase().contains(query);
     }
-
+    /**
+     * Clears all level filters and reloads articles.
+     * @param article
+     * @param filters
+     * @return
+     */
     private boolean matchesGroupFilters(Article article, List<String> filters) {
         return filters.isEmpty() || article.getGroupingIdentifiers().stream()
             .anyMatch(filters::contains);
     }
-    
+    /**
+     * Navigation methods
+     */
     @FXML
     public void goToCreateArticle() {
         navigateTo("/views/SpecialGroupAddEditArticleView.fxml");
@@ -247,6 +274,10 @@ public class SpecialGroupViewController extends PageController {
         navigateTo("/views/SpecialGroupAddEditArticleView.fxml");
     }
 
+    /**
+     * Deletes the current special group article
+     * @param article
+     */
     private void deleteArticle(Article article) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
@@ -286,7 +317,9 @@ public class SpecialGroupViewController extends PageController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
+    /**
+     * Deletes special group entirely
+     */
     @FXML
     private void deleteGroup() {
         SpecialGroup currentGroup = UserSession.getInstance().getSelectedSpecialGroup();
@@ -313,7 +346,9 @@ public class SpecialGroupViewController extends PageController {
             }
         });
     }
-    
+    /**
+     * Searches for an article by its numeric ID and displays it in the table
+     */
     @FXML
     public void searchById() {
         try {
@@ -339,6 +374,9 @@ public class SpecialGroupViewController extends PageController {
         }
     }
 
+    /**
+     * Adds the level specified to the view
+     */
     @FXML
     public void addLevelToFilter() {
         String selectedLevel = levelFilterComboBox.getValue();
@@ -350,6 +388,9 @@ public class SpecialGroupViewController extends PageController {
         }
     }
 
+    /**
+     * Clears level(s) specified from the view
+     */
     @FXML
     public void clearLevelFilters() {
         levelFilterListView.getItems().clear();

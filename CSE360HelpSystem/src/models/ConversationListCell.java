@@ -6,7 +6,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Insets;
 import models.Conversation;
-
+/**
+ * The {@code ConversationListCell} model is a custom JavaFX ListCell for displaying Conversation objects in a ListView. 
+ */
 public class ConversationListCell extends ListCell<Conversation> {
     private VBox content;
     private Label titleLabel;

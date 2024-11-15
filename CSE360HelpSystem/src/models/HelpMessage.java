@@ -1,7 +1,9 @@
 package models;
 
 import java.util.ArrayList;
-
+/**
+ * The {@Code HelpMessage} class is the Model for student Help Messages
+ */
 public class HelpMessage {
 	/**
      * Unique identifier for the help message

@@ -29,7 +29,7 @@ import models.UserSession;
  */
 public class LoginPageController extends PageController {
 	/**
-     * FXML injected UI elements for the Login Page
+     * FXML UI elements for the Login Page
      */
 	@FXML
 	private TextField usernameField;

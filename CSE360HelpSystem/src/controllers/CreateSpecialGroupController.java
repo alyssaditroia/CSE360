@@ -9,13 +9,18 @@ import java.sql.SQLException;
 import database.Database;
 import database.SpecialGroupsDatabase;
 import models.UserSession;
-
+/**
+ * The {@code CreateSpecialGroupController} handles creating a "special group" within the application. 
+ * It allows users to input a group name, validates it
+ * Interacts with a database to store the new group information.
+ */
 public class CreateSpecialGroupController extends PageController {
     @FXML
     private TextField groupNameField;
     
     private SpecialGroupsDatabase specialGroupsDB;
 
+    // Constructors 
     public CreateSpecialGroupController() {
         super();
     }
@@ -24,6 +29,7 @@ public class CreateSpecialGroupController extends PageController {
         super(primaryStage, db);
     }
 
+    // Initializer
     @FXML
     public void initialize() {
         try {
@@ -33,7 +39,9 @@ public class CreateSpecialGroupController extends PageController {
             goHome();
         }
     }
-
+    /**
+     * Handles the process of creating a new special group
+     */
     @FXML
     public void handleCreateGroup() {
         String groupName = groupNameField.getText().trim();

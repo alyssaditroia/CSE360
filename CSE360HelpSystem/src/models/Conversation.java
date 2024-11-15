@@ -3,7 +3,10 @@ package models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * The {@code Conversation} class is the model for the conversation structure
+ * This is an object that defines a conversation
+ */
 public class Conversation {
     private int conversationId;
     private Boolean isResolved;
