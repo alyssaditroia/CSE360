@@ -3,16 +3,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SearchArticleController"
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.StudentGeneralViewController"
             fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
     <content>
         <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 30;">
             
             <!-- Title Section -->
             <VBox alignment="CENTER" spacing="10">
-                <Label text="Search Articles" 
+                <Label text="Student General View" 
                        style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
-                <Label text="Search and filter articles using the options below." 
+                <Label text="Search, filter, and view articles using the options below." 
                        style="-fx-font-size: 16; -fx-text-fill: #333333;" />
             </VBox>
             
@@ -67,7 +67,7 @@
             <!-- TableView for Displaying Articles -->
             <TableView fx:id="articleTable" prefHeight="400" style="-fx-border-color: #BDC3C7; -fx-border-radius: 10;">
                 <columns>
-                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
+                    <TableColumn fx:id="idColumn" text="#" prefWidth="50" />    
                     <TableColumn fx:id="titleColumn" text="Title" prefWidth="200" />
                     <TableColumn fx:id="abstractColumn" text="Abstract" prefWidth="250" />
                     <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="100" />
@@ -76,11 +76,9 @@
             
             <!-- Buttons Section -->
             <HBox spacing="15" alignment="CENTER">
-                <Button text="Create New Article" onAction="#goToCreateArticle" 
+                <Button text="View Selected Article" onAction="#goToViewArticle" 
                         style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
-                <Button fx:id="deleteButton" text="Delete Article" onAction="#deleteSelectedArticle" 
-                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
-                <Button text="Return To Homepage" onAction="#goHome" 
+                <Button text="Return To Homepage" onAction="#returnHome" 
                         style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
             </HBox>
         </VBox>

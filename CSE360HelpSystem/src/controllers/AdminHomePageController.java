@@ -166,6 +166,18 @@ public class AdminHomePageController extends PageController {
 	 */
 	@FXML
 	private Button viewArticlesButton;
+	
+	@FXML
+	private TableColumn<User, Integer> idColumn;
+	
+	@FXML
+	private Button SpecialGroupButton;
+	
+	@FXML
+	private Button backupRestoreButton;
+	
+	@FXML 
+	private Button MessagesButton;
 
 	/**
 	 * Handles invite button click ensures email field contains proper input and the
@@ -202,7 +214,7 @@ public class AdminHomePageController extends PageController {
 				String generatedInviteCode = db.inviteUser(inviteToken, email, isAdmin, isStudent, isInstructor);
 				showAlert("User Invited!", "User invited with invite code: " + generatedInviteCode,
 						"Invite sent to: " + email);
-				System.out.println("User invited with invite code: " + generatedInviteCode);
+				System.out.println("[AdminHomePage] User invited with invite code: " + generatedInviteCode);
 				loadUsers(); // Refresh the table with updated users
 
 			} catch (SQLException e) {
@@ -219,7 +231,7 @@ public class AdminHomePageController extends PageController {
 	 */
 	@FXML
 	public void article() {
-		System.out.println("Going to Article View.");
+		System.out.println("[AdminHomePage] Navigating to Article View.");
 		//navigateTo("/views/HelpArticleView.fxml");
 		navigateTo("/views/SearchArticleView.fxml");
 	}
@@ -241,6 +253,8 @@ public class AdminHomePageController extends PageController {
 	 * Initialize table columns and their associated action buttons
 	 */
 	private void initializeTable() {
+		idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+		
 		usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
 		preferrednameColumn.setCellValueFactory(new PropertyValueFactory<>("preferredName"));
 		emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -359,6 +373,7 @@ public class AdminHomePageController extends PageController {
 	 * Load users into the TableView TableView Exists in the UI
 	 */
 	public void loadUsers() {
+		System.out.println("[AdminHomePage] Loading users...");
 		db = Database.getInstance();
 		List<User> users = new ArrayList<>();
 		try {
@@ -366,6 +381,7 @@ public class AdminHomePageController extends PageController {
 			for (Map<String, Object> row : rawUsers) {
 				User user = new User();
 				// Use the keys to retrieve values from the map
+				user.setId((Integer) row.get("id"));
 				user.setUsername((String) row.get("username"));
 				user.setPreferredName((String) row.get("preferredName"));
 				user.setEmail((String) row.get("email"));
@@ -397,6 +413,7 @@ public class AdminHomePageController extends PageController {
 		for (int i = 0; i < 5; i++) {
 			token.append(characters.charAt(random.nextInt(characters.length())));
 		}
+		System.out.println("[AdminHomePage] Invite token generated: " + token.toString());
 		return token.toString();
 	}
 
@@ -431,7 +448,14 @@ public class AdminHomePageController extends PageController {
 	 * @param isInstructor
 	 */
 	private void updatePermissions(User user, Boolean isAdmin, Boolean isStudent, Boolean isInstructor) {
-
+		// Check if we're removing admin from the last admin
+	    if (!isAdmin && user.isAdmin() && isLastAdminUser(user.getEmail())) {
+	        showAlert("Error", 
+	                 "Cannot remove admin role", 
+	                 "There must be at least one user with admin privileges in the system.");
+	        return;
+	    }
+	    
 		// Show a confirmation dialog before applying changes
 		Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
 		confirmationAlert.setTitle("Update Permissions");
@@ -453,7 +477,7 @@ public class AdminHomePageController extends PageController {
 
 					// Show success message
 					showAlert("Success", "Permissions updated for " + user.getEmail(), "");
-					System.out.println("New User Permissions For: " + user.getEmail() + " Permissions: " + isAdmin
+					System.out.println("[AdminHomePage] New User Permissions For: " + user.getEmail() + " Permissions: " + isAdmin
 							+ isStudent + isInstructor);
 					loadUsers(); // Refresh the user list to show updated permissions
 
@@ -471,6 +495,14 @@ public class AdminHomePageController extends PageController {
 	 * @param user
 	 */
 	private void deleteUser(User user) {
+		// Check if we're deleting the last admin
+	    if (user.isAdmin() && isLastAdminUser(user.getEmail())) {
+	        showAlert("Error", 
+	                 "Cannot delete user", 
+	                 "Cannot delete the last user with admin privileges from the system.");
+	        return;
+	    }
+		
 		Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
 		confirmationAlert.setTitle("Delete User");
 		confirmationAlert.setHeaderText("Delete User: " + user.getUsername());
@@ -481,6 +513,7 @@ public class AdminHomePageController extends PageController {
 				try {
 					db.deleteUser(user.getEmail());
 					showAlert("Success", "User deleted successfully", "");
+					System.out.println("[AdminHomePage] User deleted successfully");
 					loadUsers(); // Refresh the user list
 				} catch (SQLException e) {
 					e.printStackTrace();
@@ -502,6 +535,51 @@ public class AdminHomePageController extends PageController {
 	 */
 	@FXML
 	private void navigateToBackupRestore() {
+		System.out.println("[AdminHomePage] Navigating to Backup Restore");
 	    navigateTo("/views/BackupRestoreView.fxml");
+	}
+	
+	
+	@FXML
+	private void navigateToSpecialGroupSelection() {
+		System.out.println("[AdminHomePage] Navigating to Special Group Selection");
+	    navigateTo("/views/SelectSpecialGroupView.fxml");
+	}
+	
+	
+	@FXML
+	private void navigateToMessageSystem() {
+		System.out.println("[AdminHomePage] Navigating to Message System");
+	    navigateTo("/views/MessagingSystemView.fxml");
+	}
+	
+	
+	private boolean isLastAdminUser(String email) {
+	    try {
+	        // Get all users
+	        List<Map<String, Object>> allUsers = db.getAllUsers();
+	        
+	        // Count how many admin users we have
+	        int adminCount = 0;
+	        boolean isUserAdmin = false;
+	        
+	        // Count total admins and check if this user is an admin
+	        for (Map<String, Object> user : allUsers) {
+	            if ((Boolean) user.get("isAdmin")) {
+	                adminCount++;
+	                if (user.get("email").equals(email)) {
+	                    isUserAdmin = true;
+	                }
+	            }
+	        }
+	        
+	        // Return true only if this user is an admin AND there is exactly one admin total
+	        // This means they are the last/only admin
+	        return isUserAdmin && adminCount == 1;
+	        
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
 	}
 }

@@ -22,6 +22,7 @@ import javafx.scene.control.TextField;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,7 +79,28 @@ public class InstructorHomePageController extends PageController {
     
     @FXML
     private ListView<String> groupFilterListView;
+    
+    @FXML
+    private TableColumn<Article, Integer> idColumn;
+    
+    @FXML
+    private Button backupRestoreButton;
+    
+    @FXML
+    private ComboBox<String> levelFilterComboBox;
+        
+    @FXML
+    private ListView<String> levelFilterListView;
+    
+    @FXML
+    private TextField idSearchField;
+    
+    @FXML
+    private TableColumn<Article, String> abstractColumn;
 
+    @FXML
+    private TableColumn<Article, String> authorsColumn;
+    
     /**
      * Default constructor required for FXML loader
      */
@@ -95,15 +117,7 @@ public class InstructorHomePageController extends PageController {
 	public InstructorHomePageController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
-	
-	/**
-	 * Handles user logout and navigation to login page
-	 */
-	@FXML
-	public void logout() {
-		System.out.println("Instructor logged out.");
-		navigateTo("/views/LoginPageView.fxml");
-	}
+
 	
 	/**
      * Initialize the controller and set up the table
@@ -115,8 +129,13 @@ public class InstructorHomePageController extends PageController {
             initializeTable();
             loadArticles();
             
+            // Initialize group filter
             List<String> groups = db.fetchGroupingIdentifiers();
             groupFilterComboBox.setItems(FXCollections.observableArrayList(groups));
+            
+            // Initialize level filter
+            List<String> levels = Arrays.asList("beginner", "intermediate", "advanced", "expert");
+            levelFilterComboBox.setItems(FXCollections.observableArrayList(levels));
         } catch (Exception e) {
             showErrorAlert("Error", "Failed to initialize: " + e.getMessage());
         }
@@ -126,8 +145,17 @@ public class InstructorHomePageController extends PageController {
      * Initialize table columns and their cell factories
      */
     private void initializeTable() {
-        // Set up the basic columns
+    	// Set up the sequential ID column
+        idColumn.setCellValueFactory(column -> 
+            new javafx.beans.property.ReadOnlyObjectWrapper<>(
+                articleTable.getItems().indexOf(column.getValue()) + 1
+            )
+        );
+    	
+        // Set up the other columns
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        abstractColumn.setCellValueFactory(new PropertyValueFactory<>("abstractText"));
+        authorsColumn.setCellValueFactory(new PropertyValueFactory<>("authors"));
         levelColumn.setCellValueFactory(new PropertyValueFactory<>("level"));
         
         // Set up groups column to display the list of groups
@@ -199,7 +227,7 @@ public class InstructorHomePageController extends PageController {
      */
     private void loadArticles() {
         try {
-            List<Article> articles = db.getAllDecryptedArticles();
+            List<Article> articles = db.getAllGeneralArticles();
             articleTable.getItems().setAll(articles);
         } catch (Exception e) {
             showErrorAlert("Error", "Failed to load articles: " + e.getMessage());
@@ -265,11 +293,14 @@ public class InstructorHomePageController extends PageController {
         try {
             String searchQuery = searchField.getText().toLowerCase();
             List<String> selectedGroups = new ArrayList<>(groupFilterListView.getItems());
+            List<String> selectedLevels = new ArrayList<>(levelFilterListView.getItems());
             
-            System.out.println("Filtering with search query: '" + searchQuery + "'");
-            System.out.println("Selected groups for filtering: " + selectedGroups);
+            System.out.println("[InstructorHomePage] Filtering with search query: '" + searchQuery + "'");
+            System.out.println("[InstructorHomePage] Selected groups for filtering: " + selectedGroups);
+            System.out.println("[InstructorHomePage] Selected levels for filtering: " + selectedLevels);
             
-            List<Article> articles = db.searchArticles(searchQuery);  
+            // Get all general articles to apply search and filters too
+            List<Article> articles = db.getAllGeneralArticles();  
             
             // Additional group filtering if groups are selected
             if (!selectedGroups.isEmpty()) {
@@ -280,6 +311,23 @@ public class InstructorHomePageController extends PageController {
                         return articleGroups.stream()
                             .anyMatch(selectedGroups::contains);
                     })
+                    .collect(Collectors.toList());
+            }
+
+            // Filter by levels if any are selected
+            if (!selectedLevels.isEmpty()) {
+                articles = articles.stream()
+                    .filter(article -> selectedLevels.contains(article.getLevel()))
+                    .collect(Collectors.toList());
+            }
+
+            // Apply search query filter
+            if (!searchQuery.isEmpty()) {
+                articles = articles.stream()
+                    .filter(article -> 
+                        article.getTitle().toLowerCase().contains(searchQuery) ||
+                        article.getAbstractText().toLowerCase().contains(searchQuery) ||
+                        article.getAuthors().toLowerCase().contains(searchQuery))
                     .collect(Collectors.toList());
             }
 
@@ -318,5 +366,66 @@ public class InstructorHomePageController extends PageController {
     @FXML
     public void goToBackupRestore() {
         navigateTo("/views/BackupRestoreView.fxml");
+    }
+    
+    
+    // PHASE 3 ADDITIONS
+    @FXML
+    public void goToSpecialGroups() {
+        navigateTo("/views/SelectSpecialGroupView.fxml");
+    }
+    
+    @FXML
+    public void goToCreateSpecialGroup() {
+        navigateTo("/views/CreateSpecialGroupView.fxml");
+    }
+    
+    @FXML
+    public void goToMessagingSystem() {
+        navigateTo("/views/MessagingSystemView.fxml");
+    }
+    
+    
+    @FXML
+    public void addLevelToFilter() {
+        String selectedLevel = levelFilterComboBox.getValue();
+        if (selectedLevel != null && !selectedLevel.isEmpty() 
+                && !levelFilterListView.getItems().contains(selectedLevel)) {
+            levelFilterListView.getItems().add(selectedLevel);
+            levelFilterComboBox.setValue(null);
+            filterArticles();
+        }
+    }
+
+    @FXML
+    public void clearLevelFilters() {
+        levelFilterListView.getItems().clear();
+        filterArticles();
+    }
+    
+    public void goToManageStudents() {
+    	navigateTo("/views/ManageStudentsView.fxml");
+    }
+    
+    @FXML
+    public void searchById() {
+        try {
+            String idText = idSearchField.getText().trim();
+            if (idText.isEmpty()) {
+                loadArticles(); // Reset to show all articles
+                return;
+            }
+            
+            long searchId = Long.parseLong(idText);
+            List<Article> articles = db.getAllGeneralArticles().stream()
+                .filter(article -> article.getId() == searchId)
+                .collect(Collectors.toList());
+                
+            articleTable.getItems().setAll(articles);
+        } catch (NumberFormatException e) {
+            showErrorAlert("Invalid Input", "Please enter a valid numeric ID");
+        } catch (Exception e) {
+            showErrorAlert("Error", "Failed to search by ID: " + e.getMessage());
+        }
     }
 }

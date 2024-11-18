@@ -1,5 +1,7 @@
 package models;
 
+import java.util.ArrayList;
+
 /***********
  * The {@code UserSession} class handles the current sessions User, Roles, and Selected Article
  * 
@@ -39,11 +41,33 @@ public class UserSession {
      * The currently selected article for viewing or editing.
      */
 	private Article selectedArticle;
+	
+	// PHASE 3 ADDITIONS
+	// 1 is view - 'student'
+	// 2 is create and delete - 'admin'
+	// 3 is create, delete, edit, and view - 'instructor'
+	private int specialGroupAccessLevel = 0;
+	
+	/**
+	 * The currently selected special group that the user wants to view
+	 */
+	private SpecialGroup selectedSpecialGroup;
+	
+	/**
+	 * Flag variable controls if the user is adding an article to a special group
+	 */
+	private boolean createAsSpecialGroupArticle = false;
+	
+	/**
+	 * ArrayList for holding the users's searches they have made looking for help information, used to pass their searches into messages to the help system
+	 */
+	private ArrayList<String> systemSearches;
 
 	 /**
      * Private constructor to enforce singleton pattern.
      */
 	private UserSession() {
+		systemSearches = new ArrayList<>();
 	}
 
 	 /**
@@ -58,6 +82,7 @@ public class UserSession {
 		}
 		return instance;
 	}
+	
 
 	/**
      * Gets the current user's username.
@@ -105,7 +130,7 @@ public class UserSession {
      * @return The current invite code
      */
 	public String getInviteCode() {
-		System.out.println("[INFO in UserSession] getInviteCode(), Invite code: " + inviteCode);
+		System.out.println("[UserSession] getInviteCode(), Invite code: " + inviteCode);
 		return inviteCode;
 	}
 
@@ -115,7 +140,7 @@ public class UserSession {
      * @param inviteCode The invite code to set
      */
 	public void setInviteCode(String inviteCode) {
-		System.out.println("[INFO in UserSession] setInviteCode() Invite Code: " + inviteCode);
+		System.out.println("[UserSession] setInviteCode() Invite Code: " + inviteCode);
 		this.inviteCode = inviteCode;
 	}
 
@@ -125,7 +150,7 @@ public class UserSession {
      * @return The current user's email address
      */
 	public String getEmail() {
-		System.out.println("[INFO in UserSession] getEmail() Email: " + email);
+		System.out.println("[UserSession] getEmail() Email: " + email);
 		return email;
 	}
 
@@ -135,7 +160,7 @@ public class UserSession {
      * @param email The email address to set
      */
 	public void setEmail(String email) {
-		System.out.println("[INFO in UserSession] setEmail() Email: " + email);
+		System.out.println("[UserSession] setEmail() Email: " + email);
 		this.email = email;
 	}
 	
@@ -145,7 +170,7 @@ public class UserSession {
      * @return The current role (admin, instructor, or student)
      */
 	public String getCurrentRole() {
-		System.out.println("[INFO in UserSession] getCurrentRole() current role: " + currentRole);
+		System.out.println("[UserSession] getCurrentRole() current role: " + currentRole);
 		return currentRole;
 	}
 	
@@ -155,7 +180,7 @@ public class UserSession {
      * @param currentRole The role to set (admin, instructor, or student)
      */
 	public void setCurrentRole(String currentRole) {
-		System.out.println("[INFO in UserSession] setCurrentRole() current role: " + currentRole);
+		System.out.println("[UserSession] setCurrentRole() current role: " + currentRole);
 		this.currentRole = currentRole;
 	}
 
@@ -167,9 +192,9 @@ public class UserSession {
 	public void setSelectedArticle(Article selectedArticle) {
 	    
 	    if (selectedArticle != null) {
-	        System.out.println("[INFO in UserSession] setSelectedArticle() Selected Article: " + selectedArticle.getTitle());
+	        System.out.println("[UserSession] setSelectedArticle() Selected Article: " + selectedArticle.getTitle());
 	    } else {
-	        System.out.println("[INFO in UserSession] Selected Article is set to null");
+	        System.out.println("[UserSession] Selected Article is set to null");
 	    }
 	    
 	    this.selectedArticle = selectedArticle;
@@ -181,7 +206,7 @@ public class UserSession {
      * @return The currently selected Article object
      */
 	public Article getSelectedArticle() {
-		System.out.println("[INFO in UserSession] getSelectedArticle() Selected Article: " + selectedArticle.getTitle());
+		System.out.println("[UserSession] getSelectedArticle() Selected Article: " + selectedArticle.getTitle());
 		return selectedArticle;
 	}
 
@@ -192,8 +217,56 @@ public class UserSession {
      * @param userSession The UserSession instance to set
      */
 	public static void setInstance(UserSession userSession) {
-		System.out.println("[INFO in UserSession] setInstance() called");
+		System.out.println("[UserSession] setInstance() called");
 		instance = userSession;
+	}
+	
+	
+	public void setAccessLevel(int level) {
+		this.specialGroupAccessLevel = level;
+	}
+	
+	
+	public int getAccessLevel() {
+		return this.specialGroupAccessLevel;
+	}
+	
+	
+	public void setSelectedSpecialGroup(SpecialGroup group) {
+	    
+	    if (selectedArticle != null) {
+	        System.out.println("[UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
+	    } else {
+	        System.out.println("[UserSession] Selected Group is set to null");
+	    }
+	    
+	    this.selectedSpecialGroup = group;
+	}
+
+	
+	public SpecialGroup getSelectedSpecialGroup() {
+		System.out.println("[UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
+		return this.selectedSpecialGroup;
+	}
+	
+	
+	public void setSpecialGroupArticleFlag(boolean flag) {
+	    this.createAsSpecialGroupArticle = flag;
+	}
+	
+	
+	public boolean isSpecialGroupArticle() {
+	    return this.createAsSpecialGroupArticle;
+	}
+	
+	
+	public void addUserSearch(String searchRequest) {
+		this.systemSearches.add(searchRequest);
+	}
+	
+	
+	public ArrayList<String> getUserSearches() {
+		return this.systemSearches;
 	}
 }
 

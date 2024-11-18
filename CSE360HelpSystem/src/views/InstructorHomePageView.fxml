@@ -1,64 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.InstructorHomePageController"
-            prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
-    <children>
-        <VBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
-              AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.InstructorHomePageController"
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
+    <content>
+        <AnchorPane prefWidth="1200" prefHeight="1000" style="-fx-padding: 30;">
+            <children>
+                <VBox alignment="CENTER" spacing="30" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
+                      AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0" style="-fx-padding: 30;">
+                    
+                    <!-- Title Label -->
+                    <Label text="Instructor Homepage" 
+                           style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
+
+                    <!-- Action Buttons -->
+                    <HBox alignment="CENTER" spacing="15" style="-fx-padding: 10;">
+                        <Button text="Message Center" onAction="#goToMessagingSystem" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                        <Button fx:id="createArticleButton" text="Create New Article" onAction="#createNewArticle" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                        <Button text="Manage Students" onAction="#goToManageStudents" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                        <Button fx:id="backupRestoreButton" text="Backup and Restore" onAction="#goToBackupRestore" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                        <Button text="Special Groups" onAction="#goToSpecialGroups" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>    
+                        <Button text="Create Group" onAction="#goToCreateSpecialGroup" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                    </HBox>
+                    
+                    <!-- Search Section -->
+                    <VBox spacing="15" alignment="CENTER" style="-fx-padding: 15; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                        <HBox spacing="10" alignment="CENTER">
+                            <Label text="Search Articles:" style="-fx-font-size: 14;" />
+                            <TextField fx:id="searchField" promptText="Enter keywords..." 
+                                       style="-fx-pref-width: 300px;" />
+                            <Button text="Search" onAction="#filterArticles" 
+                                    style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                        </HBox>
+                    
+                        <HBox spacing="10" alignment="CENTER">
+                            <Label text="Search by ID:" style="-fx-font-size: 14;" />
+                            <TextField fx:id="idSearchField" promptText="Enter article ID..." 
+                                       style="-fx-pref-width: 300px;" />
+                            <Button text="Search ID" onAction="#searchById" 
+                                    style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                        </HBox>
+                    </VBox>
             
-            <!-- Title Label -->
-            <Label text="Instructor Homepage" 
-                   style="-fx-font-size: 24; -fx-font-weight: bold;" />
+                    <!-- Filter Section -->
+                    <VBox spacing="15" alignment="CENTER" style="-fx-padding: 15; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                        <!-- Filter by Level -->
+                        <HBox spacing="10" alignment="CENTER">
+                            <Label text="Filter by Level:" style="-fx-font-size: 14;" />
+                            <ComboBox fx:id="levelFilterComboBox" promptText="Select Level" 
+                                      style="-fx-pref-width: 200px;" />
+                            <Button text="Add Level" onAction="#addLevelToFilter" 
+                                    style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                            <Button text="Clear Levels" onAction="#clearLevelFilters" 
+                                    style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                        </HBox>
+                        <ListView fx:id="levelFilterListView" prefHeight="100" 
+                                  style="-fx-border-color: #BDC3C7; -fx-border-radius: 5;" />
+                        
+                        <!-- Filter by Groups -->
+                        <HBox spacing="10" alignment="CENTER">
+                            <Label text="Filter by Groups:" style="-fx-font-size: 14;" />
+                            <ComboBox fx:id="groupFilterComboBox" promptText="Select Groups" 
+                                      style="-fx-pref-width: 200px;" />
+                            <Button text="Add Group" onAction="#addGroupToFilter" 
+                                    style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                            <Button text="Clear Groups" onAction="#clearGroupFilters" 
+                                    style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                        </HBox>
+                        <ListView fx:id="groupFilterListView" prefHeight="100" 
+                                  style="-fx-border-color: #BDC3C7; -fx-border-radius: 5;" />
+                    </VBox>
 
-            <!-- Action Buttons -->
-            <HBox alignment="CENTER" spacing="10">
-                <Button fx:id="createArticleButton" text="Create New Article" onAction="#createNewArticle" 
-                        style="-fx-font-size: 14;"/>
-             	<Button fx:id="backupRestoreButton" text="Backup and Restore" onAction="#goToBackupRestore" style="-fx-font-size: 14;"/>
-            </HBox>
-            
-            <!-- Search Section -->
-			<HBox spacing="10" alignment="CENTER">
-			    <Label text="Search Articles:"/>
-			    <TextField fx:id="searchField" promptText="Enter keywords..." />
-			    <Button text="Search" onAction="#filterArticles"/>
-			</HBox>
-			
-			<!-- Filter by Group(s) Section -->
-			<HBox spacing="10" alignment="CENTER">
-			    <Label text="Filter by Groups:"/>
-			    <ComboBox fx:id="groupFilterComboBox" promptText="Select Groups"/>
-			    <Button text="Add Group" onAction="#addGroupToFilter"/>
-		        <Button text="Clear Groups" onAction="#clearGroupFilters"/> 
-			</HBox>
-			<ListView fx:id="groupFilterListView" prefHeight="100"/>
-		
+                    <!-- TableView for displaying articles -->
+                    <TableView fx:id="articleTable" prefHeight="400" VBox.vgrow="ALWAYS" 
+                               style="-fx-border-color: #BDC3C7; -fx-border-radius: 10;">
+                        <columns>
+                            <TableColumn fx:id="idColumn" text="#" prefWidth="50" />
+                            <TableColumn fx:id="titleColumn" text="Title" prefWidth="300" />
+                            <TableColumn fx:id="abstractColumn" text="Abstract" prefWidth="300" />
+                            <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="150" />
+                            <TableColumn fx:id="levelColumn" text="Level" prefWidth="150" />
+                            <TableColumn fx:id="groupsColumn" text="Groups" prefWidth="250" />
+                        </columns>
+                    </TableView>
 
-            <!-- TableView for displaying articles -->
-            <TableView fx:id="articleTable" prefHeight="500" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="titleColumn" text="Title" prefWidth="200"/>
-                    <TableColumn fx:id="levelColumn" text="Level" prefWidth="100"/>
-                    <TableColumn fx:id="groupsColumn" text="Groups" prefWidth="200"/>
-                </columns>
-            </TableView>
+                    <!-- Logout Button -->
+                    <Button fx:id="logoutButton" text="Logout" onAction="#logout" 
+                            style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                </VBox>
+            </children>
+        </AnchorPane>
+    </content>
+</ScrollPane>
 
-            <!-- Logout Button -->
-            <HBox alignment="CENTER_RIGHT" spacing="20">
-                <Button fx:id="logoutButton" text="Logout" onAction="#logout" 
-                        style="-fx-font-size: 14;"/>
-            </HBox>
-        </VBox>
-    </children>
-</AnchorPane>
+

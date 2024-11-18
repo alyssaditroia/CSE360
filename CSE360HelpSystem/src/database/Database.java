@@ -34,7 +34,7 @@ public class Database {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "org.h2.Driver";
 
-	 static final String DB_URL = "jdbc:h2:~/CSE360HelpDatabase";
+	static final String DB_URL = "jdbc:h2:~/CSE360Help";
 	 
 	// Database credentials
 	static final String USER = "user";
@@ -54,14 +54,14 @@ public class Database {
 	public void connectToDatabase() throws SQLException {
 		try {
 			Class.forName(JDBC_DRIVER); // Load the JDBC driver
-			System.out.println("Connecting to database...");
+			System.out.println("[Database] Connecting to database...");
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
-			System.out.println("Connection established");
+			System.out.println("[Database] Connection established");
 			statement = connection.createStatement();
-			System.out.println("Statement created");
+			System.out.println("[Database] Statement created");
 			createTables(); // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
-			System.err.println("JDBC Driver not found: " + e.getMessage());
+			System.err.println("[Database] JDBC Driver not found: " + e.getMessage());
 		}
 	}
 
@@ -90,7 +90,6 @@ public class Database {
 	 */
 	// TODO Add encryption
 	public void createTables() throws SQLException {
-		System.out.println("Creating Tables");
 		String userTable = "CREATE TABLE IF NOT EXISTS cse360users (" 
 		+ "id INT AUTO_INCREMENT PRIMARY KEY, "
 		+ "firstName VARCHAR(255)," 
@@ -107,6 +106,7 @@ public class Database {
 		+ "otpFlag BOOLEAN DEFAULT FALSE, " 
 		+ "otpExpiration TIMESTAMP)";
 		statement.execute(userTable);
+		System.out.println("[Database] Creating Tables");
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class Database {
 		ResultSet resultSet = statement.executeQuery(query);
 		if (resultSet.next()) {
 			boolean dbStatus = resultSet.getInt("count") == 0;
-			System.out.println("Database is empty " + dbStatus);
+			System.out.println("[Database] Database is empty " + dbStatus);
 			return resultSet.getInt("count") == 0;
 		}
 		return false;
@@ -156,12 +156,12 @@ public class Database {
 		statement = connection.createStatement();
 		// Validate input parameters
 		if (username == null || username.isEmpty()) {
-			System.out.println("Failed to add administrator: username cannot be null or empty.");
+			System.out.println("[Database] Failed to add administrator: username cannot be null or empty.");
 			return; // Early exit if username is invalid
 		}
 
 		if (password == null || password.length == 0) {
-			System.out.println("Failed to add administrator: password cannot be null or empty.");
+			System.out.println("[Database] Failed to add administrator: password cannot be null or empty.");
 			return; // Early exit if password is invalid
 		}
 
@@ -177,9 +177,9 @@ public class Database {
 
 			// Check if the insertion was successful
 			if (rowsAffected > 0) {
-				System.out.println("Administrator successfully added to Database");
+				System.out.println("[Database] Administrator successfully added to Database");
 			} else {
-				System.out.println("Failed to add administrator: No rows affected.");
+				System.out.println("[Database] Failed to add administrator: No rows affected.");
 			}
 		} catch (SQLException e) {
 			System.out.println("SQL Exception occurred while adding administrator: " + e.getMessage());
@@ -225,7 +225,7 @@ public class Database {
 
 		// Check if there's anything to update
 		if (fields.isEmpty()) {
-			System.out.println("No fields to update.");
+			System.out.println("[Database] No fields to update.");
 			return;
 		}
 
@@ -238,7 +238,7 @@ public class Database {
 
 			int rowsAffected = stmt.executeUpdate();
 			if (rowsAffected == 0) {
-				System.out.println("No user found with username: " + username);
+				System.out.println("[Database] No user found with username: " + username);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -426,16 +426,43 @@ public class Database {
 
 	/**
 	 * Function added by Alyssa DiTroia 
-	 * Delets a user from the database
+	 * Delets a user and any help messages they had alongside any conversations they started from the database
 	 * @param email
 	 * @throws SQLException
 	 */
 	public void deleteUser(String email) throws SQLException {
-		String sql = "DELETE FROM cse360users WHERE email = ?";
-		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-			pstmt.setString(1, email);
-			pstmt.executeUpdate();
-		}
+	    // Get user ID first
+	    int userId;
+	    String getIdSql = "SELECT id FROM cse360users WHERE email = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(getIdSql)) {
+	        pstmt.setString(1, email);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (!rs.next()) {
+	            return; // User not found
+	        }
+	        userId = rs.getInt("id");
+	    }
+
+	    // Delete from conversation_messages where user is creator
+	    String deleteConvMessages = "DELETE FROM conversation_messages WHERE creator_id = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteConvMessages)) {
+	        pstmt.setInt(1, userId);
+	        pstmt.executeUpdate();
+	    }
+
+	    // Delete all help messages from this user
+	    String deleteMessages = "DELETE FROM help_messages WHERE user_id = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteMessages)) {
+	        pstmt.setInt(1, userId);
+	        pstmt.executeUpdate();
+	    }
+	    
+	    // Finally delete the user
+	    String deleteUser = "DELETE FROM cse360users WHERE email = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteUser)) {
+	        pstmt.setString(1, email);
+	        pstmt.executeUpdate();
+	    }
 	}
 
 	/**
@@ -531,13 +558,13 @@ public class Database {
 		if (connection != null) {
 			try {
 				connection.close();
-				System.out.println("Database connection closed.");
+				System.out.println("[Database] Database connection closed.");
 			} catch (SQLException e) {
-				System.err.println("Failed to close the database connection.");
+				System.err.println("[Database] Failed to close the database connection.");
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("No connection to close.");
+			System.out.println("[Database] No connection to close.");
 		}
 	}
 
@@ -725,6 +752,29 @@ public class Database {
 				return null;
 			}
 		}
+	}
+	
+	
+	/**
+	 * Gets the user ID from the database based on username
+	 * 
+	 * @param username The username to look up
+	 * @return The user's ID from the database, or -1 if not found
+	 * @throws SQLException if database operation fails
+	 */
+	public int getUserId(String username) throws SQLException {
+	    connection = DriverManager.getConnection(DB_URL, USER, PASS);
+	    String query = "SELECT id FROM cse360users WHERE username = ?";
+	    
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, username);
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            return rs.getInt("id");
+	        }
+	        return -1; // User not found
+	    }
 	}
 }
 

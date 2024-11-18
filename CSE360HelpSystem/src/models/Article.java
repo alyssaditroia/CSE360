@@ -11,82 +11,21 @@ import java.util.List;
  * @author Justin Faris
  */
 public class Article {
-    /** 
-     * The unique identifier for the article. 
-     */
     private int id;
-    
-    /**
-     * The title of the article stored as a character array for security.
-     */
     private char[] title;
-    
-    /**
-     * The authors of the article stored as a character array for security.
-     */
     private char[] authors;
-    
-    /**
-     * The abstract/short description of the article stored as a character array for security.
-     */
-    private char[] abstractText;  
-    
-    /**
-     * Keywords associated with the article stored as a character array for security.
-     */
+    private char[] abstractText;
     private char[] keywords;
-    
-    /**
-     * The main content of the article stored as a character array for security.
-     */
     private char[] body;
-    
-    /**
-     * References cited in the article stored as a character array for security.
-     */
     private char[] references;
-    
-    /**
-     * The difficulty level of the article (beginner, intermediate, advanced, expert).
-     */
-    private String level;  
-    
-    /**
-     * List of tags or categories associated with the article.
-     */
-    private List<String> groupingIdentifiers;  
-    
-    /**
-     * Access permissions for the article.
-     */
-    private String permissions; 
-    
-    /**
-     * The date when the article was created or added to the system.
-     */
+    private String level;
+    private List<String> groupingIdentifiers;
+    private String permissions;
     private Date dateAdded;
-    
-    /**
-     * Version number of the article (e.g., "1.0", "2.1").
-     */
     private String version;
+    private Boolean isSpecialGroupArticle;
 
-    /**
-     * Constructor for creating a complete article with all fields including ID.
-     *
-     * @param id The unique identifier for the article
-     * @param title The article's title as a character array
-     * @param authors The article's authors as a character array
-     * @param abstractText A short description of the article as a character array
-     * @param keywords Keywords associated with the article as a character array
-     * @param body The main content of the article as a character array
-     * @param references References cited in the article as a character array
-     * @param level The difficulty level of the article (beginner, intermediate, advanced, expert)
-     * @param groupingIdentifiers List of tags or categories for the article
-     * @param permissions Access permissions for the article
-     * @param dateAdded Date when the article was created
-     * @param version Version number of the article
-     */
+    // Constructor for creating a complete article with all fields including ID
     public Article(int id, char[] title, char[] authors, char[] abstractText, char[] keywords, char[] body, char[] references,
                    String level, List<String> groupingIdentifiers, String permissions, Date dateAdded, String version) {
         this.id = id;
@@ -101,23 +40,11 @@ public class Article {
         this.permissions = permissions;
         this.dateAdded = dateAdded;
         this.version = version;
+        this.isSpecialGroupArticle = false;
+        System.out.println("[Article] Article created with ID: " + id);
     }
 
-    /**
-     * Constructor for creating an article without an ID (typically used for new articles).
-     *
-     * @param title The article's title as a character array
-     * @param authors The article's authors as a character array
-     * @param abstractText A short description of the article as a character array
-     * @param keywords Keywords associated with the article as a character array
-     * @param body The main content of the article as a character array
-     * @param references References cited in the article as a character array
-     * @param level The difficulty level of the article (beginner, intermediate, advanced, expert)
-     * @param groupingIdentifiers List of tags or categories for the article
-     * @param permissions Access permissions for the article
-     * @param dateAdded Date when the article was created
-     * @param version Version number of the article
-     */
+    // Constructor for creating an article without an ID (typically used for new articles)
     public Article(char[] title, char[] authors, char[] abstractText, char[] keywords, char[] body, char[] references,
                    String level, List<String> groupingIdentifiers, String permissions, Date dateAdded, String version) {
         this.title = title;
@@ -131,237 +58,150 @@ public class Article {
         this.permissions = permissions;
         this.dateAdded = dateAdded;
         this.version = version;
+        System.out.println("[Article] New article created without ID.");
     }
 
-    /**
-     * Searches the article's content for a specific keyword.
-     *
-     * @param keyword The term to search for
-     * @return true if the keyword is found in the title, keywords, or body; false otherwise
-     */
+    // Method to search for a keyword in the article
     public boolean searchArticle(String keyword) {
-        return new String(this.keywords).contains(keyword) ||
-               new String(this.title).contains(keyword) ||
-               new String(this.body).contains(keyword);
+        boolean found = new String(this.keywords).contains(keyword) ||
+                        new String(this.title).contains(keyword) ||
+                        new String(this.body).contains(keyword);
+        System.out.println("[Article] Search for keyword \"" + keyword + "\": " + found);
+        return found;
     }
-    
-    /**
-     * Gets the difficulty level of the article.
-     *
-     * @return The article's level (beginner, intermediate, advanced, expert)
-     */
+
+    // Getters and Setters with print statements
     public String getLevel() {
+        System.out.println("[Article] Getting level: " + level);
         return level;
     }
 
-    /**
-     * Sets the difficulty level of the article.
-     *
-     * @param level The new level to set
-     */
     public void setLevel(String level) {
+        System.out.println("[Article] Setting level to: " + level);
         this.level = level;
     }
 
-    /**
-     * Gets the list of grouping identifiers (tags/categories) for the article.
-     *
-     * @return List of grouping identifiers
-     */
     public List<String> getGroupingIdentifiers() {
-        System.out.println("Getting grouping identifiers: " + groupingIdentifiers);
+        System.out.println("[Article] Getting grouping identifiers: " + groupingIdentifiers);
         return groupingIdentifiers;
     }
 
-    /**
-     * Sets the list of grouping identifiers (tags/categories) for the article.
-     *
-     * @param groupingIdentifiers New list of grouping identifiers
-     */
     public void setGroupingIdentifiers(List<String> groupingIdentifiers) {
+        System.out.println("[Article] Setting grouping identifiers. New size: " + groupingIdentifiers.size());
         this.groupingIdentifiers = new ArrayList<>(groupingIdentifiers);
     }
 
-    /**
-     * Gets the permissions settings for the article.
-     *
-     * @return The article's permissions
-     */
     public String getPermissions() {
+        System.out.println("[Article] Getting permissions: " + permissions);
         return permissions;
     }
 
-    /**
-     * Sets the permissions settings for the article.
-     *
-     * @param permissions New permissions to set
-     */
     public void setPermissions(String permissions) {
+        System.out.println("[Article] Setting permissions to: " + permissions);
         this.permissions = permissions;
     }
 
-    /**
-     * Gets the date when the article was added.
-     *
-     * @return The date the article was added
-     */
     public Date getDateAdded() {
+        System.out.println("[Article] Getting date added: " + dateAdded);
         return dateAdded;
     }
 
-    /**
-     * Sets the date when the article was added.
-     *
-     * @param dateAdded New date to set
-     */
     public void setDateAdded(Date dateAdded) {
+        System.out.println("[Article] Setting date added to: " + dateAdded);
         this.dateAdded = dateAdded;
     }
 
-    /**
-     * Gets the version number of the article.
-     *
-     * @return The article's version
-     */
     public String getVersion() {
+        System.out.println("[Article] Getting version: " + version);
         return version;
     }
 
-    /**
-     * Sets the version number of the article.
-     *
-     * @param version New version to set
-     */
     public void setVersion(String version) {
+        System.out.println("[Article] Setting version to: " + version);
         this.version = version;
     }
 
-    /**
-     * Gets the unique identifier of the article.
-     *
-     * @return The article's ID
-     */
     public int getId() {
+        System.out.println("[Article] Getting ID: " + id);
         return id;
     }
 
-    /**
-     * Sets the unique identifier of the article.
-     *
-     * @param id New ID to set
-     */
     public void setId(int id) {
+        System.out.println("[Article] Setting ID to: " + id);
         this.id = id;
     }
 
-    /**
-     * Gets the title of the article.
-     *
-     * @return The article's title as a String, or null if title is not set
-     */	
     public String getTitle() {
-        return title != null ? new String(title) : null;  // Handle null title
+        System.out.println("[Article] Getting title: " + new String(title));
+        return title != null ? new String(title) : null;
     }
 
-    /**
-     * Sets the title of the article.
-     *
-     * @param title New title to set as a character array
-     */
     public void setTitle(char[] title) {
+        System.out.println("[Article] Setting title to: " + new String(title));
         this.title = title;
     }
 
-    /**
-     * Gets the authors of the article.
-     *
-     * @return The article's authors as a String, or null if authors are not set
-     */
     public String getAuthors() {
-        return authors != null ? new String(authors) : null;  // Handle null authors
+        System.out.println("[Article] Getting authors: " + new String(authors));
+        return authors != null ? new String(authors) : null;
     }
 
-    /**
-     * Sets the authors of the article.
-     *
-     * @param authors New authors to set as a character array
-     */
     public void setAuthors(char[] authors) {
+        System.out.println("[Article] Setting authors to: " + new String(authors));
         this.authors = authors;
     }
 
-	/**
-	 * Gets the abstract/short description of the article.
-	 *
-	 * @return The article's abstract as a String, or null if abstract is not set
-	 */
     public String getAbstractText() {
-        return abstractText != null ? new String(abstractText) : null;  // Handle null abstractText
+        System.out.println("[Article] Getting abstract: " + new String(abstractText));
+        return abstractText != null ? new String(abstractText) : null;
     }
 
-    /**
-     * Sets the abstract/short description of the article.
-     *
-     * @param abstractText New abstract to set as a character array
-     */
     public void setAbstractText(char[] abstractText) {
+        System.out.println("[Article] Setting abstract to: " + new String(abstractText));
         this.abstractText = abstractText;
     }
 
-    /**
-     * Gets the keywords associated with the article.
-     *
-     * @return The article's keywords as a String, or null if keywords are not set
-     */
     public String getKeywords() {
-        return keywords != null ? new String(keywords) : null;  // Handle null keywords
+        System.out.println("[Article] Getting keywords: " + new String(keywords));
+        return keywords != null ? new String(keywords) : null;
     }
 
-	/**
-	 * Sets the keywords associated with the article.
-	 *
-	 * @param keywords New keywords to set as a character array
-	 */
     public void setKeywords(char[] keywords) {
+        System.out.println("[Article] Setting keywords to: " + new String(keywords));
         this.keywords = keywords;
     }
 
-    /**
-     * Gets the main content/body of the article.
-     *
-     * @return The article's body as a String, or null if body is not set
-     */
     public String getBody() {
-        return body != null ? new String(body) : null;  // Handle null body
+        System.out.println("[Article] Getting body.");
+        return body != null ? new String(body) : null;
     }
 
-	/**
-	 * Sets the main content/body of the article.
-	 *
-	 * @param body New body content to set as a character array
-	 */
     public void setBody(char[] body) {
+        System.out.println("[Article] Setting body.");
         this.body = body;
     }
 
-    /**
-     * Gets the references cited in the article.
-     *
-     * @return The article's references as a String, or null if references are not set
-     */
     public String getReferences() {
-        return references != null ? new String(references) : null;  // Handle null references
+        System.out.println("[Article] Getting references: " + new String(references));
+        return references != null ? new String(references) : null;
     }
 
-    /**
-     * Sets the references cited in the article.
-     *
-     * @param references New references to set as a character array
-     */
     public void setReferences(char[] references) {
+        System.out.println("[Article] Setting references to: " + new String(references));
         this.references = references;
     }
+
+    public void setAsPartOfSpecialGroup() {
+        System.out.println("[Article] Setting article as part of a special group.");
+        this.isSpecialGroupArticle = true;
+    }
+
+    public Boolean checkSpecialGroupArticle() {
+        System.out.println("[Article] Checking if article is part of a special group: " + isSpecialGroupArticle);
+        return this.isSpecialGroupArticle;
+    }
 }
+
 
 
 

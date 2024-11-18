@@ -24,7 +24,7 @@ import models.UserSession;
  * creation and editing page. This class extends the PageController base
  * class, allowing it to inherit common page-related behavior.
  * </p>
- * 
+ * 	
  * @author Alyssa DiTroia
  * 
  */
@@ -150,7 +150,7 @@ public class CreateEditArticleController extends PageController {
         } 
         catch (Exception e) {
             //showErrorAlert("Error", "Failed to initialize the CreateEditArticleController: " + e.getMessage());
-            System.out.println("[ERROR] (not actually error when creating new article): " + e.getMessage());
+            System.out.println("[CreateEditArticle] No article selected to edit: " + e.getMessage());
         }
     }
 
@@ -309,6 +309,8 @@ public class CreateEditArticleController extends PageController {
      */
     @FXML
     public void goBackToList() {
+    	UserSession.getInstance().setSelectedArticle(null);
+    	
         String currentRole = UserSession.getInstance().getCurrentRole();
         if ("admin".equals(currentRole)) {
             navigateTo("/views/SearchArticleView.fxml");

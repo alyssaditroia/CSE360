@@ -39,14 +39,14 @@ public class ArticleTest {
         article = new Article(1, title, authors, abstractText, keywords, body, references, level,
                               groupingIdentifiers, permissions, dateAdded, version);
 
-        System.out.println("Setup complete: Article object initialized.");
+        System.out.println("[Article Test] Setup complete: Article object initialized.");
     }
     /**
      * A Test that tests the constructor of the article class
      */
     @Test
     public void testFullConstructor() {
-        System.out.println("Testing full constructor...");
+        System.out.println("[Article Test] Testing full constructor...");
 
         assertEquals(1, article.getId());
         assertEquals("Sample Title", article.getTitle());
@@ -69,7 +69,7 @@ public class ArticleTest {
      */
     @Test
     public void testPartialConstructor() {
-        System.out.println("Testing partial constructor...");
+        System.out.println("[Article Test] Testing partial constructor...");
 
         char[] title = "Another Title".toCharArray();
         char[] authors = "Jane Smith".toCharArray();
@@ -98,7 +98,7 @@ public class ArticleTest {
         assertNotNull(newArticle.getDateAdded());
         assertEquals("2.0", newArticle.getVersion());
 
-        System.out.println("Partial constructor test passed.");
+        System.out.println("[Article Test] Partial constructor test passed.");
     }
 
     /**
@@ -106,62 +106,62 @@ public class ArticleTest {
      */
     @Test
     public void testSettersAndGetters() {
-        System.out.println("Testing setters and getters...");
+        System.out.println("[Article Test] Testing setters and getters...");
 
         article.setId(2);
         assertEquals(2, article.getId());
-        System.out.println("ID set and retrieved successfully.");
+        System.out.println("[Article Test] ID set and retrieved successfully.");
 
         char[] newTitle = "Updated Title".toCharArray();
         article.setTitle(newTitle);
         assertEquals("Updated Title", article.getTitle());
-        System.out.println("Title set and retrieved successfully.");
+        System.out.println("[Article Test] Title set and retrieved successfully.");
 
         char[] newAuthors = "Updated Author".toCharArray();
         article.setAuthors(newAuthors);
         assertEquals("Updated Author", article.getAuthors());
-        System.out.println("Authors set and retrieved successfully.");
+        System.out.println("[Article Test] Authors set and retrieved successfully.");
 
         char[] newAbstract = "Updated Abstract".toCharArray();
         article.setAbstractText(newAbstract);
         assertEquals("Updated Abstract", article.getAbstractText());
-        System.out.println("Abstract text set and retrieved successfully.");
+        System.out.println("[Article Test] Abstract text set and retrieved successfully.");
 
         char[] newKeywords = "updated, keywords".toCharArray();
         article.setKeywords(newKeywords);
         assertEquals("updated, keywords", article.getKeywords());
-        System.out.println("Keywords set and retrieved successfully.");
+        System.out.println("[Article Test] Keywords set and retrieved successfully.");
 
         char[] newBody = "Updated body content.".toCharArray();
         article.setBody(newBody);
         assertEquals("Updated body content.", article.getBody());
-        System.out.println("Body set and retrieved successfully.");
+        System.out.println("[Article Test] Body set and retrieved successfully.");
 
         char[] newReferences = "Updated references".toCharArray();
         article.setReferences(newReferences);
         assertEquals("Updated references", article.getReferences());
-        System.out.println("References set and retrieved successfully.");
+        System.out.println("[Article Test] References set and retrieved successfully.");
 
         article.setLevel("expert");
         assertEquals("expert", article.getLevel());
-        System.out.println("Level set and retrieved successfully.");
+        System.out.println("[Article Test] Level set and retrieved successfully.");
 
         article.setGroupingIdentifiers(Arrays.asList("Group4"));
         assertEquals(Arrays.asList("Group4"), article.getGroupingIdentifiers());
-        System.out.println("Grouping identifiers set and retrieved successfully.");
+        System.out.println("[Article Test] Grouping identifiers set and retrieved successfully.");
 
         article.setPermissions("Admin,Instructor");
         assertEquals("Admin,Instructor", article.getPermissions());
-        System.out.println("Permissions set and retrieved successfully.");
+        System.out.println("[Article Test] Permissions set and retrieved successfully.");
 
         Date newDate = new Date();
         article.setDateAdded(newDate);
         assertEquals(newDate, article.getDateAdded());
-        System.out.println("Date added set and retrieved successfully.");
+        System.out.println("[Article Test] Date added set and retrieved successfully.");
 
         article.setVersion("2.1");
         assertEquals("2.1", article.getVersion());
-        System.out.println("Version set and retrieved successfully.");
+        System.out.println("[Article Test] Version set and retrieved successfully.");
     }
 
     /**
@@ -172,18 +172,18 @@ public class ArticleTest {
         System.out.println("Testing searchArticle method...");
 
         assertTrue(article.searchArticle("keyword1"));
-        System.out.println("Search for 'keyword1' passed.");
+        System.out.println("[Article Test] Search for 'keyword1' passed.");
 
         assertTrue(article.searchArticle("Sample Title"));
-        System.out.println("Search for 'Sample Title' passed.");
+        System.out.println("[Article Test] Search for 'Sample Title' passed.");
 
         assertTrue(article.searchArticle("body of the article"));
-        System.out.println("Search for 'body of the article' passed.");
+        System.out.println("[Article Test] Search for 'body of the article' passed.");
 
         assertFalse(article.searchArticle("nonexistent keyword"));
-        System.out.println("Search for 'nonexistent keyword' passed.");
+        System.out.println("[Article Test] Search for 'nonexistent keyword' passed.");
 
-        System.out.println("searchArticle method test passed.");
+        System.out.println("[Article Test] searchArticle method test passed.");
     }
 }
 
