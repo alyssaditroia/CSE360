@@ -7,6 +7,8 @@ import java.util.Arrays;
 /**
  * The {@code EncryptionUtils} handles the IV generation, byte array conversions, and char array conversions. 
  * 
+ * @author Lynn Robert carter
+ * 
  */
 public class EncryptionUtils {
 	private static int IV_SIZE = 16;

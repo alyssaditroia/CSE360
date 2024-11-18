@@ -12,6 +12,8 @@ import models.User;
 /**
  * The {@code Database} class manages all interactions with the database. Primarily the user database. 
  * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  * 
  * To visualize database run commands in your terminal: cd /h2/bin java -jar
  * h2*.jar

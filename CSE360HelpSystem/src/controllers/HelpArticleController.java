@@ -35,7 +35,8 @@ import models.Article;
  * CreateEditArticleController
  * ViewArticleController
  * 
- * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  * 
  */
 public class HelpArticleController extends PageController {

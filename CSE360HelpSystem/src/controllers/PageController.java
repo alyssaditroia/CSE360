@@ -31,6 +31,8 @@ import models.UserSession;
  * - goHome() -> Navigates the user to their home page based on their current selected role
  * - showErrorAlert(title, message) -> Shows error pop up with a Title and Message (Strings)
  * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  * 
  **************/
 public class PageController {

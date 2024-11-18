@@ -16,6 +16,7 @@ import Encryption.EncryptionHelper;
  * The OTP class also interacts with the database for updating and handling OTPs
  * 
  * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class OTP {
 	/**

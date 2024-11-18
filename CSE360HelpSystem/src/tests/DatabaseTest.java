@@ -10,7 +10,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+/**
+ * A class for testing database functionalities
+ * 
+ *  @author Alyssa DiTroia
+ *  @author Cooper Anderson
+ */
 class DatabaseTest {
 	private Database database;
 	private Connection connection;
@@ -43,13 +48,15 @@ class DatabaseTest {
 	private void clearTestDatabase() throws SQLException {
 		// Clear the database (truncate or delete rows) before each test
 		try (Statement stmt = connection.createStatement()) {
-			stmt.execute("TRUNCATE TABLE cse360users"); // Example for a 'users' table
-			System.out.println("[DatabaseTest] Test database cleared.");
+			stmt.execute("TRUNCATE TABLE cse360users"); 
+			System.out.println("Test database cleared.");
 		} catch (SQLException e) {
 			System.err.println("[DatabaseTest] Error clearing test database: " + e.getMessage());
 		}
 	}
-
+	/**
+	 * Deletes the test database after testing
+	 **/
 	private static void deleteTestDatabase() {
 		String url = "jdbc:h2:~/firstsDatabase";
 		String user = "user"; // Default user for H2
@@ -64,16 +71,28 @@ class DatabaseTest {
 		}
 	}
 
+	/**
+	 * Checks proper connection to test database using the Database class functionality 
+	 * @throws SQLException
+	 */
 	@Test
 	void testConnectToDatabase() throws SQLException {
 		assertNotNull(database.getConnection(), "Connection should not be null after connecting to the database");
 	}
 
+	/**
+	 * Checks if test database is empty from the database class
+	 * @throws SQLException
+	 */
 	@Test
 	void testIsDatabaseEmptyInitially() throws SQLException {
 		assertTrue(database.isDatabaseEmpty(), "Database should be empty ");
 	}
 
+	/**
+	 * Checks setup admin functionality
+	 * @throws SQLException
+	 */
 	@Test
 	void testSetupAdministrator() throws SQLException {
 		String username = "admin";
@@ -84,6 +103,10 @@ class DatabaseTest {
 		assertTrue(database.isUserAdmin(username), "User should be an admin after setup");
 	}
 
+	/**
+	 * Checks update user functionality
+	 * @throws SQLException
+	 */
 	@Test
 	void testUpdateUSer() throws SQLException {
 		String username = "admin";
@@ -93,6 +116,10 @@ class DatabaseTest {
 		assertTrue(database.doesUserExist("admin@eamail.com"), "User should be an admin after setup");
 	}
 
+	/**
+	 * Checks invite user functionality
+	 * @throws SQLException
+	 */
 	@Test
 	void testInviteUser() throws SQLException {
 		String inviteCode = "INVITE123";
@@ -103,6 +130,10 @@ class DatabaseTest {
 		assertTrue(database.doesUserExist(email), "User should exist after inviting");
 	}
 
+	/**
+	 * Checks complete invite functionality
+	 * @throws SQLException
+	 */
 	@Test
 	void testCompleteInvite() throws SQLException {
 		String inviteCode = "INVITE123";
@@ -114,6 +145,10 @@ class DatabaseTest {
 		assertTrue(database.isUserAdmin("newUser"), "New user should be an admin after completing invite");
 	}
 
+	/**
+	 * Checks the role check functionality
+	 * @throws SQLException
+	 */
 	@Test
 	void testIsUserAdmin() throws SQLException {
 		String username = "admin";

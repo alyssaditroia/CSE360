@@ -21,13 +21,15 @@ import models.Article;
 /**
  * The {@code HelpArticleDatabase} handles interactions with the database for the HelpArticle table and Grouping Identifiers table
  * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class HelpArticleDatabase extends Database{
 
 	/**
 	 * Database instance for interacting with core database functionality
 	 */
-    private Database db; // NOTE: Use the existing Database class
+    private Database db; // NOTE: Uses the existing Database class
     
     /**
      * Database connection instance

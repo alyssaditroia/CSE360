@@ -11,11 +11,19 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
+/**
+ * Tests for the user session class using JUnit tests
+ * 
+ *  @author Alyssa DiTroia
+ *  @author Cooper Anderson
+ */
 public class UserSessionTest {
 
     private UserSession userSession;
 
+    /**
+     * Setup for each test includes getting a user instance and setting the session user and article to null
+     */
     @BeforeEach
     public void setUp() {
         System.out.println("Setting up UserSession instance for tests...");
@@ -25,6 +33,9 @@ public class UserSessionTest {
         System.out.println("Setup complete.");
     }
 
+    /**
+     * Tests an instance of the userSession Instance
+     */
     @Test
     public void testSingletonInstance() {
         System.out.println("Testing singleton instance...");
@@ -33,6 +44,9 @@ public class UserSessionTest {
         System.out.println("Singleton instance test passed.");
     }
 
+    /**
+     * Tests the set and get invite code for the specific instance
+     */
     @Test
     public void testSetAndGetInviteCode() {
         System.out.println("Testing set and get invite code...");
@@ -43,6 +57,9 @@ public class UserSessionTest {
         System.out.println("Invite code set and retrieved successfully.");
     }
 
+    /**
+     * Tests the set and get email for the specific instance
+     */
     @Test
     public void testSetAndGetEmail() {
         System.out.println("Testing set and get email...");
@@ -53,6 +70,9 @@ public class UserSessionTest {
         System.out.println("Email set and retrieved successfully.");
     }
 
+    /**
+     * Tests the set and get current role for the specific instance
+     */
     @Test
     public void testSetAndGetCurrentRole() {
         System.out.println("Testing set and get current role...");
@@ -63,6 +83,9 @@ public class UserSessionTest {
         System.out.println("Current role set and retrieved successfully.");
     }
 
+    /**
+     * Tests the set and get selected article for the specific instance
+     */
     @Test
     public void testSetAndGetSelectedArticle() {
         System.out.println("Testing set and get selected article...");
@@ -90,6 +113,9 @@ public class UserSessionTest {
         System.out.println("Selected article set and retrieved successfully.");
     }
 
+    /**
+     * Tests the get user session when it is not set, should trigger null
+     */
     @Test
     public void testGetCurrentUserWhenNotSet() {
         System.out.println("Testing get current user when user is not set...");
@@ -100,6 +126,9 @@ public class UserSessionTest {
     }
 
 
+    /**
+     * Tests setting the current instance
+     */
     @Test
     public void testSetInstance() {
         System.out.println("Testing setInstance method...");
