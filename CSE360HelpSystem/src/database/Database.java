@@ -52,14 +52,14 @@ public class Database {
 	public void connectToDatabase() throws SQLException {
 		try {
 			Class.forName(JDBC_DRIVER); // Load the JDBC driver
-			System.out.println("Connecting to database...");
+			System.out.println("[Database] Connecting to database...");
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
-			System.out.println("Connection established");
+			System.out.println("[Database] Connection established");
 			statement = connection.createStatement();
-			System.out.println("Statement created");
+			System.out.println("[Database] Statement created");
 			createTables(); // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
-			System.err.println("JDBC Driver not found: " + e.getMessage());
+			System.err.println("[Database] JDBC Driver not found: " + e.getMessage());
 		}
 	}
 
@@ -88,7 +88,6 @@ public class Database {
 	 */
 	// TODO Add encryption
 	public void createTables() throws SQLException {
-		System.out.println("Creating Tables");
 		String userTable = "CREATE TABLE IF NOT EXISTS cse360users (" 
 		+ "id INT AUTO_INCREMENT PRIMARY KEY, "
 		+ "firstName VARCHAR(255)," 
@@ -105,6 +104,7 @@ public class Database {
 		+ "otpFlag BOOLEAN DEFAULT FALSE, " 
 		+ "otpExpiration TIMESTAMP)";
 		statement.execute(userTable);
+		System.out.println("[Database] Creating Tables");
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class Database {
 		ResultSet resultSet = statement.executeQuery(query);
 		if (resultSet.next()) {
 			boolean dbStatus = resultSet.getInt("count") == 0;
-			System.out.println("Database is empty " + dbStatus);
+			System.out.println("[Database] Database is empty " + dbStatus);
 			return resultSet.getInt("count") == 0;
 		}
 		return false;
@@ -154,12 +154,12 @@ public class Database {
 		statement = connection.createStatement();
 		// Validate input parameters
 		if (username == null || username.isEmpty()) {
-			System.out.println("Failed to add administrator: username cannot be null or empty.");
+			System.out.println("[Database] Failed to add administrator: username cannot be null or empty.");
 			return; // Early exit if username is invalid
 		}
 
 		if (password == null || password.length == 0) {
-			System.out.println("Failed to add administrator: password cannot be null or empty.");
+			System.out.println("[Database] Failed to add administrator: password cannot be null or empty.");
 			return; // Early exit if password is invalid
 		}
 
@@ -175,9 +175,9 @@ public class Database {
 
 			// Check if the insertion was successful
 			if (rowsAffected > 0) {
-				System.out.println("Administrator successfully added to Database");
+				System.out.println("[Database] Administrator successfully added to Database");
 			} else {
-				System.out.println("Failed to add administrator: No rows affected.");
+				System.out.println("[Database] Failed to add administrator: No rows affected.");
 			}
 		} catch (SQLException e) {
 			System.out.println("SQL Exception occurred while adding administrator: " + e.getMessage());
@@ -223,7 +223,7 @@ public class Database {
 
 		// Check if there's anything to update
 		if (fields.isEmpty()) {
-			System.out.println("No fields to update.");
+			System.out.println("[Database] No fields to update.");
 			return;
 		}
 
@@ -236,7 +236,7 @@ public class Database {
 
 			int rowsAffected = stmt.executeUpdate();
 			if (rowsAffected == 0) {
-				System.out.println("No user found with username: " + username);
+				System.out.println("[Database] No user found with username: " + username);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -556,13 +556,13 @@ public class Database {
 		if (connection != null) {
 			try {
 				connection.close();
-				System.out.println("Database connection closed.");
+				System.out.println("[Database] Database connection closed.");
 			} catch (SQLException e) {
-				System.err.println("Failed to close the database connection.");
+				System.err.println("[Database] Failed to close the database connection.");
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("No connection to close.");
+			System.out.println("[Database] No connection to close.");
 		}
 	}
 

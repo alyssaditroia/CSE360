@@ -2,75 +2,82 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.BackupRestoreController"
-      spacing="20" alignment="TOP_CENTER" style="-fx-padding: 20;">
-    
-    <!-- Title -->
-    <Label text="Backup and Restore Management" 
-           style="-fx-font-size: 24; -fx-font-weight: bold;"/>
-    
-    <!-- Regular Backup Section -->
-    <VBox spacing="10" style="-fx-padding: 10; -fx-border-color: #cccccc; -fx-border-radius: 5;">
-        <Label text="Full System Backup" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-        
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <Label text="Backup Location:"/>
-            <TextField fx:id="backupLocationField" prefWidth="300" editable="false"/>
-            <Button text="Choose Location" onAction="#chooseBackupLocation"/>
-        </HBox>
-        
-        <Button text="Create Full Backup" onAction="#createBackup" 
-                style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
-    </VBox>
-    
-    <!-- Group-Specific Backup Section -->
-    <VBox spacing="10" style="-fx-padding: 10; -fx-border-color: #cccccc; -fx-border-radius: 5;">
-        <Label text="Group-Specific Backup" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-        
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <Label text="Backup Location:"/>
-            <TextField fx:id="groupBackupLocationField" prefWidth="300" editable="false"/>
-            <Button text="Choose Location" onAction="#chooseGroupBackupLocation"/>
-        </HBox>
-        
-        <VBox spacing="5">
-            <Label text="Select Groups to Backup:"/>
-            <ListView fx:id="groupsForBackupList" prefHeight="100"/>
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.BackupRestoreController"
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
+    <content>
+        <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 30;">
+            
+            <!-- Title -->
+            <Label text="Backup and Restore Management" 
+                   style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;"/>
+            
+            <!-- Regular Backup Section -->
+            <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <Label text="Full System Backup" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #8C1D40;"/>
+                
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Backup Location:" style="-fx-font-size: 14;"/>
+                    <TextField fx:id="backupLocationField" prefWidth="300" editable="false"/>
+                    <Button text="Choose Location" onAction="#chooseBackupLocation"
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                </HBox>
+                
+                <Button text="Create Full Backup" onAction="#createBackup"
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+            </VBox>
+            
+            <!-- Group-Specific Backup Section -->
+            <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <Label text="Group-Specific Backup" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #8C1D40;"/>
+                
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Backup Location:" style="-fx-font-size: 14;"/>
+                    <TextField fx:id="groupBackupLocationField" prefWidth="300" editable="false"/>
+                    <Button text="Choose Location" onAction="#chooseGroupBackupLocation"
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                </HBox>
+                
+                <VBox spacing="10">
+                    <Label text="Select Groups to Backup:" style="-fx-font-size: 14;"/>
+                    <ListView fx:id="groupsForBackupList" prefHeight="100" 
+                              style="-fx-border-color: #BDC3C7; -fx-border-radius: 5;"/>
+                </VBox>
+                
+                <Button text="Create Group Backup" onAction="#createGroupBackup"
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+            </VBox>
+            
+            <!-- Restore Section -->
+            <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <Label text="Restore Articles" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #8C1D40;"/>
+                
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Restore From:" style="-fx-font-size: 14;"/>
+                    <TextField fx:id="restoreLocationField" prefWidth="300" editable="false"/>
+                    <Button text="Choose File" onAction="#chooseRestoreFile"
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                </HBox>
+                
+                <VBox spacing="10">
+                    <Label text="Restore Options:" style="-fx-font-size: 14;"/>
+                    <RadioButton fx:id="mergeRadio" text="Merge with existing articles" selected="true">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="restoreOptions"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="replaceRadio" text="Replace all existing articles" toggleGroup="$restoreOptions"/>
+                </VBox>
+                
+                <Button text="Restore Articles" onAction="#restoreArticles"
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+            </VBox>
+            
+            <!-- Navigation -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Back to Home" onAction="#goHome"
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+            </HBox>
         </VBox>
-        
-        <Button text="Create Group Backup" onAction="#createGroupBackup" 
-                style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
-    </VBox>
-    
-    <!-- Restore Section -->
-    <VBox spacing="10" style="-fx-padding: 10; -fx-border-color: #cccccc; -fx-border-radius: 5;">
-        <Label text="Restore Articles" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
-        
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <Label text="Restore From:"/>
-            <TextField fx:id="restoreLocationField" prefWidth="300" editable="false"/>
-            <Button text="Choose File" onAction="#chooseRestoreFile"/>
-        </HBox>
-        
-        <VBox spacing="5">
-            <Label text="Restore Options:"/>
-            <RadioButton fx:id="mergeRadio" text="Merge with existing articles" selected="true">
-                <toggleGroup>
-                    <ToggleGroup fx:id="restoreOptions"/>
-                </toggleGroup>
-            </RadioButton>
-            <RadioButton fx:id="replaceRadio" text="Replace all existing articles" toggleGroup="$restoreOptions"/>
-        </VBox>
-        
-        <Button text="Restore Articles" onAction="#restoreArticles" 
-                style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
-    </VBox>
-    
-    <!-- Navigation -->
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Back to Home" onAction="#goHome"/>
-    </HBox>
-    
-</VBox>
+    </content>
+</ScrollPane>

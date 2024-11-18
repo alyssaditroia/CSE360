@@ -1,8 +1,8 @@
 package models;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * The {@code Conversation} class is the model for the conversation structure
  * This is an object that defines a conversation
@@ -14,16 +14,18 @@ public class Conversation {
 
     // Constructor for new conversations
     public Conversation(int id) {
-    	this.conversationId = id;
-    	this.isResolved = false;
+        this.conversationId = id;
+        this.isResolved = false;
         this.messages = new ArrayList<>();
+        System.out.println("[Conversation] New conversation created with ID: " + id);
     }
-    
+
     /**
      * Gets the conversation's unique identifier
      * @return the conversation ID
      */
     public int getConversationId() {
+        System.out.println("[Conversation] Getting conversationId: " + conversationId);
         return conversationId;
     }
 
@@ -32,6 +34,7 @@ public class Conversation {
      * @param conversationId the ID to set
      */
     public void setConversationId(int conversationId) {
+        System.out.println("[Conversation] Setting conversationId to: " + conversationId);
         this.conversationId = conversationId;
     }
 
@@ -40,6 +43,7 @@ public class Conversation {
      * @return true if resolved, false if still active
      */
     public Boolean getIsResolved() {
+        System.out.println("[Conversation] Getting isResolved: " + isResolved);
         return isResolved;
     }
 
@@ -48,6 +52,7 @@ public class Conversation {
      * @param isResolved the resolution status to set
      */
     public void setIsResolved(Boolean isResolved) {
+        System.out.println("[Conversation] Setting isResolved to: " + isResolved);
         this.isResolved = isResolved;
     }
 
@@ -56,6 +61,7 @@ public class Conversation {
      * @return List of HelpMessage objects
      */
     public List<HelpMessage> getMessages() {
+        System.out.println("[Conversation] Getting messages. Current size: " + messages.size());
         return messages;
     }
 
@@ -64,6 +70,7 @@ public class Conversation {
      * @param messages List of HelpMessage objects
      */
     public void setMessages(List<HelpMessage> messages) {
+        System.out.println("[Conversation] Setting messages. New size: " + messages.size());
         this.messages = messages;
     }
 
@@ -76,6 +83,8 @@ public class Conversation {
             this.messages = new ArrayList<>();
         }
         this.messages.add(message);
+        System.out.println("[Conversation] Added message: " + message.getMessageBody() +
+                ". Total messages: " + messages.size());
     }
 
     /**
@@ -84,7 +93,10 @@ public class Conversation {
      * @return true if message was removed, false if not found
      */
     public boolean removeMessage(HelpMessage message) {
-        return this.messages.remove(message);
+        boolean removed = this.messages.remove(message);
+        System.out.println("[Conversation] Attempted to remove message: " + message.getMessageBody() +
+                ". Removed: " + removed + ". Total messages: " + messages.size());
+        return removed;
     }
 
     /**
@@ -93,9 +105,12 @@ public class Conversation {
      */
     public HelpMessage getLatestMessage() {
         if (messages.isEmpty()) {
+            System.out.println("[Conversation] No messages to retrieve as latest.");
             return null;
         }
-        return messages.get(messages.size() - 1);
+        HelpMessage latestMessage = messages.get(messages.size() - 1);
+        System.out.println("[Conversation] Getting latest message: " + latestMessage.getMessageBody());
+        return latestMessage;
     }
 
     /**
@@ -103,6 +118,7 @@ public class Conversation {
      * @return The total number of messages
      */
     public int getMessageCount() {
+        System.out.println("[Conversation] Getting message count: " + messages.size());
         return messages.size();
     }
 
@@ -111,6 +127,7 @@ public class Conversation {
      */
     public void resolveConversation() {
         this.isResolved = true;
+        System.out.println("[Conversation] Conversation marked as resolved.");
     }
 
     /**
@@ -118,6 +135,7 @@ public class Conversation {
      */
     public void reopenConversation() {
         this.isResolved = false;
+        System.out.println("[Conversation] Conversation reopened.");
     }
 
     /**
@@ -125,5 +143,6 @@ public class Conversation {
      */
     public void clearMessages() {
         this.messages.clear();
+        System.out.println("[Conversation] All messages cleared. Total messages: " + messages.size());
     }
 }

@@ -46,13 +46,6 @@ public class StudentHomePageController extends PageController {
 	private void navigateToGeneralGroup() {
 	    navigateTo("/views/StudentGeneralView.fxml");
 	}
-
-	// Logout functionality
-	@FXML
-	public void logout() {
-		System.out.println("Student logged out.");
-		navigateTo("/views/LoginPageView.fxml");
-	}
 	
 	@FXML
 	public void goToMessagingSystem() {

@@ -97,7 +97,7 @@ public class FinishAccountSetupController extends PageController {
 			errorLabel.setText("No user is currently logged in. Please log in again.");
 			return; // Early exit to prevent NullPointerException
 		}
-		System.out.println("Current logged in user: " + currentUsername);
+		System.out.println("[FinishAccountSetupPage] Current logged in user: " + currentUsername);
 
 		// Update user object with additional information
 		user.setEmail(email);
@@ -151,7 +151,7 @@ public class FinishAccountSetupController extends PageController {
 		if (db.isUserStudent(username)) {
 			numRoles++;
 		}
-		System.out.println("Number of roles for user: " + username + ": " + numRoles);
+		System.out.println("[FinishAccountSetupPage] Number of roles for user, " + username + ": " + numRoles);
 		return numRoles;
 	}
 

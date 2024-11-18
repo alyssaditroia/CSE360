@@ -125,7 +125,7 @@ public class LoginPageController extends PageController {
 						redirectToUpdatePassword();
 						return;
 					} else {
-						System.out.println("OTP VALIDATION MESSAGE: " + validOTP);
+						System.out.println("[LoginPage] OTP VALIDATION MESSAGE: " + validOTP);
 						// NEED TO IMPLEMENT THE CASE WHERE THE VALIDATION MESSAGE IS FALSE
 					}
 				}
@@ -161,7 +161,7 @@ public class LoginPageController extends PageController {
 				System.out.println("=========================\n");
 				
 				UserSession.getInstance().setCurrentUser(loggedInUser);
-				System.out.println("User logged in: " + UserSession.getInstance().getUsername());
+				System.out.println("[LoginPage] User logged in: " + UserSession.getInstance().getUsername());
 				
 
 				// CHANGED: Justin Faris 10-3-24
@@ -197,13 +197,13 @@ public class LoginPageController extends PageController {
 		// Validate user credentials from database
 		try {
 			if (db.validateInvite(inviteCode)) {
-				System.out.println("User invite code validated");
+				System.out.println("[LoginPage] User invite code validated");
 				User userWithInvite = new User();
 				userWithInvite.setInviteToken(inviteCode);
 				UserSession userSession = UserSession.getInstance();
 				userSession.setCurrentUser(userWithInvite); // Assume loggedInUser is of type User
 				userSession.setInviteCode(inviteCode);
-				System.out.println("User Logged in with invite code " + inviteCode);
+				System.out.println("[LoginPage] User Logged in with invite code " + inviteCode);
 				redirectToSetupAccount();
 				return; // Exit after redirection
 			} else {
@@ -212,7 +212,7 @@ public class LoginPageController extends PageController {
 				return;
 			}
 		} catch (SQLException e) {
-			System.out.println("Error when trying to validate invite code");
+			System.out.println("[LoginPage] Error when trying to validate invite code");
 			e.printStackTrace();
 		}
 	}
@@ -259,7 +259,7 @@ public class LoginPageController extends PageController {
 		if (db.isUserStudent(username)) {
 			numRoles++;
 		}
-		System.out.println("Number of roles for user: " + username + ": " + numRoles);
+		System.out.println("[LoginPage] Number of roles for user: " + username + ": " + numRoles);
 		return numRoles;
 	}
 
@@ -291,7 +291,7 @@ public class LoginPageController extends PageController {
 	    }
 
 	    // Print current role to ensure it's correctly set
-	    System.out.println("[INFO] User role set to: " + userSession.getCurrentRole());
+	    System.out.println("[LoginPage] User role set to: " + userSession.getCurrentRole());
 	}
 
 	/**

@@ -31,7 +31,7 @@ class DatabaseTest {
 				connection.close(); // Close the connection after each test
 			}
 		} catch (SQLException e) {
-			System.err.println("Error closing the connection: " + e.getMessage());
+			System.err.println("[DatabaseTest] Error closing the connection: " + e.getMessage());
 		}
 	}
 
@@ -44,9 +44,9 @@ class DatabaseTest {
 		// Clear the database (truncate or delete rows) before each test
 		try (Statement stmt = connection.createStatement()) {
 			stmt.execute("TRUNCATE TABLE cse360users"); // Example for a 'users' table
-			System.out.println("Test database cleared.");
+			System.out.println("[DatabaseTest] Test database cleared.");
 		} catch (SQLException e) {
-			System.err.println("Error clearing test database: " + e.getMessage());
+			System.err.println("[DatabaseTest] Error clearing test database: " + e.getMessage());
 		}
 	}
 
@@ -58,9 +58,9 @@ class DatabaseTest {
 		try (Connection conn = DriverManager.getConnection(url, user, password);
 				Statement stmt = conn.createStatement()) {
 			stmt.execute("DROP ALL OBJECTS");
-			System.out.println("Test database deleted successfully.");
+			System.out.println("[DatabaseTest] Test database deleted successfully.");
 		} catch (SQLException e) {
-			System.err.println("Error deleting test database: " + e.getMessage());
+			System.err.println("[DatabaseTest] Error deleting test database: " + e.getMessage());
 		}
 	}
 

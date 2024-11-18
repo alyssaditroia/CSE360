@@ -130,7 +130,7 @@ public class UserSession {
      * @return The current invite code
      */
 	public String getInviteCode() {
-		System.out.println("[INFO in UserSession] getInviteCode(), Invite code: " + inviteCode);
+		System.out.println("[UserSession] getInviteCode(), Invite code: " + inviteCode);
 		return inviteCode;
 	}
 
@@ -140,7 +140,7 @@ public class UserSession {
      * @param inviteCode The invite code to set
      */
 	public void setInviteCode(String inviteCode) {
-		System.out.println("[INFO in UserSession] setInviteCode() Invite Code: " + inviteCode);
+		System.out.println("[UserSession] setInviteCode() Invite Code: " + inviteCode);
 		this.inviteCode = inviteCode;
 	}
 
@@ -150,7 +150,7 @@ public class UserSession {
      * @return The current user's email address
      */
 	public String getEmail() {
-		System.out.println("[INFO in UserSession] getEmail() Email: " + email);
+		System.out.println("[UserSession] getEmail() Email: " + email);
 		return email;
 	}
 
@@ -160,7 +160,7 @@ public class UserSession {
      * @param email The email address to set
      */
 	public void setEmail(String email) {
-		System.out.println("[INFO in UserSession] setEmail() Email: " + email);
+		System.out.println("[UserSession] setEmail() Email: " + email);
 		this.email = email;
 	}
 	
@@ -170,7 +170,7 @@ public class UserSession {
      * @return The current role (admin, instructor, or student)
      */
 	public String getCurrentRole() {
-		System.out.println("[INFO in UserSession] getCurrentRole() current role: " + currentRole);
+		System.out.println("[UserSession] getCurrentRole() current role: " + currentRole);
 		return currentRole;
 	}
 	
@@ -180,7 +180,7 @@ public class UserSession {
      * @param currentRole The role to set (admin, instructor, or student)
      */
 	public void setCurrentRole(String currentRole) {
-		System.out.println("[INFO in UserSession] setCurrentRole() current role: " + currentRole);
+		System.out.println("[UserSession] setCurrentRole() current role: " + currentRole);
 		this.currentRole = currentRole;
 	}
 
@@ -192,9 +192,9 @@ public class UserSession {
 	public void setSelectedArticle(Article selectedArticle) {
 	    
 	    if (selectedArticle != null) {
-	        System.out.println("[INFO in UserSession] setSelectedArticle() Selected Article: " + selectedArticle.getTitle());
+	        System.out.println("[UserSession] setSelectedArticle() Selected Article: " + selectedArticle.getTitle());
 	    } else {
-	        System.out.println("[INFO in UserSession] Selected Article is set to null");
+	        System.out.println("[UserSession] Selected Article is set to null");
 	    }
 	    
 	    this.selectedArticle = selectedArticle;
@@ -206,7 +206,7 @@ public class UserSession {
      * @return The currently selected Article object
      */
 	public Article getSelectedArticle() {
-		System.out.println("[INFO in UserSession] getSelectedArticle() Selected Article: " + selectedArticle.getTitle());
+		System.out.println("[UserSession] getSelectedArticle() Selected Article: " + selectedArticle.getTitle());
 		return selectedArticle;
 	}
 
@@ -217,7 +217,7 @@ public class UserSession {
      * @param userSession The UserSession instance to set
      */
 	public static void setInstance(UserSession userSession) {
-		System.out.println("[INFO in UserSession] setInstance() called");
+		System.out.println("[UserSession] setInstance() called");
 		instance = userSession;
 	}
 	
@@ -235,9 +235,9 @@ public class UserSession {
 	public void setSelectedSpecialGroup(SpecialGroup group) {
 	    
 	    if (selectedArticle != null) {
-	        System.out.println("[INFO in UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
+	        System.out.println("[UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
 	    } else {
-	        System.out.println("[INFO in UserSession] Selected Group is set to null");
+	        System.out.println("[UserSession] Selected Group is set to null");
 	    }
 	    
 	    this.selectedSpecialGroup = group;
@@ -245,7 +245,7 @@ public class UserSession {
 
 	
 	public SpecialGroup getSelectedSpecialGroup() {
-		System.out.println("[INFO in UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
+		System.out.println("[UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
 		return this.selectedSpecialGroup;
 	}
 	

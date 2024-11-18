@@ -114,15 +114,7 @@ public class InstructorHomePageController extends PageController {
 	public InstructorHomePageController(Stage primaryStage, Database db) {
 		super(primaryStage, db);
 	}
-	
-	/**
-	 * Handles user logout and navigation to login page
-	 */
-	@FXML
-	public void logout() {
-		System.out.println("Instructor logged out.");
-		navigateTo("/views/LoginPageView.fxml");
-	}
+
 	
 	/**
      * Initialize the controller and set up the table
@@ -300,9 +292,9 @@ public class InstructorHomePageController extends PageController {
             List<String> selectedGroups = new ArrayList<>(groupFilterListView.getItems());
             List<String> selectedLevels = new ArrayList<>(levelFilterListView.getItems());
             
-            System.out.println("Filtering with search query: '" + searchQuery + "'");
-            System.out.println("Selected groups for filtering: " + selectedGroups);
-            System.out.println("Selected levels for filtering: " + selectedLevels);
+            System.out.println("[InstructorHomePage] Filtering with search query: '" + searchQuery + "'");
+            System.out.println("[InstructorHomePage] Selected groups for filtering: " + selectedGroups);
+            System.out.println("[InstructorHomePage] Selected levels for filtering: " + selectedLevels);
             
             // Get all general articles to apply search and filters too
             List<Article> articles = db.getAllGeneralArticles();  

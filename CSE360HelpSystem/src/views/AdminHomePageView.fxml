@@ -3,69 +3,72 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.AdminHomePageController"
-      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
-    <children>
-        <VBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" 
-              AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
-              
-            <!-- Title Label -->
-            <Label fx:id="adminHomeTitle" text="Admin Home Page" 
-                   style="-fx-font-size: 24; -fx-font-weight: bold;" />
-			
-			
-			<!-- Navigation Buttons -->
-			<HBox alignment="CENTER" spacing="10">
-			    <Button fx:id="viewArticlesButton" text="View Help Articles" onAction="#article" />
-			    <Button fx:id="backupRestoreButton" text="Backup/Restore" onAction="#navigateToBackupRestore" />
-			    <Button fx:id="SpecialGroupButton" text="View Special Groups" onAction="#navigateToSpecialGroupSelection" />
-   			   	<Button fx:id="MessagesButton" text="View Messages" onAction="#navigateToMessageSystem" />
-			</HBox>
-			
-			
-            <!-- GridPane for Permissions and Email -->
-            <GridPane alignment="CENTER_LEFT" hgap="10" vgap="10">
-                <!-- Label for Permissions -->
-                <Label text="Select permissions for invitee" style="-fx-font-size: 14;" GridPane.columnSpan="2" />
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.AdminHomePageController"
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
+    <content>
+        <AnchorPane prefWidth="1200" prefHeight="1000" style="-fx-padding: 30;">
+            <children>
+                <VBox alignment="CENTER" spacing="30" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
+                      AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0" style="-fx-padding: 30;">
+                    
+                    <!-- Title Label -->
+                    <Label fx:id="adminHomeTitle" text="Admin Home Page" 
+                           style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
+                    
+                    <!-- Navigation Buttons -->
+                    <HBox alignment="CENTER" spacing="15" style="-fx-padding: 10;">
+                        <Button fx:id="viewArticlesButton" text="View Help Articles" onAction="#article" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                        <Button fx:id="backupRestoreButton" text="Backup/Restore" onAction="#navigateToBackupRestore" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                        <Button fx:id="SpecialGroupButton" text="View Special Groups" onAction="#navigateToSpecialGroupSelection" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                        <Button fx:id="MessagesButton" text="View Messages" onAction="#navigateToMessageSystem" 
+                                style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                    </HBox>
 
-                <!-- Checkboxes for Permissions -->
-                <CheckBox fx:id="admin" text="Admin" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-                <CheckBox fx:id="student" text="Student" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-                <CheckBox fx:id="instructor" text="Instructor" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                    <!-- Permissions and Email Section -->
+                    <VBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 15; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                        <Label text="Select permissions for invitee" style="-fx-font-size: 16;" />
+                        <HBox spacing="10">
+                            <CheckBox fx:id="admin" text="Admin" />
+                            <CheckBox fx:id="student" text="Student" />
+                            <CheckBox fx:id="instructor" text="Instructor" />
+                        </HBox>
+                        <Label text="Enter invitee email" style="-fx-font-size: 16;" />
+                        <HBox spacing="10">
+                            <TextField fx:id="emailField" promptText="User Email" prefWidth="300" />
+                            <Button fx:id="sendInviteButton" text="Send Invite" onAction="#handleInvite" 
+                                    style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+                        </HBox>
+                    </VBox>
 
-                <!-- Label for Email Field -->
-                <Label text="Enter invitee email" style="-fx-font-size: 14;" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                    <!-- TableView for displaying invited users -->
+                    <TableView fx:id="userTable" prefHeight="400" VBox.vgrow="ALWAYS" 
+                               style="-fx-border-color: #BDC3C7; -fx-border-radius: 10;">
+                        <columns>
+                            <TableColumn fx:id="idColumn" text="User ID" prefWidth="75.0" />
+                            <TableColumn fx:id="usernameColumn" text="Username" />
+                            <TableColumn fx:id="preferrednameColumn" text="Preferred Name" />
+                            <TableColumn fx:id="emailColumn" text="Email" />
+                            <TableColumn fx:id="adminColumn" text="Admin" />
+                            <TableColumn fx:id="studentColumn" text="Student" />
+                            <TableColumn fx:id="instructorColumn" text="Instructor" />
+                            <TableColumn fx:id="updatePermissionsColumn" text="Update User Permissions" />
+                            <TableColumn fx:id="resetPasswordColumn" text="Reset User Password" />
+                            <TableColumn fx:id="deleteColumn" text="Delete User" />
+                        </columns>
+                    </TableView>
 
-                <!-- Email for User to Invite with prefWidth set -->
-                <TextField fx:id="emailField" promptText="User Email" prefWidth="300" GridPane.rowIndex="4" GridPane.columnIndex="1" />
-                <Button fx:id="sendInviteButton" text="Send Invite" onAction="#handleInvite" GridPane.rowIndex="5" GridPane.columnIndex="1" />
-            </GridPane>
+                    <!-- Logout Button -->
+                    <Button fx:id="logoutButton" text="Logout" onAction="#logout" 
+                            style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;"/>
+                </VBox>
+            </children>
+        </AnchorPane>
+    </content>
+</ScrollPane>
 
-
-            <!-- TableView for displaying invited users -->
-            <TableView fx:id="userTable" prefHeight="300">
-			    <columns>
-			    	<TableColumn fx:id="idColumn" text="User ID" prefWidth="75.0"/>
-			        <TableColumn fx:id="usernameColumn" text="Username" />
-			        <TableColumn fx:id="preferrednameColumn" text="Preferred Name" />
-			        <TableColumn fx:id="emailColumn" text="Email" />
-			        <TableColumn fx:id="adminColumn" text="Admin" />
-			        <TableColumn fx:id="studentColumn" text="Student" />
-			        <TableColumn fx:id="instructorColumn" text="Instructor" />
-			        <TableColumn fx:id="updatePermissionsColumn" text="Update User Permissions" />
-			        <TableColumn fx:id="resetPasswordColumn" text="Reset User Password" />
-			        <TableColumn fx:id="deleteColumn" text="Delete User" />
-			    </columns>
-			</TableView>
-
-
-            <!-- Buttons for Actions  -->
-            <HBox alignment="CENTER_RIGHT" spacing="20">
-                <Button fx:id="logoutButton" text="Logout" onAction="#logout" />
-            </HBox>
-        </VBox>
-    </children>
-</AnchorPane>
 
 
 

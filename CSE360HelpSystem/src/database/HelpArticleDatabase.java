@@ -46,14 +46,14 @@ public class HelpArticleDatabase extends Database{
      * @throws Exception if database connection or table creation fails
      */
     public HelpArticleDatabase() throws Exception {
-    	System.out.println("[INFO in HelpArticleDB] Help Article Table Initializing");
+    	System.out.println("[HelpArticleDB] Help Article Table Initializing");
         // Initialize the Database instance and connection
         db = Database.getInstance(); 
         connection = db.getConnection(); // Get the shared connection
         if (connection != null) {
-            System.out.println("[INFO in HelpArticleDB] Connection established successfully in HelpArticleDatabase.");
+            System.out.println("[HelpArticleDB] Connection established successfully in HelpArticleDatabase.");
         } else {
-            System.out.println("[ERROR in HelpArticleDB] Connection is null in HelpArticleDatabase.");
+            System.out.println("[HelpArticleDB] Connection is null in HelpArticleDatabase.");
         }
         encryptionHelper = new EncryptionHelper();
         createArticleTables(); // Create tables for articles if they don't exist
@@ -82,9 +82,9 @@ public class HelpArticleDatabase extends Database{
     	        + "version VARCHAR(20))"; // New field for article version
         try (Statement statement = connection.createStatement()) {
             statement.execute(articleTable);
-            System.out.println("[INFO in HelpArticleDB] Article table created or already exists");
+            System.out.println("[HelpArticleDB] Article table created or already exists");
         }catch (SQLException e) {
-            System.out.println("[ERROR in HelpArticleDB] Error creating article table: " + e.getMessage());
+            System.out.println("[HelpArticleDB] Error creating article table: " + e.getMessage());
             throw e;
         }
     }
@@ -101,9 +101,9 @@ public class HelpArticleDatabase extends Database{
                 + "identifier VARCHAR(255) UNIQUE NOT NULL)";
         try (Statement statement = connection.createStatement()) {
             statement.execute(groupingTable);
-            System.out.println("[INFO in HelpArticleDB] Grouping Identifiers table created or already exists.");
+            System.out.println("[HelpArticleDB] Grouping Identifiers table created or already exists.");
         } catch (SQLException e) {
-            System.out.println("[ERROR in HelpArticleDB] Error creating Grouping Identifiers table: " + e.getMessage());
+            System.out.println("[HelpArticleDB] Error creating Grouping Identifiers table: " + e.getMessage());
             throw e;
         }
     }
@@ -119,9 +119,9 @@ public class HelpArticleDatabase extends Database{
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, identifier);
             pstmt.executeUpdate();
-            System.out.println("[INFO in HelpArticleDB] Inserted grouping identifier into database: " + identifier);
+            System.out.println("[HelpArticleDB] Inserted grouping identifier into database: " + identifier);
         } catch (SQLException e) {
-            System.out.println("[ERROR in HelpArticleDB] Error inserting grouping identifier: " + e.getMessage());
+            System.out.println("[HelpArticleDB] Error inserting grouping identifier: " + e.getMessage());
             throw e;
         }
     }
@@ -138,7 +138,7 @@ public class HelpArticleDatabase extends Database{
 		ResultSet resultSet = statement.executeQuery(query);
 		if (resultSet.next()) {
 			boolean dbStatus = resultSet.getInt("count") == 0;
-			System.out.println("Database is empty " + dbStatus);
+			System.out.println("[HelpArticleDB] Database is empty " + dbStatus);
 			return resultSet.getInt("count") == 0;
 		}
 		return false;
@@ -164,9 +164,9 @@ public class HelpArticleDatabase extends Database{
 	public void createArticle(char[] title, char[] authors, char[] abstractText, char[] keywords, char[] body,
 			char[] references, String level, List<String> groupingIdentifiers, String permissions, Date dateAdded,
 			String version) throws Exception {
-		System.out.println("Creating article with groups: " + groupingIdentifiers);
+		System.out.println("[HelpArticleDB] Creating article with groups: " + groupingIdentifiers);
 	    String groupingIdentifiersString = String.join(",", groupingIdentifiers);
-	    System.out.println("Storing groups as: '" + groupingIdentifiersString + "'");
+	    System.out.println("[HelpArticleDB] Storing groups as: '" + groupingIdentifiersString + "'");
 		
 		byte[] iv = EncryptionUtils.getInitializationVector(title);
 
@@ -360,7 +360,7 @@ public class HelpArticleDatabase extends Database{
 	            articles.add(article);
 	        }
 	    }
-	    System.out.println("[INFO in HelpArticleDB] All articles retrieved from database");
+	    System.out.println("[HelpArticleDB]  All articles retrieved from database");
 	    return articles;
 	}
 
@@ -380,6 +380,7 @@ public class HelpArticleDatabase extends Database{
 	 * @throws Exception if decryption fails or other errors occur
 	 */
 	public void listArticles() throws Exception {
+		System.out.println("[HelpArticleDB] Listing Articles: ");
         String sql = "SELECT id, iv, title, authors FROM articles";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -563,7 +564,7 @@ public class HelpArticleDatabase extends Database{
 	            writer.write("END_OF_ARTICLE\n");
 	        }
 	    }
-	    System.out.println("[INFO in HelpArticleDB] General articles backed up to " + filename);
+	    System.out.println("[HelpArticleDB] General articles backed up to " + filename);
 	}
 
 	/**
@@ -618,7 +619,7 @@ public class HelpArticleDatabase extends Database{
 	            }
 	        }
 	    }
-	    System.out.println("[INFO in HelpArticleDB] Articles restored from " + filename);
+	    System.out.println("[HelpArticleDB] Articles restored from " + filename);
 	}
 		
 
@@ -681,12 +682,12 @@ public class HelpArticleDatabase extends Database{
             pstmt.setInt(1, id);
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("[INFO in HelpArticleDB] Article with ID " + id + " deleted successfully.");
+                System.out.println("[HelpArticleDB] Article with ID " + id + " deleted successfully.");
             } else {
-                System.out.println("[INFO in HelpArticleDB] No article found with ID " + id + ".");
+                System.out.println("[HelpArticleDB] No article found with ID " + id + ".");
             }
         } catch (SQLException e) {
-            System.err.println("Error deleting article: " + e.getMessage());
+            System.err.println("[HelpArticleDB] Error deleting article: " + e.getMessage());
             throw e;  // Re-throw the exception to handle it further up the call chain
         }
     }
@@ -708,7 +709,7 @@ public class HelpArticleDatabase extends Database{
                 identifiers.add(rs.getString("identifier"));
             }
         } catch (SQLException e) {
-            System.out.println("[INFO in HelpArticleDB] Error fetching grouping identifiers: " + e.getMessage());
+            System.out.println("[HelpArticleDB] Error fetching grouping identifiers: " + e.getMessage());
             throw e;
         }
         return identifiers;
@@ -759,7 +760,7 @@ public class HelpArticleDatabase extends Database{
                 writer.write("END_OF_ARTICLE\n");
             }
         }
-        System.out.println("[INFO in HelpArticleDB] Group-specific articles backed up to " + filename);
+        System.out.println("[HelpArticleDB] Group-specific articles backed up to " + filename);
     }
 
     /**
@@ -872,14 +873,14 @@ public class HelpArticleDatabase extends Database{
                 articles.add(article);
             }
         }
-        System.out.println("[INFO in HelpArticleDB] All general articles retrieved from database");
+        System.out.println("[HelpArticleDB] All general articles retrieved from database");
         return articles;
     }
     
     
     public void backupSpecialGroupArticles(String filename, int groupId) throws SQLException, IOException {
         // Debug print
-        System.out.println("Backing up articles for group ID: " + groupId);
+        System.out.println("[HelpArticleDB] Backing up articles for group ID: " + groupId);
         
         String sql = "SELECT a.* FROM articles a " +
                      "INNER JOIN special_group_articles sga ON a.id = sga.article_id " +
@@ -890,13 +891,13 @@ public class HelpArticleDatabase extends Database{
             ResultSet rs = pstmt.executeQuery();
             
             // Debug print
-            System.out.println("Found articles in group: " + rs.getFetchSize());
+            System.out.println("[HelpArticleDB] Found articles in group: " + rs.getFetchSize());
             
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
                 while (rs.next()) {
                     int id = rs.getInt("id");
                     // Debug print
-                    System.out.println("Writing article ID: " + id);
+                    System.out.println("[HelpArticleDB] Writing article ID: " + id);
                     
                     String ivBase64 = rs.getString("iv");
                     String title = rs.getString("title");
