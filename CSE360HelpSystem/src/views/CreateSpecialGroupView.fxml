@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.CreateSpecialGroupController" spacing="20" alignment="CENTER"
-      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
-    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
-    
-    <Label text="Create Special Group"/>
-    <TextField fx:id="groupNameField" promptText="Enter group name"/>
-    <Button text="Create Group" onAction="#handleCreateGroup" minWidth="200"/>
-    <Button text="Return Home" onAction="#goHome" minWidth="200"/>
-</VBox>
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.CreateSpecialGroupController"
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';" prefWidth="1200" prefHeight="800">
+    <content>
+        <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 30;">
+            
+            <!-- Title Section -->
+            <VBox alignment="CENTER" spacing="10">
+                <Label text="Create Special Group" 
+                       style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
+                <Label text="Enter the group name below and click 'Create Group' to proceed." 
+                       style="-fx-font-size: 16; -fx-text-fill: #333333;" />
+            </VBox>
+            
+            <!-- Form Section -->
+            <VBox spacing="20" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <TextField fx:id="groupNameField" promptText="Enter group name" 
+                           style="-fx-pref-width: 300; -fx-padding: 10;" />
+                
+                <Button text="Create Group" onAction="#handleCreateGroup" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+            </VBox>
+            
+            <!-- Navigation Button -->
+            <Button text="Return Home" onAction="#goHome" 
+                    style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+        </VBox>
+    </content>
+</ScrollPane>

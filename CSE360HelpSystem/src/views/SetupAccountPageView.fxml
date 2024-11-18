@@ -1,14 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.*?> <!-- Import other controls  as needed -->
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SetupAccountPageController" spacing="20" alignment="CENTER"
-      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
-    <Label text="CSE 360 Help System" style="-fx-font-size: 19; -fx-font-weight: bold;" />
-    <TextField fx:id="usernameField" promptText="Username" prefWidth="300" />
-    <PasswordField fx:id="passwordField" promptText="Password" prefWidth="300" />
-    <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" prefWidth="300" />
-    <Button fx:id="setupButton" text="Setup Account" onAction="#handleSetupButtonAction" prefWidth="150" />
-    <Label fx:id="statusLabel" style="-fx-text-fill: red;" /> <!-- Default style for errors -->
-</VBox>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SetupAccountPageController"
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';" prefWidth="1200" prefHeight="800">
+    <content>
+        <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 30;">
+            
+            <!-- Title Section -->
+            <VBox alignment="CENTER" spacing="10">
+                <Label text="CSE 360 Help System" 
+                       style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
+                <Label text="Set up your account by filling in the fields below." 
+                       style="-fx-font-size: 16; -fx-text-fill: #333333;" />
+            </VBox>
+            
+            <!-- Form Section -->
+            <VBox spacing="15" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <!-- Username Field -->
+                <TextField fx:id="usernameField" promptText="Username" 
+                           style="-fx-pref-width: 300; -fx-padding: 10;" />
+                
+                <!-- Password Field -->
+                <PasswordField fx:id="passwordField" promptText="Password" 
+                               style="-fx-pref-width: 300; -fx-padding: 10;" />
+                
+                <!-- Confirm Password Field -->
+                <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" 
+                               style="-fx-pref-width: 300; -fx-padding: 10;" />
+                
+                <!-- Status Label -->
+                <Label fx:id="statusLabel" text=" " style="-fx-text-fill: red; -fx-font-size: 14;" />
+            </VBox>
+            
+            <!-- Setup Account Button -->
+            <Button fx:id="setupButton" text="Setup Account" onAction="#handleSetupButtonAction" 
+                    style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+        </VBox>
+    </content>
+</ScrollPane>
 

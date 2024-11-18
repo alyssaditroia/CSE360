@@ -1,239 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" 
-            fx:controller="controllers.MessagingSystemController">
-    
-    <style>
-        .root {
-            -fx-font-family: "Segoe UI", Arial, sans-serif;
-        }
-        
-        .sidebar {
-            -fx-background-color: #f0f0f0;
-            -fx-min-width: 250px;
-            -fx-pref-width: 250px;
-        }
-        
-        .user-label {
-            -fx-font-weight: bold;
-            -fx-font-size: 14px;
-            -fx-padding: 0 0 10 0;
-        }
-        
-        .chat-area {
-            -fx-background-color: white;
-        }
-        
-        .message-scroll {
-            -fx-background: transparent;
-            -fx-background-color: transparent;
-        }
-        
-        .message-scroll > .viewport {
-            -fx-background-color: transparent;
-        }
-        
-        .message-bubble {
-            -fx-background-color: #e9ecef;
-            -fx-padding: 10px;
-            -fx-background-radius: 10px;
-            -fx-max-width: 80%;
-            -fx-spacing: 5;
-        }
-        
-        .message-bubble.own-message {
-            -fx-background-color: #007bff;
-            -fx-text-fill: white;
-        }
-        
-        .message-bubble.instructor-message {
-            -fx-background-color: #28a745;  /* Green for instructor */
-        }
-        
-        .message-bubble.student-message {
-            -fx-background-color: #17a2b8;  /* Blue-green for student */
-        }
-        
-        .sender-label {
-            -fx-font-size: 11px;
-            -fx-text-fill: #666666;
-            -fx-font-style: italic;
-        }
-        
-        .message-bubble.own-message .sender-label,
-        .message-bubble.own-message .message-type,
-        .message-bubble.own-message .search-history,
-        .message-bubble.own-message .content-label {
-            -fx-text-fill: white;
-        }
-        
-        .message-bubble.instructor-message .sender-label,
-        .message-bubble.instructor-message .message-type,
-        .message-bubble.instructor-message .search-history,
-        .message-bubble.instructor-message .content-label {
-            -fx-text-fill: white;
-        }
-        
-        .message-bubble.student-message .sender-label,
-        .message-bubble.student-message .message-type,
-        .message-bubble.student-message .search-history,
-        .message-bubble.student-message .content-label {
-            -fx-text-fill: white;
-        }
-        
-        .message-type {
-            -fx-font-style: italic;
-            -fx-font-size: 12px;
-            -fx-text-fill: #666666;
-        }
-        
-        .search-history {
-            -fx-font-size: 12px;
-            -fx-text-fill: #666666;
-        }
-        
-        .send-button, .action-button {
-            -fx-background-color: #007bff;
-            -fx-text-fill: white;
-            -fx-padding: 8 16 8 16;
-            -fx-background-radius: 5;
-            -fx-cursor: hand;
-        }
-        
-        .send-button:hover, .action-button:hover {
-            -fx-background-color: #0056b3;
-        }
-        
-        .home-button {
-            -fx-background-color: #6c757d;
-            -fx-text-fill: white;
-            -fx-padding: 8 16 8 16;
-            -fx-background-radius: 5;
-            -fx-cursor: hand;
-            -fx-font-size: 13px;
-        }
-        
-        .home-button:hover {
-            -fx-background-color: #5a6268;
-        }
-        
-        .list-view {
-            -fx-background-color: transparent;
-            -fx-padding: 5;
-        }
-        
-        .list-cell {
-            -fx-padding: 10;
-            -fx-background-color: transparent;
-        }
-        
-        .list-cell:selected {
-            -fx-background-color: #007bff;
-        }
-        
-        .list-cell:selected .label {
-            -fx-text-fill: white;
-        }
-        
-        .list-cell:selected .status-label {
-            -fx-text-fill: white !important;
-        }
-        
-        .combo-box {
-            -fx-background-color: white;
-            -fx-border-color: #ced4da;
-            -fx-border-radius: 4;
-        }
-        
-        .text-area {
-            -fx-background-color: white;
-            -fx-border-color: #ced4da;
-            -fx-border-radius: 4;
-        }
-        
-        .text-area .content {
-            -fx-background-color: white;
-        }
-        
-        .conversation-cell {
-            -fx-padding: 8;
-            -fx-border-color: #dee2e6;
-            -fx-border-width: 0 0 1 0;
-        }
-        
-        .conversation-title {
-            -fx-font-weight: bold;
-            -fx-font-size: 14px;
-        }
-        
-        .conversation-status {
-            -fx-font-size: 12px;
-            -fx-text-fill: #6c757d;
-        }
-    </style>
-    
-    <left>
-        <VBox spacing="10" styleClass="sidebar">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
-            
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Button text="← Home" 
-                        onAction="#goHome"
-                        styleClass="home-button"/>
-                <Label fx:id="currentUserLabel" 
-                       styleClass="user-label" 
-                       HBox.hgrow="ALWAYS"/>
-            </HBox>
-            
-            <ListView fx:id="conversationListView" VBox.vgrow="ALWAYS"/>
-        </VBox>
-    </left>
-    
-    <center>
-        <VBox fx:id="chatArea" spacing="10" styleClass="chat-area">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
-            
-            <ScrollPane fx:id="messageScroll" 
-                       VBox.vgrow="ALWAYS" 
-                       fitToWidth="true" 
-                       styleClass="message-scroll">
-                <VBox fx:id="messageContainer" spacing="10"/>
-            </ScrollPane>
-            
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <ComboBox fx:id="messageTypeComboBox" 
-                         promptText="Select Message Type"
-                         minWidth="150"/>
-                         
-                <TextArea fx:id="messageInput" 
-                         promptText="Type your message..." 
-                         wrapText="true"
-                         prefRowCount="3"
-                         HBox.hgrow="ALWAYS"/>
-                         
-                <Button fx:id="sendButton" 
-                        text="Send" 
-                        styleClass="send-button"/>
-            </HBox>
-        </VBox>
-    </center>
-    
-    <right>
-    <VBox spacing="10" styleClass="sidebar">
-        <padding>
-            <Insets top="10" right="10" bottom="10" left="10"/>
-        </padding>
-        <Label text="Search History" styleClass="user-label"/>
-        <ListView fx:id="searchHistoryList" VBox.vgrow="ALWAYS"/>
-    </VBox>
-</right>
-    
-</BorderPane>
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.MessagingSystemController"
+            fitToWidth="true" fitToHeight="true" style="-fx-background-color: #FFFFFF;" prefWidth="1400" prefHeight="900">
+    <content>
+        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: #FFFFFF;">
+            <BorderPane style="-fx-font-family: 'Arial';" prefWidth="1400" prefHeight="900">
+                
+                <!-- Left Sidebar -->
+                <left>
+                    <VBox spacing="20" style="-fx-background-color: #F7F7F7; -fx-padding: 10; -fx-border-color: #BDC3C7; -fx-border-width: 0 1 0 0;"
+                          VBox.vgrow="ALWAYS">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Button text="← Home" onAction="#goHome"
+                                    style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;" />
+                            <Label fx:id="currentUserLabel" text="Current User" 
+                                   style="-fx-font-size: 16; -fx-font-weight: bold;" />
+                        </HBox>
+                        <Label text="Conversations" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #333333;" />
+                        <ListView fx:id="conversationListView" VBox.vgrow="ALWAYS" 
+                                  style="-fx-border-color: #DDD; -fx-background-color: #FFFFFF; -fx-border-radius: 5;" />
+                    </VBox>
+                </left>
+                
+                <!-- Chat Area -->
+                <center>
+                    <VBox spacing="20" style="-fx-padding: 20; -fx-background-color: #FFFFFF;" VBox.vgrow="ALWAYS">
+                        <!-- Chat Header -->
+                        <Label text="Chat Area" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
+                        
+                        <!-- Messages Container -->
+                        <ScrollPane fx:id="messageScroll" fitToWidth="true" VBox.vgrow="ALWAYS" 
+                                    style="-fx-border-color: #DDD; -fx-border-radius: 5; -fx-background: #FFFFFF;">
+                            <VBox fx:id="messageContainer" spacing="10" 
+                                  style="-fx-padding: 15; -fx-background-color: #F9F9F9; -fx-border-color: #DDD; -fx-border-radius: 5;" />
+                        </ScrollPane>
+                        
+                        <!-- Dropdown Above Message Input -->
+                        <ComboBox fx:id="messageTypeComboBox" promptText="Select Message Type" 
+                                  style="-fx-pref-width: 200; -fx-border-color: #DDD; -fx-border-radius: 5;" />
+                        
+                        <!-- Message Input -->
+                        <TextArea fx:id="messageInput" promptText="Type your message..." wrapText="true" 
+                                  style="-fx-pref-width: 800; -fx-border-color: #DDD; -fx-border-radius: 5;" />
+                        
+                        <!-- Send Button -->
+                        <Button fx:id="sendButton" text="Send" 
+                                style="-fx-padding: 10 30; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;" />
+                    </VBox>
+                </center>
+                
+                <!-- Right Sidebar -->
+                <right>
+                    <VBox spacing="20" style="-fx-background-color: #F7F7F7; -fx-padding: 10; -fx-border-color: #BDC3C7; -fx-border-width: 0 0 0 1;"
+                          VBox.vgrow="ALWAYS">
+                        <Label text="Search History" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #333333;" />
+                        <ListView fx:id="searchHistoryList" VBox.vgrow="ALWAYS" 
+                                  style="-fx-border-color: #DDD; -fx-background-color: #FFFFFF; -fx-border-radius: 5;" />
+                    </VBox>
+                </right>
+                
+            </BorderPane>
+        </ScrollPane>
+    </content>
+</ScrollPane>
+
+
+

@@ -1,14 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.*?> <!-- Import other controls as needed -->
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.FinishAccountSetupController" spacing="20" alignment="CENTER"
-      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
-    <Label text="CSE 360 Help System" style="-fx-font-size: 19; -fx-font-weight: bold;" />
-    <TextField fx:id="emailField" promptText="Email" />
-    <TextField fx:id="firstNameField" promptText="First Name" />
-    <TextField fx:id="lastNameField" promptText="Last Name" />
-    <TextField fx:id="preferredNameField" promptText="Preferred Name (optional)" />
-    <Button fx:id="finishSetupButton" text="Finish" onAction="#finishSetup" />
-    <Label fx:id="errorLabel" text=" " />
-</VBox>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.FinishAccountSetupController"
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';" prefWidth="1200" prefHeight="800">
+    <content>
+        <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 30;">
+            
+            <!-- Title Section -->
+            <VBox alignment="CENTER" spacing="10">
+                <Label text="CSE 360 Help System" 
+                       style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
+                <Label text="Complete your account setup by filling in the fields below." 
+                       style="-fx-font-size: 16; -fx-text-fill: #333333;" />
+            </VBox>
+            
+            <!-- Form Section -->
+            <VBox spacing="15" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <!-- Email Input -->
+                <TextField fx:id="emailField" promptText="Email" 
+                           style="-fx-pref-width: 300; -fx-padding: 10;" />
+                
+                <!-- First Name Input -->
+                <TextField fx:id="firstNameField" promptText="First Name" 
+                           style="-fx-pref-width: 300; -fx-padding: 10;" />
+                
+                <!-- Last Name Input -->
+                <TextField fx:id="lastNameField" promptText="Last Name" 
+                           style="-fx-pref-width: 300; -fx-padding: 10;" />
+                
+                <!-- Preferred Name Input -->
+                <TextField fx:id="preferredNameField" promptText="Preferred Name (optional)" 
+                           style="-fx-pref-width: 300; -fx-padding: 10;" />
+            </VBox>
+            
+            <!-- Error Label -->
+            <Label fx:id="errorLabel" text=" " style="-fx-text-fill: red; -fx-font-size: 14;" />
+            
+            <!-- Finish Setup Button -->
+            <Button fx:id="finishSetupButton" text="Finish Setup" onAction="#finishSetup" 
+                    style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+        </VBox>
+    </content>
+</ScrollPane>

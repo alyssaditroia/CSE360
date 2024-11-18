@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.InstructorHomePageController"
-            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';" prefWidth="1200" prefHeight="800">
     <content>
         <AnchorPane prefWidth="1200" prefHeight="1000" style="-fx-padding: 30;">
             <children>

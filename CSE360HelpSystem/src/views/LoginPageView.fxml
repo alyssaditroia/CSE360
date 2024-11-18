@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginPageController"
-      prefWidth="800" prefHeight="800" spacing="30" alignment="CENTER"
+      prefWidth="1200" prefHeight="800" spacing="30" alignment="CENTER"
       style="-fx-padding: 30; -fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
     
     <!-- Title Section -->
