@@ -89,7 +89,7 @@ public class SpecialGroupsDatabase extends Database {
                 }
             }
         }
-        System.out.println("Total groups found: " + accessibleGroups.size());
+        System.out.println("[SpecialGroupsDB] Total groups found: " + accessibleGroups.size());
         System.out.println("=================================\n");
         return accessibleGroups;
     }
@@ -263,7 +263,7 @@ public class SpecialGroupsDatabase extends Database {
     public List<User> getGroupUsersByAccessLevel(int groupId, int accessLevel) throws SQLException {
         List<User> users = new ArrayList<>();
         // Debug print
-        System.out.println("Fetching users for group " + groupId + " with access level " + accessLevel);
+        System.out.println("[SpecialGroupsDB] Fetching users for group " + groupId + " with access level " + accessLevel);
         
         String sql = "SELECT u.* FROM cse360users u " +
                      "INNER JOIN special_group_members sgm ON u.id = sgm.user_id " +
@@ -289,12 +289,12 @@ public class SpecialGroupsDatabase extends Database {
                     user.setId(rs.getInt("id"));
                     users.add(user);
                     // Debug print
-                    System.out.println("Found user: " + user.getUsername() + " (ID: " + user.getId() + ")");
+                    System.out.println("[SpecialGroupsDB] Found user: " + user.getUsername() + " (ID: " + user.getId() + ")");
                 }
             }
         }
         // Debug print
-        System.out.println("Total users found: " + users.size());
+        System.out.println("[SpecialGroupsDB] Total users found: " + users.size());
         return users;
     }
 
@@ -358,6 +358,7 @@ public class SpecialGroupsDatabase extends Database {
      * @throws SQLException
      */
     public void printGroupMembers(int groupId) throws SQLException {
+    	System.out.println("[SpecialGroupsDB] Printing Group Members...");
         String sql = "SELECT user_id, access_level FROM special_group_members WHERE group_id = ?";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

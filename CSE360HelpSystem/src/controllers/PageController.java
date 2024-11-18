@@ -64,7 +64,7 @@ public class PageController {
 
 		// Access the username from UserSession
 		String username = UserSession.getInstance().getUsername();
-		System.out.println("Current user: " + username);
+		System.out.println("[PageController] Current user: " + username);
 	}
 
 	/**
@@ -136,6 +136,7 @@ public class PageController {
     public void logout() {
         // Reset the UserSession to null
         UserSession.setInstance(null);
+        System.out.println("[PageController] user logged out.");
 
         // Navigate to the login page
         navigateTo("/views/LoginPageView.fxml");  // Make sure this path is correct based on your project structure
@@ -172,10 +173,10 @@ public class PageController {
     @FXML
     public void goHome() {
         String currentRole = UserSession.getInstance().getCurrentRole();
-        System.out.println("Current role in goHome(): " + currentRole);
+        System.out.println("[PageController] Current role in goHome(): " + currentRole);
 
         if (currentRole == null) {
-            System.out.println("Error: User session not set or current role is null.");
+            System.out.println("[PageController] Error: User session not set or current role is null.");
             showErrorAlert("Session Error", "The user session is not set. Please log in again.");
             navigateTo("/views/LoginPageView.fxml"); // Navigate to login page
             return; // Stop further execution
@@ -183,13 +184,13 @@ public class PageController {
 
         // Check the role and navigate accordingly
         if ("admin".equals(currentRole)) {
-            System.out.println("Navigating to Admin Homepage");
+            System.out.println("[PageController] Navigating to Admin Homepage");
             goToAdminHomepage();
         } else if ("instructor".equals(currentRole)) {
-            System.out.println("Navigating to Instructor Homepage");
+            System.out.println("[PageController] Navigating to Instructor Homepage");
             goToInstructorHomepage();
         } else {
-            System.out.println("Navigating to Student Homepage");
+            System.out.println("[PageController] Navigating to Student Homepage");
             goToStudentHomepage();
         }
 	}

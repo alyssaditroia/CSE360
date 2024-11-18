@@ -78,7 +78,7 @@ public class UpdatePasswordPageController extends PageController {
 		UserSession currentUser = UserSession.getInstance(); // Get the current user instance
 		String inviteCode = currentUser.getInviteCode(); // Get the current user instance invite code
 		String currentUsername = currentUser.getUsername();
-		System.out.println("Current user username: " + currentUsername);
+		System.out.println("[UpdatePasswordPage] Current user username: " + currentUsername);
 
 		// Trim whitespace from username field
 		String username = usernameField.getText().trim();

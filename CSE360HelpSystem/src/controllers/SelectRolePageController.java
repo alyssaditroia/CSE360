@@ -84,7 +84,7 @@ public class SelectRolePageController extends PageController {
 		if (currentUser != null) {
 			setButtonVisibility();
 		} else {
-			System.out.println("Current user is null");
+			System.out.println("[SelectRolePage] Current user is null");
 			navigateTo("/views/LoginPageView.fxml");
 		}
 	}

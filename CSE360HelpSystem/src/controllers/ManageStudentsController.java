@@ -124,7 +124,7 @@ public class ManageStudentsController extends PageController {
                 String generatedInviteCode = db.inviteUser(inviteToken, email, false, true, false);
                 showAlert("Student Invited!", "Student invited with invite code: " + generatedInviteCode,
                         "Invite sent to: " + email);
-                System.out.println("Student invited with invite code: " + generatedInviteCode);
+                System.out.println("[ManageStudentsPage] Student invited with invite code: " + generatedInviteCode);
                 loadStudents();
             } catch (SQLException e) {
                 e.printStackTrace();

@@ -150,7 +150,7 @@ public class CreateEditArticleController extends PageController {
         } 
         catch (Exception e) {
             //showErrorAlert("Error", "Failed to initialize the CreateEditArticleController: " + e.getMessage());
-            System.out.println("[ERROR] (not actually error when creating new article): " + e.getMessage());
+            System.out.println("[CreateEditArticle] No article selected to edit: " + e.getMessage());
         }
     }
 

@@ -31,7 +31,7 @@ public class TextValidation {
      */
 	private static void displayInputState(char[] password, int currentCharNdx, char currentChar) {
 		System.out.println(password);
-		System.out.println("Password length: " + password.length + " | Current index: " + currentCharNdx
+		System.out.println("[TextValidation] Password length: " + password.length + " | Current index: " + currentCharNdx
 				+ " | Current character: \"" + currentChar + "\"");
 	}
 
@@ -146,8 +146,10 @@ public class TextValidation {
 		Pattern pattern = Pattern.compile(emailRegex);
 		Matcher matcher = pattern.matcher(email);
 		if (!matcher.matches()) {
+			System.out.println("[TextValidation] Error, Invalid email: " + email);
 			return "*** Error *** Invalid email format!";
 		}
+		System.out.println("[TextValidation] Email validated: " + email);
 		return ""; // Email is valid
 	}
 
@@ -162,14 +164,18 @@ public class TextValidation {
      */
 	public static String validateUsername(String username) {
 		if (username == null || username.isEmpty()) {
+			System.out.println("[TextValidation] Error, empty username");
 			return "*** Error *** Username cannot be empty!";
 		}
 		if (username.length() < 3 || username.length() > 20) {
+			System.out.println("[TextValidation] Error, username length: " + username);
 			return "*** Error *** Username must be between 3 and 20 characters.";
 		}
 		if (!username.matches("^[a-zA-Z0-9_]+$")) {
+			System.out.println("[TextValidation] Error, username should only contain letters, digits, and underscores: " + username);
 			return "*** Error *** Username can only contain letters, digits, and underscores.";
 		}
+		System.out.println("[TextValidation] username validated: " + username);
 		return ""; // Username is valid
 	}
 
@@ -207,9 +213,10 @@ public class TextValidation {
 		}
 
 		if (!areCharArraysEqual(password, confirmPassword)) {
+			System.out.println("[TextValidation] Error, passwords do not match");
 			return "*** Error *** Passwords do not match!";
 		}
-
+		System.out.println("[TextValidation] Password successfully validated");
 		return ""; // All validations passed
 	}
 

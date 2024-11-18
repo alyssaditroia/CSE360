@@ -2,61 +2,86 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.StudentGeneralViewController" spacing="10" alignment="TOP_CENTER">
-    
-    <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
-    </padding>
-	
-    <!-- Search Section -->
-    <HBox spacing="10" alignment="CENTER">
-        <Label text="Search Articles:"/>
-        <TextField fx:id="searchField" promptText="Enter keywords..." />
-        <Button text="Search" onAction="#loadArticles"/>
-    </HBox>
-    
-    <!-- ID Search Section -->
-    <HBox spacing="10" alignment="CENTER">
-	    <Label text="Search by ID:"/>
-	    <TextField fx:id="idSearchField" promptText="Enter article ID..." />
-	    <Button text="Search ID" onAction="#searchById"/>
-	</HBox>
-    
-    <!-- Level Filter Section -->
-	<HBox spacing="10" alignment="CENTER">
-	    <Label text="Filter by Level:"/>
-	    <ComboBox fx:id="levelFilterComboBox" promptText="Select Level"/>
-	    <Button text="Add Level" onAction="#addLevelToFilter"/>
-	    <Button text="Clear Levels" onAction="#clearLevelFilters"/>
-	</HBox>
-	<ListView fx:id="levelFilterListView" prefHeight="100"/>
-	<Label fx:id="levelStatsLabel" />
-    
-    <!-- Group Filter Section -->
-	<HBox spacing="10" alignment="CENTER">
-	    <Label text="Filter by Groups:"/>
-	    <ComboBox fx:id="groupFilterComboBox" promptText="Select Groups"/>
-	    <Button text="Add Group" onAction="#addGroupToFilter"/>
-	    <Button text="Clear Groups" onAction="#clearGroupFilters"/>
-	</HBox>
-	<ListView fx:id="groupFilterListView" prefHeight="100"/>
-    
-    <!-- TableView for displaying Articles -->
-    <TableView fx:id="articleTable" prefHeight="400" prefWidth="600">
-        <columns>
-            <TableColumn fx:id="idColumn" text="#" prefWidth="50"/>	
-            <TableColumn fx:id="titleColumn" text="Title" prefWidth="200"/>
-            <TableColumn fx:id="abstractColumn" text="Abstract" prefWidth="250"/>
-            <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="100"/>
-        </columns>
-    </TableView>
-    
-    <!-- Buttons Section for creating, viewing, and editing Articles -->
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="View Selected Article" onAction="#goToViewArticle"/>
-        <Button text="Return To Homepage" onAction="#returnHome"/>
-    </HBox>
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.StudentGeneralViewController"
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
+    <content>
+        <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 30;">
+            
+            <!-- Title Section -->
+            <VBox alignment="CENTER" spacing="10">
+                <Label text="Student General View" 
+                       style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
+                <Label text="Search, filter, and view articles using the options below." 
+                       style="-fx-font-size: 16; -fx-text-fill: #333333;" />
+            </VBox>
+            
+            <!-- Search Section -->
+            <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Search Articles:" style="-fx-font-size: 14;" />
+                    <TextField fx:id="searchField" promptText="Enter keywords..." 
+                               style="-fx-pref-width: 300;" />
+                    <Button text="Search" onAction="#loadArticles" 
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;" />
+                </HBox>
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Search by ID:" style="-fx-font-size: 14;" />
+                    <TextField fx:id="idSearchField" promptText="Enter article ID..." 
+                               style="-fx-pref-width: 300;" />
+                    <Button text="Search ID" onAction="#searchById" 
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;" />
+                </HBox>
+            </VBox>
+            
+            <!-- Filter Section -->
+            <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <!-- Level Filter Section -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Filter by Level:" style="-fx-font-size: 14;" />
+                    <ComboBox fx:id="levelFilterComboBox" promptText="Select Level" 
+                              style="-fx-pref-width: 200;" />
+                    <Button text="Add Level" onAction="#addLevelToFilter" 
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;" />
+                    <Button text="Clear Levels" onAction="#clearLevelFilters" 
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;" />
+                </HBox>
+                <ListView fx:id="levelFilterListView" prefHeight="100" 
+                          style="-fx-border-color: #BDC3C7; -fx-border-radius: 5;" />
+                <Label fx:id="levelStatsLabel" style="-fx-font-size: 14;" />
+                
+                <!-- Group Filter Section -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Filter by Groups:" style="-fx-font-size: 14;" />
+                    <ComboBox fx:id="groupFilterComboBox" promptText="Select Groups" 
+                              style="-fx-pref-width: 200;" />
+                    <Button text="Add Group" onAction="#addGroupToFilter" 
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;" />
+                    <Button text="Clear Groups" onAction="#clearGroupFilters" 
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;" />
+                </HBox>
+                <ListView fx:id="groupFilterListView" prefHeight="100" 
+                          style="-fx-border-color: #BDC3C7; -fx-border-radius: 5;" />
+            </VBox>
+            
+            <!-- TableView for Displaying Articles -->
+            <TableView fx:id="articleTable" prefHeight="400" style="-fx-border-color: #BDC3C7; -fx-border-radius: 10;">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="#" prefWidth="50" />    
+                    <TableColumn fx:id="titleColumn" text="Title" prefWidth="200" />
+                    <TableColumn fx:id="abstractColumn" text="Abstract" prefWidth="250" />
+                    <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="100" />
+                </columns>
+            </TableView>
+            
+            <!-- Buttons Section -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="View Selected Article" onAction="#goToViewArticle" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+                <Button text="Return To Homepage" onAction="#returnHome" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+            </HBox>
+        </VBox>
+    </content>
+</ScrollPane>
 
-</VBox>

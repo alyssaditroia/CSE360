@@ -3,31 +3,40 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginPageController" spacing="20" alignment="CENTER"
-      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
-    <Label text="CSE 360 Help System" style="-fx-font-size: 19; -fx-font-weight: bold;" />
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.LoginPageController"
+      prefWidth="800" prefHeight="800" spacing="30" alignment="CENTER"
+      style="-fx-padding: 30; -fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
+    
+    <!-- Title Section -->
+    <Label text="CSE 360 Help System" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
+    
     <!-- Login Section -->
-    <Label text="Login" style="-fx-font-size: 18; -fx-font-weight: bold;" />
+    <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #ECF0F1; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;">
+        <Label text="Login" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495E;" />
+        <GridPane hgap="15" vgap="15" alignment="CENTER">
+            <TextField fx:id="usernameField" promptText="Username" style="-fx-pref-width: 300px; -fx-font-size: 14;" GridPane.rowIndex="0"/>
+            <PasswordField fx:id="passwordField" promptText="Password" style="-fx-pref-width: 300px; -fx-font-size: 14;" GridPane.rowIndex="1"/>
+        </GridPane>
+        <Button fx:id="loginButton" text="Login" onAction="#handleLogin"
+                style="-fx-padding: 10 30; -fx-font-size: 14; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;"/>
+    </VBox>
     
-    <GridPane hgap="10" vgap="10" alignment="CENTER">
-        <TextField fx:id="usernameField" promptText="Username" style="-fx-pref-width: 250px;" GridPane.rowIndex="0"/>
-        <PasswordField fx:id="passwordField" promptText="Password" style="-fx-pref-width: 250px;" GridPane.rowIndex="1"/>
-    </GridPane>
-    
-    <Button fx:id="loginButton" text="Login" onAction="#handleLogin" style="-fx-padding: 8 20;" />
-    
-    <!-- Invite Code Section  -->
-    <Label text="Enter Invite Code" style="-fx-font-size: 18; -fx-font-weight: bold;" />
-    
-    <GridPane hgap="10" vgap="10" alignment="CENTER">
-        <TextField fx:id="inviteCodeField" promptText="Invite Code" style="-fx-pref-width: 250px;" GridPane.rowIndex="0"/>
-    </GridPane>
-    
-    <Button fx:id="inviteButton" text="Create Account" onAction="#handleInviteButton" style="-fx-padding: 8 20;" />
+    <!-- Invite Code Section -->
+    <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #ECF0F1; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;">
+        <Label text="Enter Invite Code" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #34495E;" />
+        <GridPane hgap="15" vgap="15" alignment="CENTER">
+            <TextField fx:id="inviteCodeField" promptText="Invite Code" style="-fx-pref-width: 300px; -fx-font-size: 14;" GridPane.rowIndex="0"/>
+        </GridPane>
+        <Button fx:id="inviteButton" text="Create Account" onAction="#handleInviteButton"
+                style="-fx-padding: 10 30; -fx-font-size: 14; -fx-background-color: #FFC627; -fx-text-fill: white; -fx-background-radius: 8;"/>
+    </VBox>
     
     <!-- Status Labels -->
-    <Label fx:id="errorLabel" text=" " style="-fx-text-fill: red; -fx-font-size: 12;" />
-    <Label fx:id="statusLabel" text=" " style="-fx-text-fill: green; -fx-font-size: 12;" />
+    <VBox spacing="5" alignment="CENTER">
+        <Label fx:id="errorLabel" text=" " style="-fx-text-fill: red; -fx-font-size: 14;" />
+        <Label fx:id="statusLabel" text=" " style="-fx-text-fill: green; -fx-font-size: 14;" />
+    </VBox>
 </VBox>
+
 
 

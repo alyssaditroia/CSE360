@@ -28,14 +28,14 @@ public class HelpMessageDatabase extends Database {
      * @throws Exception if database connection or table creation fails
      */
     public HelpMessageDatabase() throws Exception {
-        System.out.println("[INFO] Help Message Database Initializing");
+        System.out.println("[HelpMessageDB] Help Message Database Initializing");
         // Initialize the Database instance and connection
         db = Database.getInstance(); 
         connection = db.getConnection(); // Get the shared connection
         if (connection != null) {
-            System.out.println("[INFO] Connection established successfully in HelpMessageDatabase.");
+            System.out.println("[HelpMessageDB] Connection established successfully in HelpMessageDatabase.");
         } else {
-            System.out.println("[ERROR] Connection is null in HelpMessageDatabase.");
+            System.out.println("[HelpMessageDB] Error connection is null in HelpMessageDatabase.");
         }
         createHelpTables();
     }
@@ -66,9 +66,9 @@ public class HelpMessageDatabase extends Database {
         try (Statement statement = connection.createStatement()) {
             statement.execute(messageTable);
             statement.execute(conversationMessagesTable);
-            System.out.println("[INFO] Help system tables created successfully");
+            System.out.println("[HelpMessageDB] Help system tables created successfully");
         } catch (SQLException e) {
-            System.out.println("[ERROR] Error creating help system tables: " + e.getMessage());
+            System.out.println("[HelpMessageDB] Error creating help system tables: " + e.getMessage());
             throw e;
         }
     }
@@ -280,7 +280,7 @@ public class HelpMessageDatabase extends Database {
                 connection = db.getConnection();
             }
         } catch (SQLException e) {
-            System.out.println("[ERROR] Error checking database connection: " + e.getMessage());
+            System.out.println("[HelpMessageDB] Error checking database connection: " + e.getMessage());
             e.printStackTrace();
         }
         return connection;

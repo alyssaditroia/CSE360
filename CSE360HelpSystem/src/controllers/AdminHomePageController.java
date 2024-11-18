@@ -214,7 +214,7 @@ public class AdminHomePageController extends PageController {
 				String generatedInviteCode = db.inviteUser(inviteToken, email, isAdmin, isStudent, isInstructor);
 				showAlert("User Invited!", "User invited with invite code: " + generatedInviteCode,
 						"Invite sent to: " + email);
-				System.out.println("User invited with invite code: " + generatedInviteCode);
+				System.out.println("[AdminHomePage] User invited with invite code: " + generatedInviteCode);
 				loadUsers(); // Refresh the table with updated users
 
 			} catch (SQLException e) {
@@ -231,7 +231,7 @@ public class AdminHomePageController extends PageController {
 	 */
 	@FXML
 	public void article() {
-		System.out.println("Going to Article View.");
+		System.out.println("[AdminHomePage] Navigating to Article View.");
 		//navigateTo("/views/HelpArticleView.fxml");
 		navigateTo("/views/SearchArticleView.fxml");
 	}
@@ -373,6 +373,7 @@ public class AdminHomePageController extends PageController {
 	 * Load users into the TableView TableView Exists in the UI
 	 */
 	public void loadUsers() {
+		System.out.println("[AdminHomePage] Loading users...");
 		db = Database.getInstance();
 		List<User> users = new ArrayList<>();
 		try {
@@ -412,6 +413,7 @@ public class AdminHomePageController extends PageController {
 		for (int i = 0; i < 5; i++) {
 			token.append(characters.charAt(random.nextInt(characters.length())));
 		}
+		System.out.println("[AdminHomePage] Invite token generated: " + token.toString());
 		return token.toString();
 	}
 
@@ -475,7 +477,7 @@ public class AdminHomePageController extends PageController {
 
 					// Show success message
 					showAlert("Success", "Permissions updated for " + user.getEmail(), "");
-					System.out.println("New User Permissions For: " + user.getEmail() + " Permissions: " + isAdmin
+					System.out.println("[AdminHomePage] New User Permissions For: " + user.getEmail() + " Permissions: " + isAdmin
 							+ isStudent + isInstructor);
 					loadUsers(); // Refresh the user list to show updated permissions
 
@@ -511,6 +513,7 @@ public class AdminHomePageController extends PageController {
 				try {
 					db.deleteUser(user.getEmail());
 					showAlert("Success", "User deleted successfully", "");
+					System.out.println("[AdminHomePage] User deleted successfully");
 					loadUsers(); // Refresh the user list
 				} catch (SQLException e) {
 					e.printStackTrace();
@@ -532,18 +535,21 @@ public class AdminHomePageController extends PageController {
 	 */
 	@FXML
 	private void navigateToBackupRestore() {
+		System.out.println("[AdminHomePage] Navigating to Backup Restore");
 	    navigateTo("/views/BackupRestoreView.fxml");
 	}
 	
 	
 	@FXML
 	private void navigateToSpecialGroupSelection() {
+		System.out.println("[AdminHomePage] Navigating to Special Group Selection");
 	    navigateTo("/views/SelectSpecialGroupView.fxml");
 	}
 	
 	
 	@FXML
 	private void navigateToMessageSystem() {
+		System.out.println("[AdminHomePage] Navigating to Message System");
 	    navigateTo("/views/MessagingSystemView.fxml");
 	}
 	
