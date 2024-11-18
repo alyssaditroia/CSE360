@@ -1,5 +1,7 @@
 package models;
 
+import java.util.ArrayList;
+
 /***********
  * The {@code UserSession} class handles the current sessions User, Roles, and Selected Article
  * 
@@ -39,11 +41,33 @@ public class UserSession {
      * The currently selected article for viewing or editing.
      */
 	private Article selectedArticle;
+	
+	// PHASE 3 ADDITIONS
+	// 1 is view - 'student'
+	// 2 is create and delete - 'admin'
+	// 3 is create, delete, edit, and view - 'instructor'
+	private int specialGroupAccessLevel = 0;
+	
+	/**
+	 * The currently selected special group that the user wants to view
+	 */
+	private SpecialGroup selectedSpecialGroup;
+	
+	/**
+	 * Flag variable controls if the user is adding an article to a special group
+	 */
+	private boolean createAsSpecialGroupArticle = false;
+	
+	/**
+	 * ArrayList for holding the users's searches they have made looking for help information, used to pass their searches into messages to the help system
+	 */
+	private ArrayList<String> systemSearches;
 
 	 /**
      * Private constructor to enforce singleton pattern.
      */
 	private UserSession() {
+		systemSearches = new ArrayList<>();
 	}
 
 	 /**
@@ -58,6 +82,7 @@ public class UserSession {
 		}
 		return instance;
 	}
+	
 
 	/**
      * Gets the current user's username.
@@ -194,6 +219,54 @@ public class UserSession {
 	public static void setInstance(UserSession userSession) {
 		System.out.println("[INFO in UserSession] setInstance() called");
 		instance = userSession;
+	}
+	
+	
+	public void setAccessLevel(int level) {
+		this.specialGroupAccessLevel = level;
+	}
+	
+	
+	public int getAccessLevel() {
+		return this.specialGroupAccessLevel;
+	}
+	
+	
+	public void setSelectedSpecialGroup(SpecialGroup group) {
+	    
+	    if (selectedArticle != null) {
+	        System.out.println("[INFO in UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
+	    } else {
+	        System.out.println("[INFO in UserSession] Selected Group is set to null");
+	    }
+	    
+	    this.selectedSpecialGroup = group;
+	}
+
+	
+	public SpecialGroup getSelectedSpecialGroup() {
+		System.out.println("[INFO in UserSession] setSelectedSpecialGroup Selected Group: " + selectedSpecialGroup.getName());
+		return this.selectedSpecialGroup;
+	}
+	
+	
+	public void setSpecialGroupArticleFlag(boolean flag) {
+	    this.createAsSpecialGroupArticle = flag;
+	}
+	
+	
+	public boolean isSpecialGroupArticle() {
+	    return this.createAsSpecialGroupArticle;
+	}
+	
+	
+	public void addUserSearch(String searchRequest) {
+		this.systemSearches.add(searchRequest);
+	}
+	
+	
+	public ArrayList<String> getUserSearches() {
+		return this.systemSearches;
 	}
 }
 

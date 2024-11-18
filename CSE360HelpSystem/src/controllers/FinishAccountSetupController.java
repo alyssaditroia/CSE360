@@ -109,6 +109,11 @@ public class FinishAccountSetupController extends PageController {
 		try {
 			// Update user in the database
 			db.updateUser(username, firstName, lastName, preferredName, email);
+			
+			// Get UserSession and update the user's ID
+		    UserSession userSession = UserSession.getInstance();
+		    userSession.getCurrentUser().setId(db.getUserId(username));
+	        
 			int numRoles = checkNumRoles(username);
 			if (numRoles == 1) {
 				redirectBasedOnSingleRole(username);

@@ -34,7 +34,7 @@ public class Database {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "org.h2.Driver";
 
-	 static final String DB_URL = "jdbc:h2:~/CSE360HelpDatabase";
+	static final String DB_URL = "jdbc:h2:C:\\Users\\jjust\\h2\\firstDatabase";
 	 
 	// Database credentials
 	static final String USER = "user";
@@ -426,16 +426,43 @@ public class Database {
 
 	/**
 	 * Function added by Alyssa DiTroia 
-	 * Delets a user from the database
+	 * Delets a user and any help messages they had alongside any conversations they started from the database
 	 * @param email
 	 * @throws SQLException
 	 */
 	public void deleteUser(String email) throws SQLException {
-		String sql = "DELETE FROM cse360users WHERE email = ?";
-		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-			pstmt.setString(1, email);
-			pstmt.executeUpdate();
-		}
+	    // Get user ID first
+	    int userId;
+	    String getIdSql = "SELECT id FROM cse360users WHERE email = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(getIdSql)) {
+	        pstmt.setString(1, email);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (!rs.next()) {
+	            return; // User not found
+	        }
+	        userId = rs.getInt("id");
+	    }
+
+	    // Delete from conversation_messages where user is creator
+	    String deleteConvMessages = "DELETE FROM conversation_messages WHERE creator_id = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteConvMessages)) {
+	        pstmt.setInt(1, userId);
+	        pstmt.executeUpdate();
+	    }
+
+	    // Delete all help messages from this user
+	    String deleteMessages = "DELETE FROM help_messages WHERE user_id = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteMessages)) {
+	        pstmt.setInt(1, userId);
+	        pstmt.executeUpdate();
+	    }
+	    
+	    // Finally delete the user
+	    String deleteUser = "DELETE FROM cse360users WHERE email = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(deleteUser)) {
+	        pstmt.setString(1, email);
+	        pstmt.executeUpdate();
+	    }
 	}
 
 	/**
@@ -725,6 +752,29 @@ public class Database {
 				return null;
 			}
 		}
+	}
+	
+	
+	/**
+	 * Gets the user ID from the database based on username
+	 * 
+	 * @param username The username to look up
+	 * @return The user's ID from the database, or -1 if not found
+	 * @throws SQLException if database operation fails
+	 */
+	public int getUserId(String username) throws SQLException {
+	    connection = DriverManager.getConnection(DB_URL, USER, PASS);
+	    String query = "SELECT id FROM cse360users WHERE username = ?";
+	    
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, username);
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            return rs.getInt("id");
+	        }
+	        return -1; // User not found
+	    }
 	}
 }
 

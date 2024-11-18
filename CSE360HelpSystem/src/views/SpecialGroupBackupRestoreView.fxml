@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SpecialGroupBackupRestoreController"
+spacing="20" alignment="TOP_CENTER" style="-fx-padding: 20;">
+
+	<!-- Title -->
+	<Label text="Special Group Backup and Restore" 
+	style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+	
+	<!-- Backup Section -->
+	<VBox spacing="10" style="-fx-padding: 10; -fx-border-color: #cccccc; -fx-border-radius: 5;">
+	    <Label text="Backup Special Group Articles" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+	    
+	    <HBox spacing="10" alignment="CENTER_LEFT">
+	        <Label text="Backup Location:"/>
+	        <TextField fx:id="backupLocationField" prefWidth="300" editable="false"/>
+	        <Button text="Choose Location" onAction="#chooseBackupLocation"/>
+	    </HBox>
+	    
+	    <Button text="Create Backup" onAction="#createBackup"
+	    style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+	</VBox>
+	
+	<!-- Restore Section -->
+	<VBox spacing="10" style="-fx-padding: 10; -fx-border-color: #cccccc; -fx-border-radius: 5;">
+	    <Label text="Restore Special Group Articles" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+	    
+	    <HBox spacing="10" alignment="CENTER_LEFT">
+	        <Label text="Restore From:"/>
+	        <TextField fx:id="restoreLocationField" prefWidth="300" editable="false"/>
+	        <Button text="Choose File" onAction="#chooseRestoreFile"/>
+	    </HBox>
+	    
+	    <Button text="Restore Articles" onAction="#restoreArticles"
+	    style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+	</VBox>
+	
+	<!-- Navigation -->
+	<HBox spacing="10" alignment="CENTER">
+	    <Button text="Back to Group View" onAction="#goBack"/>
+	</HBox>
+
+</VBox>

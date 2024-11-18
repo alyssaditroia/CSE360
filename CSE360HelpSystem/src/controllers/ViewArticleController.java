@@ -91,6 +91,10 @@ public class ViewArticleController extends PageController {
             keywordsField.setText(selectedArticle.getKeywords());
             bodyField.setText(selectedArticle.getBody());  // Ensure body content is loaded here
             referencesField.setText(selectedArticle.getReferences());
+            
+         // Hide edit button if user is a student
+            String currentRole = UserSession.getInstance().getCurrentRole();
+            editArticle.setVisible(!"student".equals(currentRole));
         } else {
             showErrorAlert("Error", "No article selected.");
         }
@@ -103,12 +107,18 @@ public class ViewArticleController extends PageController {
      */
     @FXML
     public void goBackToList() {
+        // Clear the selected article when leaving the view page
+        UserSession.getInstance().setSelectedArticle(null);
+        
         String currentRole = UserSession.getInstance().getCurrentRole();
         if ("admin".equals(currentRole)) {
             // Admins go to the article management view
             navigateTo("/views/SearchArticleView.fxml");
+        } else if("student".equals(currentRole))  {
+        	// Students go to their general article view
+        	navigateTo("/views/StudentHomepageView.fxml");
         } else {
-        	// Instructors and students go back to their homepage
+            // Instructors go back to their homepage
             goHome();
         }
     }
@@ -118,6 +128,10 @@ public class ViewArticleController extends PageController {
      */
     @FXML
     public void goToEditArticle() {
-        navigateTo("/views/CreateEditArticleView.fxml"); // Navigate to the article edit page
+    	if(UserSession.getInstance().getSelectedArticle().checkSpecialGroupArticle() == true) {
+    		navigateTo("/views/SpecialGroupAddEditArticleView.fxml");
+    	} else {
+    		navigateTo("/views/CreateEditArticleView.fxml"); 
+    	}    
     }
 }

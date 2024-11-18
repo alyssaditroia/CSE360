@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SpecialGroupAddEditArticleController">
+<content>
+<VBox spacing="10" alignment="TOP_LEFT">
+<padding>
+<Insets top="10" right="10" bottom="10" left="10"/>
+</padding>
+
+	<!-- Title Section with Group Label -->
+	<HBox spacing="10" alignment="CENTER_LEFT">
+	    <Label text="Creating Article in Group:" style="-fx-font-weight: bold"/>
+	    <Label fx:id="groupNameLabel" style="-fx-font-style: italic"/>
+	</HBox>
+	
+	<!-- Title Input -->
+	<Label text="Title:"/>
+	<TextField fx:id="titleField" promptText="Enter Title"/>
+	
+	<!-- Authors Input -->
+	<Label text="Authors:"/>
+	<TextField fx:id="authorsField" promptText="Enter Authors"/>
+	
+	<!-- Abstract Input -->
+	<Label text="Abstract:"/>
+	<TextArea fx:id="abstractField" promptText="Enter Abstract" prefHeight="100"/>
+	
+	<!-- Keywords Input -->
+	<Label text="Keywords:"/>
+	<TextArea fx:id="keywordsField" promptText="Enter Keywords" prefHeight="60"/>
+	
+	<!-- Body Input -->
+	<Label text="Body:"/>
+	<TextArea fx:id="bodyField" promptText="Enter Body" prefHeight="150"/>
+	
+	<!-- References Input -->
+	<Label text="References:"/>
+	<TextArea fx:id="referencesField" promptText="Enter References" prefHeight="80"/>
+	
+	<!-- Level Dropdown (ComboBox) -->
+	<Label text="Level:"/>
+	<ComboBox fx:id="levelField" promptText="Select Level"/>
+	
+	<!-- Permissions Section -->
+	<Label text="Permissions:"/>
+	<HBox spacing="10">
+	    <CheckBox fx:id="adminCheckbox" text="Admin"/>
+	    <CheckBox fx:id="instructorCheckbox" text="Instructor"/>
+	    <CheckBox fx:id="studentCheckbox" text="Student"/>
+	</HBox>
+	
+	<!-- Date Added -->
+	<Label text="Date Added:"/>
+	<DatePicker fx:id="dateAddedField"/>
+	
+	<!-- Version Input -->
+	<Label text="Version:"/>
+	<TextField fx:id="versionField" promptText="Enter Version"/>
+	
+	<!-- Buttons Section -->
+	<HBox spacing="10" alignment="CENTER">
+	    <Button fx:id="saveButton" text="Add to Special Group" onAction="#saveArticle"/>
+	    <Button fx:id="backToList" text="Back to Group" onAction="#goBackToList"/>
+	    <Button fx:id="cancel" text="Cancel" onAction="#cancel"/>
+	</HBox>
+	
+	</VBox>
+</content>
+</ScrollPane>
