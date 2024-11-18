@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SearchArticleController"
-            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';" prefWidth="1200" prefHeight="800">
     <content>
         <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 30;">
             

@@ -6,7 +6,7 @@
 <ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.StudentHomePageController"
             fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
     <content>
-        <AnchorPane prefWidth="1200" prefHeight="1000">
+        <AnchorPane prefWidth="1200" prefHeight="800">
             <VBox spacing="30" alignment="TOP_CENTER" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
                   AnchorPane.rightAnchor="0" style="-fx-padding: 30;">
                 

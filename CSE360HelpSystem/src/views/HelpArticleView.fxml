@@ -1,83 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HelpArticleController" spacing="10" alignment="CENTER">
-    <padding>
-        <Insets topRightBottomLeft="10"/>
-    </padding>
-    
-    <!-- Title Input -->
-    <TextField fx:id="titleField" promptText="Title" />
-    
-    <!-- Authors Input -->
-    <TextField fx:id="authorsField" promptText="Authors" />
-    
-    <!-- Abstract Input -->
-    <TextArea fx:id="abstractField" promptText="Abstract" prefHeight="100"/>
-    
-    <!-- Keywords Input -->
-    <TextArea fx:id="keywordsField" promptText="Keywords" prefHeight="60"/>
-    
-    <!-- Body Input -->
-    <TextArea fx:id="bodyField" promptText="Body" prefHeight="150"/>
-    
-    <!-- References Input -->
-    <TextArea fx:id="referencesField" promptText="References" prefHeight="80"/>
-    
-    <!-- Level Dropdown (ComboBox) -->
-    <ComboBox fx:id="levelField" promptText="Select Level"></ComboBox>
-    
- 	<!-- Grouping Identifiers Section -->
-	<HBox spacing="10">
-    	<TextField fx:id="groupingSearchField" promptText="Search or Add Grouping Identifier"/>
-    	<Button fx:id="addGroupingButton" text="Add" onAction="#addGroupingIdentifier"/>
-	</HBox>
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HelpArticleController"
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';" prefWidth="1200" prefHeight="800">
+    <content>
+        <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 30;">
+            
+            <!-- Title Section -->
+            <VBox alignment="CENTER" spacing="10">
+                <Label text="Help Article Management" 
+                       style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
+                <Label text="Manage your help articles using the form and actions below." 
+                       style="-fx-font-size: 16; -fx-text-fill: #333333;" />
+            </VBox>
+            
+            <!-- Form Section -->
+            <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <!-- Title Input -->
+                <TextField fx:id="titleField" promptText="Title" style="-fx-pref-width: 400; -fx-padding: 10;" />
+                
+                <!-- Authors Input -->
+                <TextField fx:id="authorsField" promptText="Authors" style="-fx-pref-width: 400; -fx-padding: 10;" />
+                
+                <!-- Abstract Input -->
+                <TextArea fx:id="abstractField" promptText="Abstract" prefHeight="100" style="-fx-pref-width: 400; -fx-padding: 10;" />
+                
+                <!-- Keywords Input -->
+                <TextArea fx:id="keywordsField" promptText="Keywords" prefHeight="60" style="-fx-pref-width: 400; -fx-padding: 10;" />
+                
+                <!-- Body Input -->
+                <TextArea fx:id="bodyField" promptText="Body" prefHeight="150" style="-fx-pref-width: 400; -fx-padding: 10;" />
+                
+                <!-- References Input -->
+                <TextArea fx:id="referencesField" promptText="References" prefHeight="80" style="-fx-pref-width: 400; -fx-padding: 10;" />
+                
+                <!-- Level Dropdown -->
+                <ComboBox fx:id="levelField" promptText="Select Level" style="-fx-pref-width: 400;" />
+                
+                <!-- Grouping Identifiers -->
+                <Label text="Grouping Identifiers:" style="-fx-font-size: 14;" />
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <TextField fx:id="groupingSearchField" promptText="Search or Add Grouping Identifier" style="-fx-pref-width: 300;" />
+                    <Button fx:id="addGroupingButton" text="Add" onAction="#addGroupingIdentifier" 
+                            style="-fx-padding: 8 15; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8;" />
+                </HBox>
+                <ListView fx:id="groupingListView" prefHeight="100" style="-fx-border-color: #BDC3C7; -fx-border-radius: 5;" />
+                
+                <!-- Permissions Checkboxes -->
+                <Label text="Permissions:" style="-fx-font-size: 14;" />
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <CheckBox fx:id="adminCheckbox" text="Admin" />
+                    <CheckBox fx:id="instructorCheckbox" text="Instructor" />
+                    <CheckBox fx:id="studentCheckbox" text="Student" />
+                </HBox>
+                
+                <!-- Date Picker for Date Added -->
+                <Label text="Date Added:" style="-fx-font-size: 14;" />
+                <DatePicker fx:id="dateAddedField" promptText="Select Date Added" style="-fx-pref-width: 200;" />
+                
+                <!-- Version Input -->
+                <TextField fx:id="versionField" promptText="Version" style="-fx-pref-width: 400;" />
+            </VBox>
+            
+            <!-- TableView Section -->
+            <Label text="Articles List" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333333;" />
+            <TableView fx:id="articleTable" prefHeight="200" style="-fx-border-color: #BDC3C7; -fx-border-radius: 5;">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
+                    <TableColumn fx:id="titleColumn" text="Title" prefWidth="200" />
+                    <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="150" />
+                </columns>
+            </TableView>
+            
+            <!-- Buttons for Actions -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="createButton" text="Create Article" onAction="#createArticle" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+                <Button fx:id="listButton" text="List Articles" onAction="#listArticles" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+                <Button fx:id="viewButton" text="View Article" onAction="#viewArticle" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+                <Button fx:id="deleteButton" text="Delete Article" onAction="#deleteArticle" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+            </HBox>
+            
+            <!-- Buttons for Backup/Restore -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="backupButton" text="Backup Articles" onAction="#backupArticles" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+                <Button fx:id="restoreButton" text="Restore Articles" onAction="#restoreArticles" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+            </HBox>
+        </VBox>
+    </content>
+</ScrollPane>
 
-	<!-- ListView for grouping identifiers -->
-	<ListView fx:id="groupingListView" prefHeight="100"/>
-
-    
-    <!-- Permissions Checkboxes -->
-    <HBox spacing="10">
-        <CheckBox fx:id="adminCheckbox" text="Admin"/>
-        <CheckBox fx:id="instructorCheckbox" text="Instructor"/>
-        <CheckBox fx:id="studentCheckbox" text="Student"/>
-    </HBox>
-    
-    <!-- Date Picker for Date Added -->
-    <DatePicker fx:id="dateAddedField" promptText="Select Date Added"/>
-    
-    <!-- Version Input -->
-    <TextField fx:id="versionField" promptText="Version"/>
-
-    <!-- TableView for Articles -->
-    <TableView fx:id="articleTable" prefHeight="200" prefWidth="400">
-        <columns>
-            <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
-            <TableColumn fx:id="titleColumn" text="Title" prefWidth="200" />
-            <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="150" />
-        </columns>
-    </TableView>
-    
-    <!-- Buttons for Article Actions -->
-    <HBox spacing="10">
-        <Button fx:id="createButton" text="Create Article" onAction="#createArticle"/>
-        <Button fx:id="listButton" text="List Articles" onAction="#listArticles"/>
-        <Button fx:id="viewButton" text="View Article" onAction="#viewArticle"/>
-        <Button fx:id="deleteButton" text="Delete Article" onAction="#deleteArticle"/>
-    </HBox>
-    
-    <!-- Buttons for Backup/Restore Actions -->
-    <HBox spacing="10">
-        <Button fx:id="backupButton" text="Backup Articles" onAction="#backupArticles"/>
-        <Button fx:id="restoreButton" text="Restore Articles" onAction="#restoreArticles"/>
-    </HBox>
-
-</VBox>
 
 
 
