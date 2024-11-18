@@ -5,17 +5,28 @@ import java.util.ArrayList;
 import java.util.List;
 import models.SpecialGroup;
 import models.User;
-
+/**
+ * The {@code SpecialGroupsDatabase} class handles all special group related users, articles, and identifiers
+ * Special group articles and regular articles are encrypted using the parent Database class
+ */
 public class SpecialGroupsDatabase extends Database {
     private Database db;
     private Connection connection;
 
+    /**
+     * Constructor
+     * @throws Exception
+     */
     public SpecialGroupsDatabase() throws Exception {
         db = Database.getInstance();
         connection = db.getConnection();
         createSpecialGroupTables();
     }
-
+    /**
+     * createSpecialGroupTables
+     * Creates special group tables if they do not exist
+     * @throws SQLException
+     */
     private void createSpecialGroupTables() throws SQLException {
         // Main table for special groups
         String groupsTable = "CREATE TABLE IF NOT EXISTS special_groups ("
@@ -42,7 +53,13 @@ public class SpecialGroupsDatabase extends Database {
         }
     }
 
-    // Get all groups a user has access to
+    /**
+     * getUserGroups method
+     * Gets all groups that a user has access to
+     * @param userId
+     * @return special groups the user has access to
+     * @throws SQLException
+     */
     public List<String[]> getUserGroups(String userId) throws SQLException {
         List<String[]> accessibleGroups = new ArrayList<>();
         
@@ -77,7 +94,14 @@ public class SpecialGroupsDatabase extends Database {
         return accessibleGroups;
     }
 
-    // Get user's access level for a specific group
+    /**
+     * getUserAccessLevel
+     * Get user's access level for a specific group
+     * @param userId
+     * @param groupId
+     * @return 0 for no access or access level (numeric value)
+     * @throws SQLException
+     */
     public int getUserAccessLevel(String userId, int groupId) throws SQLException {
         String sql = "SELECT access_level FROM special_group_members "
                   + "WHERE user_id = ? AND group_id = ?";
@@ -274,6 +298,12 @@ public class SpecialGroupsDatabase extends Database {
         return users;
     }
 
+    /**
+     * 
+     * @param groupId
+     * @return userID of users that belong to a specific special group
+     * @throws SQLException
+     */
     public List<User> getAvailableUsers(int groupId) throws SQLException {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM cse360users u WHERE u.id NOT IN " +
@@ -303,6 +333,13 @@ public class SpecialGroupsDatabase extends Database {
         return users;
     }
 
+    /**
+     * Updates access(permissions) for user in a special group
+     * @param groupId
+     * @param userId
+     * @param newAccessLevel
+     * @throws SQLException
+     */
     public void updateUserAccess(int groupId, int userId, int newAccessLevel) throws SQLException {
         String sql = "UPDATE special_group_members SET access_level = ? " +
                      "WHERE group_id = ? AND user_id = ?";
@@ -315,7 +352,11 @@ public class SpecialGroupsDatabase extends Database {
         }
     }
     
-    
+    /**
+     * Displays group members for special group in the console
+     * @param groupId
+     * @throws SQLException
+     */
     public void printGroupMembers(int groupId) throws SQLException {
         String sql = "SELECT user_id, access_level FROM special_group_members WHERE group_id = ?";
         

@@ -13,9 +13,12 @@ import java.util.List;
 
 import database.Database;
 import database.SpecialGroupsDatabase;
-
+/**
+ * The {@code SpecialGroupManagementController} manages user access levels within a special group
+ */
 public class SpecialGroupManagementController extends PageController {
-	 // Table views
+	// FXML COMPONENTS
+	// Table views
     @FXML private TableView<User> adminUsersTable;
     @FXML private TableView<User> manageUsersTable;
     @FXML private TableView<User> viewUsersTable;
@@ -119,7 +122,9 @@ public class SpecialGroupManagementController extends PageController {
             }
         });
     }
-
+    /**
+     * Configures the table for users who are not yet in the group
+     */
     private void initializeAvailableUsersTable() {
         // Set up basic columns
         setupBasicColumns(availableUsersTable);
@@ -149,7 +154,10 @@ public class SpecialGroupManagementController extends PageController {
             }
         });
     }
-
+    /**
+     * Sets up standard columns for user tables, including ID, username, and email columns
+     * @param table
+     */
     private void setupBasicColumns(TableView<User> table) {
         ((TableColumn<User, String>) table.getColumns().get(0)).setCellValueFactory(
                 new PropertyValueFactory<>("id"));
@@ -158,7 +166,9 @@ public class SpecialGroupManagementController extends PageController {
         ((TableColumn<User, String>) table.getColumns().get(2)).setCellValueFactory(
                 new PropertyValueFactory<>("email"));
     }
-
+    /**
+     * Loads users from the database into the appropriate tables based on access levels
+     */
     private void loadUsers() {
         try {
             System.out.println("Loading users for group ID: " + this.groupId);
@@ -175,7 +185,11 @@ public class SpecialGroupManagementController extends PageController {
             System.out.println("Error loading users: " + e.getMessage());
         }
     }
-
+    /**
+     * Adds a user to the group with a specified access level
+     * @param user
+     * @param accessLevel
+     */
     private void addUserToGroup(User user, int accessLevel) {
         try {
             specialGroupsDb.addUserToGroup(groupId, String.valueOf(user.getId()), accessLevel);
@@ -184,7 +198,10 @@ public class SpecialGroupManagementController extends PageController {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Removes a user from the group
+     * @param user
+     */
     private void removeUserFromGroup(User user) {
         try {
             // Check if this is the last admin
@@ -202,7 +219,11 @@ public class SpecialGroupManagementController extends PageController {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Updates the access level of a user within the group
+     * @param user
+     * @param newAccessLevel
+     */
     private void updateUserAccess(User user, int newAccessLevel) {
         try {
             // If user is being downgraded from admin (level 3)
@@ -232,7 +253,11 @@ public class SpecialGroupManagementController extends PageController {
     	navigateTo("/views/SpecialGroupView.fxml");
     }
     
-    
+    /**
+     * Checks if the specified user is the last admin in the group
+     * @param user
+     * @return
+     */
     private boolean isLastAdmin(User user) {
         try {
             // Get all users with admin access (level 3)

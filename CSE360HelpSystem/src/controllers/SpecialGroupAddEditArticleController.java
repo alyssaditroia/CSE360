@@ -13,14 +13,18 @@ import database.SpecialGroupsDatabase;
 import models.Article;
 import models.UserSession;
 import models.SpecialGroup;
-
+/**
+ * The {@code SpecialGroupAddEditArticleController} is for creating and editing help articles within a special group.
+ * allows users to input and update article details, configure permissions, and save or cancel article edits. 
+ */
 public class SpecialGroupAddEditArticleController extends PageController {
-    
+    // Instances
     private HelpArticleDatabase had;
     private SpecialGroupsDatabase specialGroupsDB;
     private Article articleToEdit;
     private SpecialGroup currentGroup;
     
+    // FXML COMPONENTS
     @FXML private TextField titleField;
     @FXML private TextField authorsField;
     @FXML private TextArea abstractField;
@@ -35,7 +39,8 @@ public class SpecialGroupAddEditArticleController extends PageController {
     @FXML private Button backToList;
     @FXML private Button cancel;
     @FXML private Label groupNameLabel;
-
+    
+    // CONSTRUCTORS
     public SpecialGroupAddEditArticleController() {
         super();
     }
@@ -43,7 +48,7 @@ public class SpecialGroupAddEditArticleController extends PageController {
     public SpecialGroupAddEditArticleController(Stage primaryStage, Database db) {
         super(primaryStage, db);
     }
-    
+    // Initialization 
     @FXML
     public void initialize() {
         try {
@@ -63,7 +68,10 @@ public class SpecialGroupAddEditArticleController extends PageController {
             System.out.println("[ERROR] (not actually error when creating new article): " + e.getMessage());
         }
     }
-
+    /**
+     * Fills in the article data in the respective fields
+     * @param article
+     */
     public void loadArticleData(Article article) {
         titleField.setText(article.getTitle());
         authorsField.setText(article.getAuthors());
@@ -80,7 +88,9 @@ public class SpecialGroupAddEditArticleController extends PageController {
     }
 
     
-
+    /**
+     * Handles saving the article
+     */
     @FXML
     public void saveArticle() {
         try {
@@ -145,18 +155,26 @@ public class SpecialGroupAddEditArticleController extends PageController {
             showErrorAlert("Error", "Failed to save article: " + e.getMessage());
         }
     }
-
+    /**
+     * Navigates back to the list of articles in the special group
+     */
     @FXML
     public void goBackToList() {
     	UserSession.getInstance().setSelectedArticle(null);
         navigateTo("/views/SpecialGroupView.fxml");
     }
 
+    /**
+     * Navigates back to the list of articles in the special group
+     */
     @FXML
     public void cancel() {
         goBackToList();
     }
-
+    /**
+     * Returns a comma-separated string of selected permissions based on the checkboxes
+     * @return
+     */
     private String getSelectedPermissions() {
         StringBuilder permissions = new StringBuilder();
         if (adminCheckbox.isSelected()) permissions.append("Admin,");
@@ -167,7 +185,9 @@ public class SpecialGroupAddEditArticleController extends PageController {
         }
         return permissions.toString();
     }
-
+    /**
+     * Resets all input fields and checkboxes, preparing the form for a new article.
+     */
     private void clearFields() {
         titleField.clear();
         authorsField.clear();

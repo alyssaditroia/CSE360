@@ -1,7 +1,11 @@
 package models;
 
 import java.util.ArrayList;
-
+/**
+ * The {@code SpecialGroup} class is a model for a special group
+ * encapsulating information about the group's members, administrators, and associated articles. 
+ * It provides methods to manage members, admins, and articles, ensuring data consistency.
+ */
 public class SpecialGroup {
     private int groupId;
     private String name;

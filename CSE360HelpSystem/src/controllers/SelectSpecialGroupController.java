@@ -18,7 +18,7 @@ import models.SpecialGroup;
 import models.UserSession;
 
 /**
- * Controller for the special group selection page.
+ * The {@code SelectSpecialGroupController} is for the special group selection page.
  * Allows users to select from their accessible special groups.
  */
 public class SelectSpecialGroupController extends PageController {
