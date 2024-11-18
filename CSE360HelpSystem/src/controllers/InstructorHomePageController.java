@@ -34,6 +34,9 @@ import java.util.stream.Collectors;
  * <p>
  * Description: Home page for individuals with instructor permissions
  * </p>
+ * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class InstructorHomePageController extends PageController {
 	/**

@@ -26,6 +26,9 @@ import models.UserSession;
  * Description: Implements login page and all of the functionalities associated
  * with it
  * </p>
+ * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class LoginPageController extends PageController {
 	/**

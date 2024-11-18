@@ -26,6 +26,9 @@ import models.UserSession;
  * <p>
  * Description: Manages the page that allows the user to search the system for specific help articles
  * </p>
+ * 
+ * @author Alyssa DiTroia
+ * @author Justin Faris
  */
 public class SearchArticleController extends PageController {
 	/**
