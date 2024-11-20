@@ -18,12 +18,16 @@ import java.util.List;
 public class ArticleTest {
 
     private Article article;
+    private static int testcount = 0;
 
     /**
      * Setup for each test includes creating a mock article for testing
      */
     @BeforeEach
     public void setUp() {
+		System.out.println("\n =========== ARTICLE TEST ===========\n");
+		testcount = testcount + 1;
+		System.out.printf("Test # %d%n", testcount);
         char[] title = "Sample Title".toCharArray();
         char[] authors = "John Doe".toCharArray();
         char[] abstractText = "Sample Abstract".toCharArray();
@@ -61,7 +65,7 @@ public class ArticleTest {
         assertNotNull(article.getDateAdded());
         assertEquals("1.0", article.getVersion());
 
-        System.out.println("Full constructor test passed.");
+        System.out.println("[Article Test] Full constructor test passed.");
     }
 
     /**

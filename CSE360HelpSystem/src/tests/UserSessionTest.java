@@ -20,12 +20,15 @@ import org.junit.jupiter.api.Test;
 public class UserSessionTest {
 
     private UserSession userSession;
-
+    private static int testcount = 0;
     /**
      * Setup for each test includes getting a user instance and setting the session user and article to null
      */
     @BeforeEach
     public void setUp() {
+		System.out.println("\n =========== USER SESSION TEST ===========\n");
+		testcount = testcount + 1;
+		System.out.printf("Test # %d%n", testcount);
         System.out.println("Setting up UserSession instance for tests...");
         userSession = UserSession.getInstance();
         userSession.setCurrentUser(null); // Reset the user for each test

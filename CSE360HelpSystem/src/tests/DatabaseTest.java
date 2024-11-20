@@ -19,9 +19,14 @@ import java.sql.Statement;
 class DatabaseTest {
 	private Database database;
 	private Connection connection;
+	private static int testcount = 0;
 
 	@BeforeEach
 	void setUp() throws SQLException {
+		System.out.println("\n =========== DATABASE TEST ===========\n");
+		testcount = testcount + 1;
+		System.out.printf("Test # %d%n", testcount);
+		System.out.println();
 		database = Database.getInstance();
 		database.connectToDatabase();
 		connection = database.getConnection(); // Get the connection for cleanup
@@ -49,7 +54,7 @@ class DatabaseTest {
 		// Clear the database (truncate or delete rows) before each test
 		try (Statement stmt = connection.createStatement()) {
 			stmt.execute("TRUNCATE TABLE cse360users"); 
-			System.out.println("Test database cleared.");
+			System.out.println("[DatabaseTest] Test database cleared.");
 		} catch (SQLException e) {
 			System.err.println("[DatabaseTest] Error clearing test database: " + e.getMessage());
 		}
@@ -58,7 +63,7 @@ class DatabaseTest {
 	 * Deletes the test database after testing
 	 **/
 	private static void deleteTestDatabase() {
-		String url = "jdbc:h2:~/firstsDatabase";
+		String url = "jdbc:h2:~/CSE360HelpTest";
 		String user = "user"; // Default user for H2
 		String password = ""; // Default password for H2 (empty)
 
@@ -77,6 +82,7 @@ class DatabaseTest {
 	 */
 	@Test
 	void testConnectToDatabase() throws SQLException {
+		System.out.println("\n ------- Testing Connection -------\n");
 		assertNotNull(database.getConnection(), "Connection should not be null after connecting to the database");
 	}
 
@@ -86,6 +92,7 @@ class DatabaseTest {
 	 */
 	@Test
 	void testIsDatabaseEmptyInitially() throws SQLException {
+		System.out.println("\n ------- Testing IsEmpty() -------\n");
 		assertTrue(database.isDatabaseEmpty(), "Database should be empty ");
 	}
 
@@ -95,6 +102,7 @@ class DatabaseTest {
 	 */
 	@Test
 	void testSetupAdministrator() throws SQLException {
+		System.out.println("\n ------- Testing SetupAdministrator() -------\n");
 		String username = "admin";
 		char[] password = "Password1!".toCharArray();
 		database.setupAdministrator(username, password);
@@ -109,6 +117,7 @@ class DatabaseTest {
 	 */
 	@Test
 	void testUpdateUSer() throws SQLException {
+		System.out.println("\n ------- Testing UpdateUser() -------\n");
 		String username = "admin";
 		char[] password = "Password1!".toCharArray();
 		database.setupAdministrator(username, password);
@@ -122,6 +131,7 @@ class DatabaseTest {
 	 */
 	@Test
 	void testInviteUser() throws SQLException {
+		System.out.println("\n ------- Testing InviteUser() -------\n");
 		String inviteCode = "INVITE123";
 		String email = "invitee@example.com";
 		database.inviteUser(inviteCode, email, true, false, false);
@@ -136,6 +146,7 @@ class DatabaseTest {
 	 */
 	@Test
 	void testCompleteInvite() throws SQLException {
+		System.out.println("\n ------- Testing CompleteInvite() -------\n");
 		String inviteCode = "INVITE123";
 		String email = "invitee@example.com";
 		database.inviteUser(inviteCode, email, true, false, false);
@@ -151,6 +162,7 @@ class DatabaseTest {
 	 */
 	@Test
 	void testIsUserAdmin() throws SQLException {
+		System.out.println("\n ------- Testing Admin Permission Check -------\n");
 		String username = "admin";
 		char[] password = "Password1!".toCharArray();
 		database.setupAdministrator(username, password);
