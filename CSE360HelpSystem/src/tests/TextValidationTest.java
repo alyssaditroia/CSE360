@@ -2,14 +2,27 @@ package tests;
 
 import org.junit.jupiter.api.Test;
 
+import models.SpecialGroup;
 import models.TextValidation;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
 /**
  * Junit test cases for the Text Validation class
  */
 class TextValidationTest {
+	private static int testcount = 0;
 
+    @BeforeEach
+    void setUp() {
+		System.out.println("\n =========== TEXT VALIDATION TEST ===========\n");
+		testcount = testcount + 1;
+		System.out.printf("Test # %d%n", testcount);
+    }
 	/**
 	 * Tests empty password check
 	 */

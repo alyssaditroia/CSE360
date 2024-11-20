@@ -61,8 +61,9 @@ public class MessagingSystemController extends PageController {
             setupEventHandlers();
             configureForUserRole();
         } catch (Exception e) {
-            e.printStackTrace();
-            showError("Error initializing messaging system");
+            //e.printStackTrace();
+            //showInfoAlert("Information", "There are currently no messages");
+        	System.out.println("[MessagingSystem] Initialization error");
         }
     }
     /**

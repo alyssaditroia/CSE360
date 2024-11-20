@@ -2,27 +2,32 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SelectSpecialGroupController" spacing="20" alignment="CENTER"
-      prefWidth="800" prefHeight="800" style="-fx-padding: 20; -fx-background-color: #F0F0F0;">
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
-
-    <Label text="Select Special Group" style="-fx-font-size: 18px;"/>
-    
-    <VBox alignment="CENTER" spacing="10">
-        <ComboBox fx:id="groupDropdown" 
-                  promptText="Choose a group"
-                  minWidth="200"/>
-        
-        <Button text="Select Group" 
-                onAction="#handleGroupSelection"
-                minWidth="200"/>
+<ScrollPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SelectSpecialGroupController"
+            fitToWidth="true" style="-fx-background-color: #FFFFFF; -fx-font-family: 'Arial';" prefWidth="1200" prefHeight="800">
+    <content>
+        <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 30;">
+            
+            <!-- Title Section -->
+            <VBox alignment="CENTER" spacing="10">
+                <Label text="Select Special Group" 
+                       style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #FFC627;" />
+                <Label text="Choose a special group from the dropdown below to view articles." 
+                       style="-fx-font-size: 16; -fx-text-fill: #333333;" />
+            </VBox>
+            
+            <!-- Group Selection Section -->
+            <VBox spacing="20" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #F7F7F7; -fx-border-color: #BDC3C7; -fx-border-width: 1; -fx-border-radius: 10;">
+                <ComboBox fx:id="groupDropdown" promptText="Choose a group" 
+                          style="-fx-pref-width: 300; -fx-padding: 10;" />
                 
-        <Button text="Return Home" 
-                onAction="#goHome"
-                minWidth="200"/>
-    </VBox>
-</VBox>
+                <Button text="Select Group" onAction="#handleGroupSelection" 
+                        style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+            </VBox>
+            
+            <!-- Navigation Buttons -->
+            <Button text="Return Home" onAction="#goHome" 
+                    style="-fx-padding: 10 20; -fx-background-color: #8C1D40; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-size: 14;" />
+        </VBox>
+    </content>
+</ScrollPane>

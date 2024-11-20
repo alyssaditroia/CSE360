@@ -34,7 +34,7 @@ public class Database {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "org.h2.Driver";
 
-	static final String DB_URL = "jdbc:h2:~/CSE360Help";
+	static final String DB_URL = "jdbc:h2:~/CSE360HelpTest";
 	 
 	// Database credentials
 	static final String USER = "user";

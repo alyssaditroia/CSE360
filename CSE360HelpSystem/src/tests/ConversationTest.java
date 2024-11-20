@@ -18,9 +18,13 @@ class ConversationTest {
     private Conversation conversation;
     private HelpMessage message1;
     private HelpMessage message2;
+    private static int testcount = 0;
 
     @BeforeEach
     void setUp() {
+		System.out.println("\n =========== CONVERSATION TEST ===========\n");
+		testcount = testcount + 1;
+		System.out.printf("Test # %d%n", testcount);
         // Initialize a Conversation and some HelpMessages before each test
         conversation = new Conversation(1);
         message1 = new HelpMessage("Help with tool usage", false, 101);

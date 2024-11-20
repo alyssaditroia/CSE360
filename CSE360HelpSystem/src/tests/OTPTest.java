@@ -22,9 +22,13 @@ class OTPTest {
     private OTP otp;
     private Database db;
     private String testEmail = "test@example.com";
+    private static int testcount = 0;
 
     @BeforeEach
     void setUp() throws SQLException {
+		System.out.println("\n =========== OTP TEST ===========\n");
+		testcount = testcount + 1;
+		System.out.printf("Test # %d%n", testcount);
         db = Database.getInstance();
         db.connectToDatabase();
 

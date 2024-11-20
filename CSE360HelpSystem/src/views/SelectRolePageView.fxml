@@ -5,7 +5,7 @@
 <?import javafx.geometry.Insets?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.SelectRolePageController" spacing="30" alignment="CENTER"
-      prefWidth="800" prefHeight="800" style="-fx-padding: 30; -fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
+      prefWidth="1200" prefHeight="800" style="-fx-padding: 30; -fx-background-color: #FFFFFF; -fx-font-family: 'Arial';">
     
     <!-- Title -->
     <Label text="CSE 360 Help System" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #8C1D40;" />
