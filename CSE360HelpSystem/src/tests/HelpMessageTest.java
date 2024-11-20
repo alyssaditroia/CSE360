@@ -12,9 +12,13 @@ import models.HelpMessage;
 class HelpMessageTest {
 
     private HelpMessage helpMessage;
+    private static int testcount = 0;
 
     @BeforeEach
     void setUp() {
+		System.out.println("\n =========== HELP MESSAGE TEST ===========\n");
+		testcount = testcount + 1;
+		System.out.printf("Test # %d%n", testcount);
         // Initialize a HelpMessage object before each test
         helpMessage = new HelpMessage("Need help finding articles", true, 101);
         helpMessage.setMessageId(1);

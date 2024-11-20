@@ -3,7 +3,7 @@ package models;
 import java.util.ArrayList;
 
 /**
- * The {@Code HelpMessage} class is the Model for student Help Messages
+ * The {@Code HelpMessage} class is the Model for Help Messages
  */
 public class HelpMessage {
     /**
