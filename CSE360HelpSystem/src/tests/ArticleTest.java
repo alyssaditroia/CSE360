@@ -3,6 +3,7 @@ package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,8 @@ import java.util.List;
 public class ArticleTest {
 
     private Article article;
-    private static int testcount = 0;
+    private static int testcount = 1;
+    private static int testsPassed = 1;
 
     /**
      * Setup for each test includes creating a mock article for testing
@@ -27,7 +29,7 @@ public class ArticleTest {
     public void setUp() {
 		System.out.println("\n =========== ARTICLE TEST ===========\n");
 		testcount = testcount + 1;
-		System.out.printf("Test # %d%n", testcount);
+		System.out.printf("Test Group # %d%n", testcount);
         char[] title = "Sample Title".toCharArray();
         char[] authors = "John Doe".toCharArray();
         char[] abstractText = "Sample Abstract".toCharArray();
@@ -45,12 +47,18 @@ public class ArticleTest {
 
         System.out.println("[Article Test] Setup complete: Article object initialized.");
     }
+    @AfterAll
+    static void afterAll() {
+    	System.out.println("\n =========== ARTICLE TESTS COMPLETE ===========\n");
+    	System.out.println("\nTOTAL TESTS: " + testsPassed + "\nTESTS PASSED: " + testsPassed + "\n");
+    }
     /**
      * A Test that tests the constructor of the article class
      */
     @Test
     public void testFullConstructor() {
         System.out.println("[Article Test] Testing full constructor...");
+        System.out.println("\nTESTS IN THIS TEST GROUP: 12\n");
 
         assertEquals(1, article.getId());
         assertEquals("Sample Title", article.getTitle());
@@ -66,6 +74,7 @@ public class ArticleTest {
         assertEquals("1.0", article.getVersion());
 
         System.out.println("[Article Test] Full constructor test passed.");
+        testsPassed+= 12;
     }
 
     /**
@@ -74,6 +83,7 @@ public class ArticleTest {
     @Test
     public void testPartialConstructor() {
         System.out.println("[Article Test] Testing partial constructor...");
+        System.out.println("\nTESTS IN THIS TEST GROUP: 11\n");
 
         char[] title = "Another Title".toCharArray();
         char[] authors = "Jane Smith".toCharArray();
@@ -103,6 +113,7 @@ public class ArticleTest {
         assertEquals("2.0", newArticle.getVersion());
 
         System.out.println("[Article Test] Partial constructor test passed.");
+        testsPassed+= 11;
     }
 
     /**
@@ -111,6 +122,7 @@ public class ArticleTest {
     @Test
     public void testSettersAndGetters() {
         System.out.println("[Article Test] Testing setters and getters...");
+        System.out.println("\nTESTS IN THIS TEST GROUP: 13\n");
 
         article.setId(2);
         assertEquals(2, article.getId());
@@ -166,6 +178,11 @@ public class ArticleTest {
         article.setVersion("2.1");
         assertEquals("2.1", article.getVersion());
         System.out.println("[Article Test] Version set and retrieved successfully.");
+        
+        article.setAsPartOfSpecialGroup();
+        assertEquals(true, article.checkSpecialGroupArticle());
+        System.out.println("[Article Test] special group check completed successfully.");
+        testsPassed+= 13;
     }
 
     /**
@@ -174,6 +191,7 @@ public class ArticleTest {
     @Test
     public void testSearchArticle() {
         System.out.println("Testing searchArticle method...");
+        System.out.println("\nTESTS IN THIS TEST GROUP: 4\n");
 
         assertTrue(article.searchArticle("keyword1"));
         System.out.println("[Article Test] Search for 'keyword1' passed.");
@@ -188,6 +206,7 @@ public class ArticleTest {
         System.out.println("[Article Test] Search for 'nonexistent keyword' passed.");
 
         System.out.println("[Article Test] searchArticle method test passed.");
+        testsPassed+= 4;
     }
 }
 

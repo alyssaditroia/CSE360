@@ -22,9 +22,9 @@ class ConversationTest {
 
     @BeforeEach
     void setUp() {
-		System.out.println("\n =========== CONVERSATION TEST ===========\n");
+		System.out.println("\n =========== HELP CONVERSATION MESSAGES TEST ===========\n");
 		testcount = testcount + 1;
-		System.out.printf("Test # %d%n", testcount);
+		System.out.printf("Test Group # %d%n", testcount);
         // Initialize a Conversation and some HelpMessages before each test
         conversation = new Conversation(1);
         message1 = new HelpMessage("Help with tool usage", false, 101);
@@ -34,18 +34,20 @@ class ConversationTest {
 
     @AfterAll
     static void printPassCount() {
-        System.out.println("[ConversationTest] Number of passed tests: " + passCount);
+    	System.out.println("\n =========== HELP CONVERSATION MESSAGES TESTS COMPLETE ===========\n");
+        System.out.println("\nTOTAL TESTS: " + passCount + "\nTESTS PASSED: " + passCount + "\n");
     }
 
     @Test
     void testConstructorInitialization() {
+    	System.out.println("\nNumber Of Tests In Group: 4\n");
         try {
             assertEquals(1, conversation.getConversationId());
             assertFalse(conversation.getIsResolved());
             assertNotNull(conversation.getMessages());
             assertTrue(conversation.getMessages().isEmpty());
-            passCount++;
-            System.out.println("[ConversationTest] Constructor Test passed.");
+            passCount+= 4;
+            System.out.println("[ConversationTest] Constructor Tests passed.");
         } catch (AssertionError e) {
             System.out.println("[ConversationTest] Constructor Test failed: " + e.getMessage());
         }
@@ -53,6 +55,7 @@ class ConversationTest {
 
     @Test
     void testSettersAndGetters() {
+    	System.out.println("\nNumber Of Tests In Group: 4\n");
         try {
             conversation.setConversationId(2);
             assertEquals(2, conversation.getConversationId());
@@ -65,7 +68,7 @@ class ConversationTest {
             conversation.setMessages(messages);
             assertEquals(1, conversation.getMessages().size());
             assertTrue(conversation.getMessages().contains(message1));
-            passCount++;
+            passCount+= 4;
             System.out.println("[ConversationTest] Setter/Getter Test passed.");
         } catch (AssertionError e) {
             System.out.println("[ConversationTest] Setter/Getter Test failed: " + e.getMessage());
@@ -74,13 +77,14 @@ class ConversationTest {
 
     @Test
     void testAddMessage() {
+    	System.out.println("\nNumber Of Tests In Group: 3\n");
         try {
             conversation.addMessage(message1);
             conversation.addMessage(message2);
             assertEquals(2, conversation.getMessages().size());
             assertTrue(conversation.getMessages().contains(message1));
             assertTrue(conversation.getMessages().contains(message2));
-            passCount++;
+            passCount+= 3;
             System.out.println("[ConversationTest] Add Message Test passed.");
         } catch (AssertionError e) {
             System.out.println("[ConversationTest] Add Message Test failed: " + e.getMessage());
@@ -89,13 +93,14 @@ class ConversationTest {
 
     @Test
     void testRemoveMessage() {
+    	System.out.println("\nNumber Of Tests In Group: 3\n");
         try {
             conversation.addMessage(message1);
             conversation.addMessage(message2);
             assertTrue(conversation.removeMessage(message1));
             assertFalse(conversation.getMessages().contains(message1));
             assertEquals(1, conversation.getMessages().size());
-            passCount++;
+            passCount+= 3;
             System.out.println("[ConversationTest] Remove Message Test passed.");
         } catch (AssertionError e) {
             System.out.println("[ConversationTest] Remove Message Test failed: " + e.getMessage());
@@ -104,6 +109,7 @@ class ConversationTest {
 
     @Test
     void testGetLatestMessage() {
+    	System.out.println("\nNumber Of Tests In Group: 1\n");
         try {
             assertNull(conversation.getLatestMessage());
 
@@ -119,13 +125,14 @@ class ConversationTest {
 
     @Test
     void testGetMessageCount() {
+    	System.out.println("\nNumber Of Tests In Group: 2\n");
         try {
             assertEquals(0, conversation.getMessageCount());
 
             conversation.addMessage(message1);
             conversation.addMessage(message2);
             assertEquals(2, conversation.getMessageCount());
-            passCount++;
+            passCount+= 2;
             System.out.println("[ConversationTest] Get Message Count Test passed.");
         } catch (AssertionError e) {
             System.out.println("[ConversationTest] Get Message Count Test failed: " + e.getMessage());
@@ -134,6 +141,7 @@ class ConversationTest {
 
     @Test
     void testResolveConversation() {
+    	System.out.println("\nNumber Of Tests In Group: 1\n");
         try {
             conversation.resolveConversation();
             assertTrue(conversation.getIsResolved());
@@ -146,13 +154,14 @@ class ConversationTest {
 
     @Test
     void testReopenConversation() {
+    	System.out.println("\nNumber Of Tests In Group: 2\n");
         try {
             conversation.resolveConversation();
             assertTrue(conversation.getIsResolved());
 
             conversation.reopenConversation();
             assertFalse(conversation.getIsResolved());
-            passCount++;
+            passCount+= 2;
             System.out.println("[ConversationTest] Reopen Conversation Test passed.");
         } catch (AssertionError e) {
             System.out.println("[ConversationTest] Reopen Conversation Test failed: " + e.getMessage());
@@ -161,6 +170,7 @@ class ConversationTest {
 
     @Test
     void testClearMessages() {
+    	System.out.println("\nNumber Of Tests In Group: 3\n");
         try {
             conversation.addMessage(message1);
             conversation.addMessage(message2);
@@ -169,7 +179,7 @@ class ConversationTest {
             conversation.clearMessages();
             assertEquals(0, conversation.getMessageCount());
             assertTrue(conversation.getMessages().isEmpty());
-            passCount++;
+            passCount+= 3;
             System.out.println("[ConversationTest] Clear Messages Test passed.");
         } catch (AssertionError e) {
             System.out.println("[ConversationTest] Clear Messages Test failed: " + e.getMessage());

@@ -1,3 +1,4 @@
+
 package database;
 
 import java.sql.*;
@@ -9,6 +10,9 @@ import models.HelpMessage;
  * The {@code HelpMessageDatabase} stores student help messages for sending and receiving messages between students and instructors.
  * Extends the original database class
  */
+
+//$EXCLUDE$
+
 public class HelpMessageDatabase extends Database {
 
     /**

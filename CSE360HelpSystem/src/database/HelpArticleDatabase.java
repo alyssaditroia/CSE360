@@ -178,6 +178,15 @@ public class HelpArticleDatabase extends Database{
 		byte[] encryptedKeywords = encryptionHelper.encrypt(EncryptionUtils.toByteArray(keywords), iv);
 		byte[] encryptedBody = encryptionHelper.encrypt(EncryptionUtils.toByteArray(body), iv);
 		byte[] encryptedReferences = encryptionHelper.encrypt(EncryptionUtils.toByteArray(references), iv);
+		
+	    System.out.println("[HelpArticleDB] Encrypted Article Fields Before Storage:");
+	    System.out.println(" - Encrypted Title: " + Base64.getEncoder().encodeToString(encryptedTitle));
+	    System.out.println(" - Encrypted Authors: " + Base64.getEncoder().encodeToString(encryptedAuthors));
+	    System.out.println(" - Encrypted Abstract: " + Base64.getEncoder().encodeToString(encryptedAbstract));
+	    System.out.println(" - Encrypted Keywords: " + Base64.getEncoder().encodeToString(encryptedKeywords));
+	    System.out.println(" - Encrypted Body: " + Base64.getEncoder().encodeToString(encryptedBody));
+	    System.out.println(" - Encrypted References: " + Base64.getEncoder().encodeToString(encryptedReferences));
+	    System.out.println();
 
 		String sql = "INSERT INTO articles (iv, title, authors, abstract, keywords, body, references, level, grouping_identifiers, permissions, date_added, version) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -218,6 +227,14 @@ public class HelpArticleDatabase extends Database{
 	    byte[] encryptedBody = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getBody().toCharArray()), iv);
 	    byte[] encryptedReferences = encryptionHelper.encrypt(EncryptionUtils.toByteArray(article.getReferences().toCharArray()), iv);
 
+	    System.out.println("[HelpArticleDB] Encrypted Article Fields Before Storage:");
+	    System.out.println(" - Encrypted Title: " + Base64.getEncoder().encodeToString(encryptedTitle));
+	    System.out.println(" - Encrypted Authors: " + Base64.getEncoder().encodeToString(encryptedAuthors));
+	    System.out.println(" - Encrypted Abstract: " + Base64.getEncoder().encodeToString(encryptedAbstract));
+	    System.out.println(" - Encrypted Keywords: " + Base64.getEncoder().encodeToString(encryptedKeywords));
+	    System.out.println(" - Encrypted Body: " + Base64.getEncoder().encodeToString(encryptedBody));
+	    System.out.println(" - Encrypted References: " + Base64.getEncoder().encodeToString(encryptedReferences));
+	    
 	    // SQL query to insert the article into the database
 	    String sql = "INSERT INTO articles (iv, title, authors, abstract, keywords, body, references, level, grouping_identifiers, permissions, date_added, version) "
 	               + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -240,6 +257,7 @@ public class HelpArticleDatabase extends Database{
 
 	        // Execute the update
 	        pstmt.executeUpdate();
+	        
 	    }
 	}
 
@@ -418,12 +436,11 @@ public class HelpArticleDatabase extends Database{
 	    List<Article> articles = new ArrayList<>();
 	    String sql = "SELECT * FROM articles WHERE level = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-	        pstmt.setString(1, level);
+	        pstmt.setString(1, level); // Set the difficulty level to filter by
 	        try (ResultSet rs = pstmt.executeQuery()) {
 	            while (rs.next()) {
-	                // Same decryption process as in getAllDecryptedArticles
-	                // Fetch, decrypt, and create the Article object here
-	                // Add the article to the list
+	                // Decrypt and create an Article object
+	                articles.add(decryptArticleFromResultSet(rs));
 	            }
 	        }
 	    }

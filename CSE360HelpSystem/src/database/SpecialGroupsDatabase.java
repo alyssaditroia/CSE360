@@ -3,7 +3,6 @@ package database;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import models.SpecialGroup;
 import models.User;
 /**
  * The {@code SpecialGroupsDatabase} class handles all special group related users, articles, and identifiers
