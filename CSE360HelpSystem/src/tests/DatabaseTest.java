@@ -70,7 +70,7 @@ class DatabaseTest {
 	 * Deletes the test database after testing
 	 **/
 	private static void deleteTestDatabase() {
-		String url = "jdbc:h2:~/CSE360HelpTest";
+		String url = "jdbc:h2:~/CSE360HelpTest1";
 		String user = "user"; // Default user for H2
 		String password = ""; // Default password for H2 (empty)
 
