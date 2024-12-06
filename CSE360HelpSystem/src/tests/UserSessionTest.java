@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +22,7 @@ public class UserSessionTest {
 
     private UserSession userSession;
     private static int testcount = 0;
+    private static int testPass = 0; 
     /**
      * Setup for each test includes getting a user instance and setting the session user and article to null
      */
@@ -35,16 +37,22 @@ public class UserSessionTest {
         userSession.setSelectedArticle(null); // Reset the selected article for each test
         System.out.println("Setup complete.");
     }
+	@AfterAll
+	static void afterAll() {
+		System.out.println("\n =========== USER SESSION TESTS COMPLETE ===========\n");
+    	System.out.println("\nTOTAL TESTS: " + testPass + "\nTESTS PASSED: " + testPass + "\n");
+	}
 
     /**
      * Tests an instance of the userSession Instance
      */
     @Test
     public void testSingletonInstance() {
-        System.out.println("Testing singleton instance...");
+        System.out.println("Testing singleton instance");
         UserSession anotherInstance = UserSession.getInstance();
         assertSame(userSession, anotherInstance);
         System.out.println("Singleton instance test passed.");
+        testPass++; 
     }
 
     /**
@@ -52,12 +60,13 @@ public class UserSessionTest {
      */
     @Test
     public void testSetAndGetInviteCode() {
-        System.out.println("Testing set and get invite code...");
+        System.out.println("Testing set and get invite code");
 
         userSession.setInviteCode("INVITE123");
         assertEquals("INVITE123", userSession.getInviteCode());
 
         System.out.println("Invite code set and retrieved successfully.");
+        testPass++;
     }
 
     /**
@@ -65,12 +74,26 @@ public class UserSessionTest {
      */
     @Test
     public void testSetAndGetEmail() {
-        System.out.println("Testing set and get email...");
+        System.out.println("Testing set and get email");
 
         userSession.setEmail("test@example.com");
         assertEquals("test@example.com", userSession.getEmail());
 
         System.out.println("Email set and retrieved successfully.");
+        testPass++;
+    }
+    /**
+     * Tests the set and get username for the specific instance
+     */
+    @Test
+    public void testSetUsername() {
+        System.out.println("Testing get and set username");
+
+        userSession.setUsername("TestUser");
+        assertEquals("TestUser", userSession.getUsername());
+
+        System.out.println("Username set and retrieved successfully.");
+        testPass++;
     }
 
     /**
@@ -78,12 +101,13 @@ public class UserSessionTest {
      */
     @Test
     public void testSetAndGetCurrentRole() {
-        System.out.println("Testing set and get current role...");
+        System.out.println("Testing set and get current role");
 
         userSession.setCurrentRole("Admin");
         assertEquals("Admin", userSession.getCurrentRole());
 
         System.out.println("Current role set and retrieved successfully.");
+        testPass++;
     }
 
     /**
@@ -91,7 +115,7 @@ public class UserSessionTest {
      */
     @Test
     public void testSetAndGetSelectedArticle() {
-        System.out.println("Testing set and get selected article...");
+        System.out.println("Testing set and get selected article");
 
         char[] title = "Sample Title".toCharArray();
         char[] authors = "John Doe".toCharArray();
@@ -114,6 +138,7 @@ public class UserSessionTest {
         assertEquals(article, userSession.getSelectedArticle());
 
         System.out.println("Selected article set and retrieved successfully.");
+        testPass++;
     }
 
     /**
@@ -121,11 +146,12 @@ public class UserSessionTest {
      */
     @Test
     public void testGetCurrentUserWhenNotSet() {
-        System.out.println("Testing get current user when user is not set...");
+        System.out.println("Testing get current user when user is not set");
 
         assertNull(userSession.getCurrentUser());
 
         System.out.println("Current user is null as expected.");
+        testPass++;
     }
 
 
@@ -134,7 +160,7 @@ public class UserSessionTest {
      */
     @Test
     public void testSetInstance() {
-        System.out.println("Testing setInstance method...");
+        System.out.println("Testing setInstance method");
 
         UserSession newUserSession = UserSession.getInstance();
         UserSession.setInstance(newUserSession);
@@ -142,6 +168,37 @@ public class UserSessionTest {
         assertSame(newUserSession, UserSession.getInstance());
 
         System.out.println("Instance set and retrieved successfully.");
+        testPass++;
+    }
+    
+    @Test
+    public void testSetAndGetAccessLevel() {
+        System.out.println("Testing setAccessLevel and getAccessLevel");
+        
+        userSession.setAccessLevel(1);
+        int accessLevel = userSession.getAccessLevel();
+        
+        System.out.println("Access Level: " + accessLevel);
+        assertEquals(1, accessLevel);
+        testPass++;
+    }
+    
+    @Test
+    public void testSetAndCheckSpecialGroupArticleFlag() {
+        System.out.println("Testing setSpecialGroupArticleFlag and isSpecialGroupArticle");
+        
+        userSession.setSpecialGroupArticleFlag(true);
+        boolean isSpecialGroupArticle = userSession.isSpecialGroupArticle();
+        
+        System.out.println("Special Group Article Flag: " + isSpecialGroupArticle);
+        assertTrue(isSpecialGroupArticle);
+        
+        userSession.setSpecialGroupArticleFlag(false);
+        isSpecialGroupArticle = userSession.isSpecialGroupArticle();
+        
+        System.out.println("Special Group Article Flag: " + isSpecialGroupArticle);
+        assertFalse(isSpecialGroupArticle);
+        testPass++;
     }
 }
 

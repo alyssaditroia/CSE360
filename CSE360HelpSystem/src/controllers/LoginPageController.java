@@ -117,9 +117,11 @@ public class LoginPageController extends PageController {
 				// ****** BELOW CHECKS IF THE USER'S PASSWORD IS A ONE TIME PASSWORD *******
 				Boolean otpFlag = db.getOTPFlag(username);
 				if (otpFlag == true) {
+					System.out.println("[LoginPage] User's password is an OTP");
 					OTP otp = new OTP();
 					String validOTP = otp.validateOTP(username, password);
 					if (validOTP == "") {
+						System.out.println("[LoginPage] OTP validation success.");
 						User loggedInUser = new User();
 						loggedInUser.setUsername(username);
 						otp.invalidateOTP(username);
@@ -138,6 +140,7 @@ public class LoginPageController extends PageController {
 				// have a first name
 				// The user will be navigated to the Finish Account Setup Page
 				if (firstName == null || firstName.isEmpty()) {
+					System.out.println("[LoginPage] User is not fully setup.");
 					User loggedInUser = new User(); // Creating a new User
 					loggedInUser.setUsername(username); // Setting the username of the User
 					UserSession userSession = UserSession.getInstance(); // Getting the userSession Instance
@@ -211,6 +214,7 @@ public class LoginPageController extends PageController {
 				return; // Exit after redirection
 			} else {
 				// Show error if invite code is invalid
+				System.out.println("[LoginPage] Invite code is invalid");
 				showError("Invalid invite code. Please try again.");
 				return;
 			}

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import models.User;
+
 
 /**
  * The {@code Database} class manages all interactions with the database. Primarily the user database. 
@@ -15,17 +15,16 @@ import models.User;
  * @author Alyssa DiTroia
  * @author Justin Faris
  * 
- * To visualize database run commands in your terminal: cd /h2/bin java -jar
- * h2*.jar
+ * To visualize database run commands in your terminal: cd /h2/bin java -jar h2*.jar
  * 
  * Make sure the terminal is closed and database connection is not open before
  * running the application
  * 
- * You can close connection in terminal with control C
+ * You can close connection in terminal with control c
  * 
  * If using Windows OS change the DB_URL path:
- * "jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\firstDatabase" If using
- * UNIX or Linux change the DB_URL path: "jdbc:h2:~/firstDatabase"
+ * "jdbc:h2:C:\\\\Users\\\\YourUserNameHere\\\\h2\\\\ASUHelpDatabase" If using
+ * UNIX or Linux change the DB_URL path: "jdbc:h2:~/ASUHelpDatabase"
  * 
  * To clear contents of the database delete the database file from your computer
  * located in /Users/YourUserNameHere
@@ -34,7 +33,7 @@ public class Database {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "org.h2.Driver";
 
-	static final String DB_URL = "jdbc:h2:~/CSE360HelpTest";
+	static final String DB_URL = "jdbc:h2:~/CSE360HelpTest1";
 	 
 	// Database credentials
 	static final String USER = "user";
@@ -426,7 +425,7 @@ public class Database {
 
 	/**
 	 * Function added by Alyssa DiTroia 
-	 * Delets a user and any help messages they had alongside any conversations they started from the database
+	 * Deletes a user and any help messages they had alongside any conversations they started from the database
 	 * @param email
 	 * @throws SQLException
 	 */
@@ -526,7 +525,7 @@ public class Database {
 				return storedEmail != null ? storedEmail : "";
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return "";
 	}
@@ -653,30 +652,13 @@ public class Database {
 	}
 
 	/**
-	 * Function added by Justin Faris - 10/3/24
-	 * 
-	 * Helper function that checks a specific role for a user
-	 * 
-	 * @param username   The username of the user to check
-	 * @param roleColumn The name of the column in the database representing the
-	 *                   role
-	 * @return True if the user has the specified role, False if not, null if user
-	 *         not found or role not set
-	 * @throws SQLException If there's an error executing the SQL query.
+	 * Updates user permissions in the database
+	 * @param email
+	 * @param isAdmin
+	 * @param isStudent
+	 * @param isInstructor
+	 * @throws SQLException
 	 */
-	private Boolean checkUserRole(String username, String roleColumn) throws SQLException {
-		String query = "SELECT " + roleColumn + " FROM cse360users WHERE username = ?";
-		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-			pstmt.setString(1, username);
-			try (ResultSet rs = pstmt.executeQuery()) {
-				if (rs.next()) {
-					return rs.getBoolean(1);
-				}
-			}
-		}
-		return null; // User not found or role not set
-	}
-
 	public void updateUserPermissions(String email, Boolean isAdmin, Boolean isStudent, Boolean isInstructor)
 			throws SQLException {
 		String query = "UPDATE cse360users SET isAdmin = ?, isStudent = ?, isInstructor = ? WHERE email = ?";

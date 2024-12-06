@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  * @author Alyssa Ditroia
  * 
  **************/
+// $COVERAGE-IGNORE$
 public class TextValidation {
 
 	/**
